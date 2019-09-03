@@ -1,0 +1,1 @@
+pyinstaller -F src\wxTable.py & move dist\wxTable.exe ..\wxTable
