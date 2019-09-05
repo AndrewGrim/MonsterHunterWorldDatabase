@@ -5,3 +5,7 @@
 /dist
 /build
 /src/__pycache__
+/.vscode
+src/test.py
+src/test2.py
+src/extraCode.py

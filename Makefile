@@ -1,2 +1,2 @@
 debug:
-	python src/wxTable.py
+	python src/main.py
