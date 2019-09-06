@@ -11,60 +11,59 @@ class HelloFrame(wx.Frame):
 
 		icon = wx.Icon("images/OfflineDatabase.ico")
 		self.SetIcon(icon)
-		self.SetSize(1300, 1000)
+		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
 
 		# main window notebook
 		mainWindow = wx.Panel(self)
 		mainFrame = wx.BoxSizer(wx.HORIZONTAL)
 		mainNotebook = wx.Notebook(mainWindow)
-		monstersFrame = wx.Panel(mainNotebook)
+		self.monstersFrame = wx.Panel(mainNotebook)
 		weaponsFrame = wx.Panel(mainNotebook)
-		mainNotebook.AddPage(monstersFrame, "Monsters")
+		mainNotebook.AddPage(self.monstersFrame, "Monsters")
 		mainNotebook.AddPage(weaponsFrame, "Weapons")
 		mainFrame.Add(mainNotebook, 1, wx.EXPAND)
 		
 		# monsters tab
-		outerFrame = wx.BoxSizer(wx.HORIZONTAL)
+		self.outerFrame = wx.BoxSizer(wx.HORIZONTAL)
 
 		# left
 		tableView = wx.BoxSizer(wx.HORIZONTAL)
 
-		self.table = wx.grid.Grid(monstersFrame)
-		self.table.CreateGrid(60, 5)
+		self.table = wx.grid.Grid(self.monstersFrame)
+		self.table.CreateGrid(56, 5)
 		self.table.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onSingleSelect)
 		self.table.Bind(wx.EVT_SIZE, self.onSize)
 
-		outerFrame.Add(tableView, 1, wx.EXPAND|wx.ALIGN_LEFT)
+		self.outerFrame.Add(tableView, 1, wx.EXPAND)
 		tableView.Add(self.table, 1, wx.EXPAND)
 
 		# right
-		detailedView = wx.BoxSizer(wx.VERTICAL)
+		self.detailedView = wx.BoxSizer(wx.VERTICAL)
 
-		self.img = wx.Bitmap("images/Nergigante.png", wx.BITMAP_TYPE_ANY)
-		self.imageLabel = wx.StaticBitmap(monstersFrame, bitmap=self.img)
+		self.img = wx.Bitmap("images/monsters/256/Nergigante.png", wx.BITMAP_TYPE_ANY)
+		self.imageLabel = wx.StaticBitmap(self.monstersFrame, bitmap=self.img)
 
-		self.notebook = wx.Notebook(monstersFrame)
+		self.notebook = wx.Notebook(self.monstersFrame)
 		self.frame = wx.Panel(self.notebook)
 		self.frame2 = wx.Panel(self.notebook)
 		self.notebook.AddPage(self.frame, "Overview")
 		self.notebook.AddPage(self.frame2, "Damage")
 
-		outerFrame.Add(detailedView, 1, wx.EXPAND|wx.ALIGN_RIGHT)
-		detailedView.Add(self.imageLabel, 1, wx.EXPAND)
-		detailedView.Add(self.notebook, 1, wx.EXPAND)
-
-
-
+		self.outerFrame.Add(self.detailedView, 1, wx.EXPAND)
+		self.detailedView.Add(self.imageLabel, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.ADJUST_MINSIZE, 10)
+		self.detailedView.Add(self.notebook, 1, wx.EXPAND)
 
 		mainWindow.SetSizer(mainFrame)
-		monstersFrame.SetSizer(outerFrame)
-		
+		self.monstersFrame.SetSizer(self.outerFrame)
 		
 		self.makeMenuBar()
 		self.CreateStatusBar()
 		self.SetStatusText("Welcome to wxPython!")
 		self.loadData()
+		self.SetSize(1201, 980)
+		width, height = wx.DisplaySize()
+		self.SetPosition(wx.Point(width / 1.4 - self.GetSize().width, height / 1.5 - self.GetSize().height / 1.3))
 
 
 	def onSize(self, event):
@@ -73,10 +72,11 @@ class HelloFrame(wx.Frame):
 		halfOfWindow = 2
 		# all columns equal width
 		for col in range(numOfColumns):
-			self.table.SetColSize(col, ((width / halfOfWindow) / numOfColumns) - 13) 
+			self.table.SetColSize(col, ((width / halfOfWindow) / numOfColumns) - 11) 
 		
 	
 	def loadData(self):
+		# possibly add icon to the first col since the id and row# are the same
 		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
 		data = conn.execute("SELECT * FROM monsters")
 		i = 0
@@ -99,13 +99,10 @@ class HelloFrame(wx.Frame):
 
 
 	def onSingleSelect(self, event):
-		#print("row: {}, col: {}".format(event.GetRow(), event.GetCol()))
-		# get row from selection
-		# based off of row get column with name
-		# use that value + .png in the images folder to load file
-		self.img = wx.Bitmap()
-		self.imageLabel.SetBitmap(self.img)
-		self.img.LoadFile("images/" + str(self.table.GetCellValue(event.GetRow(), 1)) + ".png")
+		if str(self.table.GetCellValue(event.GetRow(), 1)) != "":
+			self.img.LoadFile("images/monsters/256/" + str(self.table.GetCellValue(event.GetRow(), 1)) + ".png")
+		else:
+			self.img.LoadFile("images/monsters/256/Unknown.png")
 		self.imageLabel.SetBitmap(self.img)
 
 
