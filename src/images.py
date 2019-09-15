@@ -1,5 +1,6 @@
 import wx
 import os
+import sys
 
 def addBorder():
     resizeImages = os.listdir(os.getcwd() + "/images/monsters/resize")
@@ -12,7 +13,7 @@ def addBorder():
         image.SaveFile("images/monsters/256/" + img, wx.BITMAP_TYPE_PNG)
 
 
-def resizeTo256():
+def rescaleTo256():
     originalImages = os.listdir(os.getcwd() + "/images/monsters/original")
     for img in originalImages:
         image = wx.Image()
@@ -57,4 +58,42 @@ def fixGastodon():
     image.SaveFile("images/monsters/256/Gastodon.png", wx.BITMAP_TYPE_PNG)
     
 
-fixGastodon()
+def rescaleFolder(size):
+    folderPath = os.getcwd() + "/" + sys.argv[1]
+    originalImages = os.listdir(folderPath)
+    for img in originalImages:
+        image = wx.Image()
+        image.LoadFile(folderPath + "/" + img, wx.BITMAP_TYPE_PNG)
+        image.Rescale(int(size), int(size), wx.IMAGE_QUALITY_HIGH)
+        image.SaveFile(folderPath + "/" + size + "/" + img, wx.BITMAP_TYPE_PNG)
+
+
+def rescaleImage(size):
+    img = sys.argv[1]
+    image = wx.Image()
+    image.LoadFile(img, wx.BITMAP_TYPE_PNG)
+    image.Rescale(int(size), int(size), wx.IMAGE_QUALITY_HIGH)
+    image.SaveFile(img.split(".")[0] + size + ".png", wx.BITMAP_TYPE_PNG)
+
+
+print(
+    """
+    Rescale a single image:
+        python images.py <pathToImage> <rescaleSize>
+    """
+    )
+#rescaleImage(sys.argv[2])
+#rescaleFolder(sys.argv[2])
+
+"""self.bmp_withcolourmask  = images.TestStar2.GetBitmap()
+mask = wx.Mask(self.bmp_withcolourmask, wx.WHITE)
+self.bmp_withcolourmask.SetMask(mask)"""
+
+alpha = os.listdir(os.getcwd() + "/images/VectorDrawable2Svg-master/alpha")
+alpha.remove("trans")
+for img in alpha:
+    image = wx.Image()
+    image.LoadFile("images/VectorDrawable2Svg-master/alpha/" + img, wx.BITMAP_TYPE_PNG)
+    image.SetMaskColour(255, 255, 255)
+    image.Rescale(32, 32, wx.IMAGE_QUALITY_HIGH)
+    image.SaveFile("images/VectorDrawable2Svg-master/alpha/trans/" + img, wx.BITMAP_TYPE_PNG)
