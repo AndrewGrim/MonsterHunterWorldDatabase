@@ -1,6 +1,7 @@
 import wx
 import wx.grid
-import wx.lib.mixins.gridlabelrenderer as glr
+import wx.lib.gizmos as gizmos
+import customGridRenderer as cgr
 import sqlite3
 
 
@@ -13,7 +14,9 @@ class Application(wx.Frame):
 		self.SetIcon(icon)
 		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
+		self.resolutionWidth, self.resolutionHeight = wx.DisplaySize()
 		self.init = True
+		self.currentMonsterID = 43 # nergigante
 
 		self.initMainNotebook()
 		self.initMonstersTab()
@@ -25,16 +28,16 @@ class Application(wx.Frame):
 		self.SetStatusText("Welcome to wxPython!")
 		self.loadData()
 		self.initDamage()
+		self.initMaterials()
 		self.init = False
 
 		# to trigger onSize event so the table looks as it should
 		self.SetSize(1201, 980)
-		width, height = wx.DisplaySize()
 		# roughly center
-		self.SetPosition(wx.Point(width / 1.4 - self.GetSize().width, height / 1.5 - self.GetSize().height / 1.3))
+		self.SetPosition(wx.Point(self.resolutionWidth / 1.4 - self.GetSize().width, self.resolutionHeight / 1.5 - self.GetSize().height / 1.3))
 
-		# testing: damage tab
-		self.monsterDetailsNotebook.SetSelection(1)
+		# TEST materials tab
+		self.monsterDetailsNotebook.SetSelection(2)
 
 
 	def initMainNotebook(self):
@@ -70,7 +73,7 @@ class Application(wx.Frame):
 		# for scaling the columns
 		self.monstersTable.Bind(wx.EVT_SIZE, self.onSize)
 		# add left side sizer to the main sizer of the monsters tab
-		self.monstersSizer.Add(self.monstersTableSizer, 1, wx.EXPAND)
+		self.monstersSizer.Add(self.monstersTableSizer, 0, wx.EXPAND)
 		# add table to sizer
 		self.monstersTableSizer.Add(self.monstersTable, 1, wx.EXPAND)
 
@@ -78,17 +81,23 @@ class Application(wx.Frame):
 		# sizer containing the monsters details
 		self.monstersDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		# create bitmap from image and load bitmap into a label
-		self.img = wx.Bitmap("images/monsters/256/Nergigante.png", wx.BITMAP_TYPE_ANY)
+		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
+		data = conn.execute("SELECT name FROM monsters WHERE id = ?", (self.currentMonsterID, ))
+		monsterIcon = data.fetchone()[0]
+		self.img = wx.Bitmap("images/monsters/256/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
 		self.imageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.img)
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
 		self.overviewPanel = wx.Panel(self.monsterDetailsNotebook)
 		self.damagePanel = wx.Panel(self.monsterDetailsNotebook)
+		self.materialsPanel = wx.Panel(self.monsterDetailsNotebook)
 		self.monsterDetailsNotebook.AddPage(self.overviewPanel, "Overview")
-		# main sizer for the overview notebook tab
-		self.monsterDamageSizer = wx.BoxSizer(wx.HORIZONTAL)
-		#
+		# 
+		self.monsterDamageSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.damagePanel, "Damage")
+		#
+		self.monsterMaterialsSizer = wx.BoxSizer(wx.VERTICAL)
+		self.monsterDetailsNotebook.AddPage(self.materialsPanel, "Materials")
 		# add the right side detailed view to the main size of the monsters notebook tab
 		self.monstersSizer.Add(self.monstersDetailedSizer, 1, wx.EXPAND)
 		# add widgets within to their parent sizer
@@ -100,66 +109,282 @@ class Application(wx.Frame):
 
 	
 	def initDamage(self):
-		self.damageTable = HeaderBitmapGrid(self.damagePanel) #wx.grid.Grid(self.damagePanel)
-		self.damageTable.CreateGrid(28, 5)
+		self.damageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.damageTable.CreateGrid(35, 14)
 		self.monsterDamageSizer.Add(self.damageTable, 1, wx.EXPAND)
 		self.damagePanel.SetSizer(self.monsterDamageSizer)
 
-		self.damageTable.SetCornerLabelRenderer(HeaderBitmapCornerLabelRenderer())
-		self.damageTable.SetRowLabelSize(30)
-		self.damageTable.SetColLabelSize(30)
-		self.damageTable.SetColLabelValue(0, "Part")
-		self.damageTable.SetColLabelValue(1, "Cut")
-		self.damageTable.SetColLabelValue(2, "Impact")
-		self.damageTable.SetColLabelValue(3, "Shot")
-		self.damageTable.SetColLabelValue(4, "KO")
-		self.loadDamage(46)
+		self.damageTable.SetColLabelAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
-		
+		self.damageTable.SetColLabelRenderer(1, cgr.HeaderBitmapColLabelRenderer("images/damage types/cut.png"))
+		self.damageTable.SetColLabelRenderer(2, cgr.HeaderBitmapColLabelRenderer("images/damage types/impact.png"))
+		self.damageTable.SetColLabelRenderer(3, cgr.HeaderBitmapColLabelRenderer("images/damage types/shot.png"))
+		self.damageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/damage types/fire.png"))
+		self.damageTable.SetColLabelRenderer(5, cgr.HeaderBitmapColLabelRenderer("images/damage types/water.png"))
+		self.damageTable.SetColLabelRenderer(6, cgr.HeaderBitmapColLabelRenderer("images/damage types/ice.png"))
+		self.damageTable.SetColLabelRenderer(7, cgr.HeaderBitmapColLabelRenderer("images/damage types/thunder.png"))
+		self.damageTable.SetColLabelRenderer(8, cgr.HeaderBitmapColLabelRenderer("images/damage types/dragon.png"))
+		self.damageTable.SetColLabelRenderer(9, cgr.HeaderBitmapColLabelRenderer("images/damage types/stun.png"))
+		self.damageTable.SetColLabelRenderer(13, cgr.HeaderBitmapColLabelRenderer("images/kinsect.png"))
 
-	def loadDamage(self, monsterId):
+		"""for num in range(1, 13):
+			self.damageTable.SetColLabelRenderer(num, HeaderBitmapColLabelRenderer("images/VectorDrawable2Svg-master/png2/32/ic_equipment_dual_blades_rarity_" + str(num) + ".xml.svg.png"))
+		self.damageTable.SetColLabelRenderer(1, HeaderBitmapColLabelRenderer("images/VectorDrawable2Svg-master/png2/trans.png"))"""
+
+		self.damageTable.SetRowLabelSize(0)
+		self.damageTable.SetColLabelSize(32)
+		self.damageTable.SetColLabelValue(0, "Body Part")
+
+		for num in range(1, 14):
+			self.damageTable.SetColLabelValue(num, "")
+		self.damageTable.SetColLabelValue(10, "FLN") 
+		self.damageTable.SetColLabelValue(11, "BRK")
+		self.damageTable.SetColLabelValue(12, "SVR")
+
+		self.loadDamage(self.currentMonsterID)
+
+
+	def loadDamage(self, monsterID):
 		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
-		data = conn.execute("SELECT cut, impact, shot, ko, id FROM monster_hitzone WHERE monster_id = ?", (monsterId, ))
-		bodyPartId = []
+		data = conn.execute("SELECT id FROM monster_hitzone WHERE monster_id = ?", (monsterID, ))
+		bodyPartID = []
+		bodyPartRow = {}
 
 		for row in data:
-			bodyPartId.append(row[4])
+			bodyPartID.append(row[0])
 
-		data = conn.execute("SELECT cut, impact, shot, ko, id FROM monster_hitzone WHERE monster_id = ?", (monsterId, ))
+		dataWeak = conn.execute("SELECT cut, impact, shot, ko, fire, water, ice, thunder, dragon FROM monster_hitzone WHERE monster_id = ?", (monsterID, ))
+		dataBreak = conn.execute("SELECT flinch, wound, sever, extract FROM monster_break WHERE monster_id = ?", (monsterID, ))
 
 		bodyPartName = []
-		for id in bodyPartId:
+		for id in bodyPartID:
 			data2 = conn.execute("SELECT name FROM monster_hitzone_text WHERE id = ?", (id, ))
 			name = data2.fetchone()
 			bodyPartName.append(name[0])
 
 		i = 0
-		for row in data:
+		for row in dataWeak:
 			self.damageTable.SetCellValue(i, 0, str(bodyPartName[i]))
 			self.damageTable.SetCellValue(i, 1, str(row[0]))
 			self.damageTable.SetCellValue(i, 2, str(row[1]))
 			self.damageTable.SetCellValue(i, 3, str(row[2]))
 			self.damageTable.SetCellValue(i, 4, str(row[3]))
+			self.damageTable.SetCellValue(i, 5, str(row[4]))
+			self.damageTable.SetCellValue(i, 6, str(row[5]))
+			self.damageTable.SetCellValue(i, 7, str(row[6]))
+			self.damageTable.SetCellValue(i, 8, str(row[7]))
+			self.damageTable.SetCellValue(i, 9, str(row[8]))
+			bodyPartRow[bodyPartName[i]] = i
+			bodyPartRow[bodyPartName[i] + "s"] = i
 			i += 1
 
-		#self.damageTable.SetRowLabelSize(1)
+		###
+		data = conn.execute("SELECT id FROM monster_break WHERE monster_id = ?", (monsterID, ))
+		bodyPartID = []
+
+		for row in data:
+			bodyPartID.append(row[0])
+
+		bodyPartName = []
+		for id in bodyPartID:
+			data2 = conn.execute("SELECT part_name FROM monster_break_text WHERE id = ?", (id, ))
+			name = data2.fetchone()
+			bodyPartName.append(name[0])
+
+
+		j = 0
+		for row in dataBreak:
+			self.damageTable.SetCellValue(i, 0, str(bodyPartName[j]))
+			self.damageTable.SetCellValue(i, 10, str(row[0]))
+			if str(row[1]) == "None":
+				self.damageTable.SetCellValue(i, 11, "")
+			else:
+				self.damageTable.SetCellValue(i, 11, str(row[1]))
+			if str(row[2]) == "None":
+				self.damageTable.SetCellValue(i, 12, "")
+			else:
+				self.damageTable.SetCellValue(i, 12, str(row[2]))
+			self.damageTable.SetCellValue(i, 13, str(row[3]))
+			i += 1
+			j += 1
+
+		# TODO maybe uses the stars for weakness/ailments, alt use images
+		# TODO fix data maybe and then use the dictionary to use the same body part name
+		#self.damageTable.SetCellValue(i, 13, "⭐⭐⭐")
+		#self.damageTable.SetCellValue(i + 1, 13, "⭐⭐")
+		#self.damageTable.SetCellValue(i + 2, 13, "⭐⭐")
+
+	
+	def initMaterials(self):
+		self.materialsTree = gizmos.TreeListCtrl(self.materialsPanel, -1, style=0, agwStyle=
+												 gizmos.TR_DEFAULT_STYLE
+												 | gizmos.TR_TWIST_BUTTONS
+												 | gizmos.TR_ROW_LINES
+												 | gizmos.TR_COLUMN_LINES
+												 | gizmos.TR_NO_LINES
+												 | gizmos.TR_FULL_ROW_HIGHLIGHT
+												 | gizmos.TR_HIDE_ROOT
+												)
+
+		self.materialsTree.AddColumn("")
+		self.materialsTree.AddColumn("Quantity #")
+		self.materialsTree.AddColumn("Chance %")
+		self.materialsTree.SetMainColumn(0)
+		self.materialsTree.SetColumnWidth(0, (self.GetSize().width * 0.66) * 0.67)
+		self.materialsTree.SetColumnWidth(1, (self.GetSize().width * 0.66) * 0.10)
+		self.materialsTree.SetColumnWidth(2, (self.GetSize().width * 0.66) * 0.10)
+
+		isz = (32,32)
+		il = wx.ImageList(isz[0], isz[1])
+		self.fldridx = il.Add(wx.ArtProvider.GetBitmap(wx.ART_FOLDER, wx.ART_OTHER, isz))
+		self.fldropenidx = il.Add(wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN, wx.ART_OTHER, isz))
+		self.fileidx = il.Add(wx.ArtProvider.GetBitmap(wx.ART_NORMAL_FILE, wx.ART_OTHER, isz))
+		nerg = wx.Bitmap("Nergigante32.png")
+		self.nergidx = il.Add(nerg)
+
+		self.materialsTree.SetImageList(il)
+		self.il = il
+
+		self.monsterMaterialsSizer.Add(self.materialsTree, 1, wx.EXPAND)
+		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
+		self.loadMaterials(self.currentMonsterID)
+
+	def loadMaterials(self, monsterID):
+		self.root = self.materialsTree.AddRoot("Materials")
+
+		# master rank
+		self.masterRankNode = self.materialsTree.AppendItem(self.root, "Master Rank")
+		#self.materialsTree.SetItemImage(self.masterRankNode, self.fldridx, which = wx.TreeItemIcon_Normal)
+		#self.materialsTree.SetItemImage(self.masterRankNode, self.fldropenidx, which = wx.TreeItemIcon_Expanded)
+		masterRankColour = wx.Colour(255, 230, 0)
+		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, wx.Colour(255, 230, 0))
+		
+		# high rank
+		self.highRankNode = self.materialsTree.AppendItem(self.root, "High Rank")
+		#self.materialsTree.SetItemImage(self.highRankNode, self.fldridx, which = wx.TreeItemIcon_Normal)
+		#self.materialsTree.SetItemImage(self.highRankNode, self.fldropenidx, which = wx.TreeItemIcon_Expanded)
+		highRankColour = wx.Colour(255, 140, 0)
+		self.materialsTree.SetItemBackgroundColour(self.highRankNode, wx.Colour(255, 140, 0))
+		
+		# low rank
+		self.lowRankNode = self.materialsTree.AppendItem(self.root, "Low Rank")
+		#self.materialsTree.SetItemImage(self.lowRankNode, self.fldridx, which = wx.TreeItemIcon_Normal)
+		#self.materialsTree.SetItemImage(self.lowRankNode, self.fldropenidx, which = wx.TreeItemIcon_Expanded)
+		lowRankColour = wx.Colour(30, 190, 255)
+		self.materialsTree.SetItemBackgroundColour(self.lowRankNode, lowRankColour)
+
+		sql = """
+		SELECT r.rank, ct.name condition_name, r.stack, r.percentage,
+			i.id item_id, it.name item_name, i.icon_name item_icon_name, i.category item_category,
+			i.icon_color item_icon_color
+		FROM monster_reward r
+			JOIN monster_reward_condition_text ct
+				ON ct.id = r.condition_id
+				AND ct.lang_id = :langId
+			JOIN item i
+				ON i.id = r.item_id
+			JOIN item_text it
+				ON it.id = i.id
+				AND it.lang_id = :langId
+		WHERE r.monster_id = :monsterId ORDER BY r.id"""
+
+		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		data = conn.execute(sql, ("en", monsterID, ))
+
+		rewardCondition = 0
+		monsterMaterial = 0
+		categoriesLR = []
+		categoriesHR = []
+		categoriesMR = []
+		rankNodes = {
+			"LR": self.lowRankNode,
+			"HR": self.highRankNode,
+			"MR": self.masterRankNode,
+			}
+		for row in data:
+			currentCategory = str(row[1])
+			if row[0] == "LR":
+				if currentCategory in categoriesLR:
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
+					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
+				else:
+					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
+					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemBackgroundColour(rewardCondition, lowRankColour)
+					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
+					self.materialsTree.Expand(rewardCondition)
+
+				categoriesLR.append(currentCategory)
+			if row[0] == "HR":
+				if currentCategory in categoriesHR:
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
+					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
+				else:
+					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
+					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemBackgroundColour(rewardCondition, highRankColour)
+					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
+					self.materialsTree.Expand(rewardCondition)
+					
+
+				categoriesHR.append(currentCategory)
+
+			if row[0] == "MR":
+				if currentCategory in categoriesMR:
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
+					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
+				else:
+					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
+					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
+					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
+					self.materialsTree.Expand(rewardCondition)
+
+				categoriesMR.append(currentCategory)
+
+		self.materialsTree.Expand(self.masterRankNode)
+		#self.materialsTree.Expand(self.highRankNode)
+		#self.materialsTree.Expand(self.lowRankNode)
 
 
 	def onSize(self, event):
 		width, height = self.GetSize()
-		numOfColumns = 5
-		halfOfWindow = 2
-		# all columns equal width
-		for col in range(numOfColumns):
-			self.monstersTable.SetColSize(col, ((width / halfOfWindow) / numOfColumns) - 11)
-			if self.init == False:
-				self.damageTable.SetColSize(col, ((width / halfOfWindow) / numOfColumns) - 11)
-				self.damageTable.SetColSize(0, ((width / halfOfWindow) / numOfColumns) + 10)
-		
+		numOfColumns = 4
+		numOfColumnsDamage = 14
+		halfOfWindow = 3
+
+		self.monstersTable.SetColSize(1, ((width / halfOfWindow) / numOfColumns + 30))
+		self.monstersTable.SetColSize(2, ((width / halfOfWindow) / numOfColumns))
+		self.monstersTable.SetColSize(3, ((width / halfOfWindow) / numOfColumns))
+		self.monstersTable.SetColSize(4, ((width / halfOfWindow) / numOfColumns))
+			
+		if self.init == False:
+			for col in range(numOfColumnsDamage):
+				self.damageTable.SetColSize(col, ((width * 0.66) / numOfColumnsDamage - 13))
+				self.damageTable.SetColSize(0, ((width * 0.66) / numOfColumnsDamage + 80))
+
 	
 	def loadData(self):
 		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
-		data = conn.execute("SELECT * FROM monsters")
+		data = conn.execute("SELECT * FROM monsters ORDER by size DESC, name ASC ")
 		i = 0
 
 		for row in data:
@@ -177,7 +402,8 @@ class Application(wx.Frame):
 		self.monstersTable.SetColLabelValue(2, "Species")
 		self.monstersTable.SetColLabelValue(3, "Generation")
 		self.monstersTable.SetColLabelValue(4, "Size")
-
+		self.monstersTable.SetColLabelSize(30)
+		self.monstersTable.HideCol(0)
 
 
 	def onSingleSelect(self, event):
@@ -187,7 +413,10 @@ class Application(wx.Frame):
 			self.img.LoadFile("images/monsters/256/Unknown.png")
 		self.imageLabel.SetBitmap(self.img)
 		self.damageTable.ClearGrid()
-		self.loadDamage(self.monstersTable.GetCellValue(event.GetRow(), 0))
+		self.materialsTree.DeleteAllItems()
+		self.currentMonsterID = self.monstersTable.GetCellValue(event.GetRow(), 0)
+		self.loadDamage(self.currentMonsterID)
+		self.loadMaterials(self.currentMonsterID)
 
 
 	def makeMenuBar(self):
@@ -225,79 +454,6 @@ class Application(wx.Frame):
 		wx.MessageBox("This is a wxPython Hello World sample",
 					  "About Hello World 2",
 					  wx.OK|wx.ICON_INFORMATION)
-
-					
-class HeaderBitmapGrid(wx.grid.Grid, glr.GridWithLabelRenderersMixin):
-	def __init__(self, *args, **kw):
-		wx.grid.Grid.__init__(self, *args, **kw)
-		glr.GridWithLabelRenderersMixin.__init__(self)
-
-
-class HeaderBitmapRowLabelRenderer(glr.GridLabelRenderer):
-	def __init__(self, bgcolor):
-		self._bgcolor = bgcolor
-
-	def Draw(self, grid, dc, rect, row):
-		dc.SetBrush(wx.Brush(self._bgcolor))
-		dc.SetPen(wx.TRANSPARENT_PEN)
-		dc.DrawRectangle(rect)
-		hAlign, vAlign = wx.grid.GetRowLabelAlignment()
-		text = wx.grid.GetRowLabelValue(row)
-		self.DrawBorder(wx.grid, dc, rect)
-		self.DrawText(wx.grid, dc, rect, text, hAlign, vAlign)
-
-
-class HeaderBitmapColLabelRenderer(glr.GridLabelRenderer):
-	def __init__(self, bgcolor):
-		self._bgcolor = bgcolor
-
-	def Draw(self, grid, dc, rect, col):
-		dc.SetBrush(wx.Brush(self._bgcolor))
-		dc.SetPen(wx.TRANSPARENT_PEN)
-		dc.DrawRectangle(rect)
-		hAlign, vAlign = wx.grid.GetColLabelAlignment()
-		text = wx.grid.GetColLabelValue(col)
-		self.DrawBorder(wx.grid, dc, rect)
-		self.DrawText(wx.grid, dc, rect, text, hAlign, vAlign)
-
-
-class HeaderBitmapCornerLabelRenderer(glr.GridLabelRenderer):
-	def __init__(self):
-		import images
-		self._bmp = wx.Bitmap("Nergigante32.png", wx.BITMAP_TYPE_ANY)
-
-	def Draw(self, grid, dc, rect, rc):
-		x = rect.left + (rect.width - self._bmp.GetWidth()) / 2
-		y = rect.top + (rect.height - self._bmp.GetHeight()) / 2
-		dc.DrawBitmap(self._bmp, x, y, True)
-
-
-
-"""class TestPanel(wx.Panel):
-	def __init__(self, parent, log):
-		self.log = log
-		wx.Panel.__init__(self, parent, -1)
-
-		ROWS = 27
-		COLS = 15
-
-		g = MyGrid(self, size=(100,100))
-		g.CreateGrid(ROWS, COLS)
-
-		g.SetCornerLabelRenderer(MyCornerLabelRenderer())
-
-		for row in range(0, ROWS, 3):
-			g.SetRowLabelRenderer(row+0, MyRowLabelRenderer('#ffe0e0'))
-			g.SetRowLabelRenderer(row+1, MyRowLabelRenderer('#e0ffe0'))
-			g.SetRowLabelRenderer(row+2, MyRowLabelRenderer('#e0e0ff'))
-
-		for col in range(0, COLS, 3):
-			g.SetColLabelRenderer(col+0, MyColLabelRenderer('#e0ffe0'))
-			g.SetColLabelRenderer(col+1, MyColLabelRenderer('#e0e0ff'))
-			g.SetColLabelRenderer(col+2, MyColLabelRenderer('#ffe0e0'))
-
-		self.Sizer = wx.BoxSizer()
-		self.Sizer.Add(g, 1, wx.EXPAND)"""
 
 
 if __name__ == '__main__':
