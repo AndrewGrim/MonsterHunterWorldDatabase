@@ -1,1 +1,1 @@
-pyinstaller -F src\wxTable.py & move dist\wxTable.exe ..\wxTable
+pyinstaller -F -i images\OfflineDatabase.ico src\main.py & move dist\main.exe ..\MonsterHunterWorld
