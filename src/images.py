@@ -85,15 +85,16 @@ print(
 #rescaleImage(sys.argv[2])
 #rescaleFolder(sys.argv[2])
 
-"""self.bmp_withcolourmask  = images.TestStar2.GetBitmap()
-mask = wx.Mask(self.bmp_withcolourmask, wx.WHITE)
-self.bmp_withcolourmask.SetMask(mask)"""
+image = wx.Image()
+image.LoadFile("images/VectorDrawable2Svg-master/png/ic_items_scale_base96.png", wx.BITMAP_TYPE_PNG)
+image.SetMaskColour(255, 255, 255)
+image.SaveFile("images/VectorDrawable2Svg-master/alpha/trans/ic_items_scale_base96.png", wx.BITMAP_TYPE_PNG)
 
-alpha = os.listdir(os.getcwd() + "/images/VectorDrawable2Svg-master/alpha")
+"""alpha = os.listdir(os.getcwd() + "/images/VectorDrawable2Svg-master/alpha")
 alpha.remove("trans")
 for img in alpha:
     image = wx.Image()
     image.LoadFile("images/VectorDrawable2Svg-master/alpha/" + img, wx.BITMAP_TYPE_PNG)
     image.SetMaskColour(255, 255, 255)
     image.Rescale(32, 32, wx.IMAGE_QUALITY_HIGH)
-    image.SaveFile("images/VectorDrawable2Svg-master/alpha/trans/" + img, wx.BITMAP_TYPE_PNG)
+    image.SaveFile("images/VectorDrawable2Svg-master/alpha/trans/" + img, wx.BITMAP_TYPE_PNG)"""
