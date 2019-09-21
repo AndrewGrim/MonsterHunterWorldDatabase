@@ -18,12 +18,12 @@ class Application(wx.Frame):
 		self.resolutionWidth, self.resolutionHeight = wx.DisplaySize()
 		self.currentMonsterID = 43 # nergigante
 		self.currentMonsterMaterialID = 412 # nergigante : immortal dragon scale
-		self.testIcon = wx.Bitmap("Nergigante24.png", wx.BITMAP_TYPE_ANY) # TODO remove
+		self.testIcon = wx.Bitmap("Nergigante24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.initMainNotebook()
 		self.initMonstersTab()
 		self.weaponsFrame = wx.Panel(self.mainNotebook) # TODO move to weapons init
-		self.mainNotebook.AddPage(self.weaponsFrame, "Weapons") # TODO move to weapons init!
+		self.mainNotebook.AddPage(self.weaponsFrame, "Weapons") # TODO move to weapons init
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -39,14 +39,16 @@ class Application(wx.Frame):
 		self.monstersTable.Bind(wx.EVT_SIZE, self.onSize)
 
 		# to trigger onSize event so the table looks as it should
+		# TODO could probably replace this by calling layout or refresh or something
 		self.SetSize(1199, 1000)
 		# roughly center
 		self.SetPosition(wx.Point(self.resolutionWidth / 1.4 - self.GetSize().width, self.resolutionHeight / 1.5 - self.GetSize().height / 1.3))
 
-		# TEST materials tab
+		# TEST defaults to materials tab
+		# PREFERENCES make this customizable
 		self.monsterDetailsNotebook.SetSelection(0)
 
-		self.usageMaterialPage.SetSplitterLeft() # TODO remove?
+		self.usageMaterialPage.SetSplitterLeft() # REMOVE or find a better time/place to do this
 		self.obtainingMaterialPage.SetSplitterLeft()
 
 		self.SetSize(1200, 1000)
@@ -99,7 +101,7 @@ class Application(wx.Frame):
 		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
 		data = conn.execute("SELECT name FROM monsters WHERE id = ?", (self.currentMonsterID, ))
 		monsterIcon = data.fetchone()[0]
-		self.monsterImage = wx.Bitmap("images/monsters/256/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
+		self.monsterImage = wx.Bitmap("images/monsters/325/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
 		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage)
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
@@ -107,7 +109,7 @@ class Application(wx.Frame):
 		self.damagePanel = wx.ScrolledWindow(self.monsterDetailsNotebook)
 		self.materialsPanel = wx.Panel(self.monsterDetailsNotebook)
 		#
-		self.monsterSummarySizer = wx.BoxSizer(wx.VERTICAL)
+		self.monsterSummarySizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.monsterDetailsNotebook.AddPage(self.summaryPanel, "Summary")
 		# 
 		self.monsterDamageSizer = wx.BoxSizer(wx.VERTICAL)
@@ -118,8 +120,8 @@ class Application(wx.Frame):
 		# add the right side detailed view to the main size of the monsters notebook tab
 		self.monstersSizer.Add(self.monstersDetailedSizer, 1, wx.EXPAND)
 		# add widgets within to their parent sizer
-		self.monstersDetailedSizer.Add(self.monsterImageLabel, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.ADJUST_MINSIZE, 10)
-		self.monstersDetailedSizer.Add(self.monsterDetailsNotebook, 1, wx.EXPAND)
+		self.monstersDetailedSizer.Add(self.monsterImageLabel, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.ADJUST_MINSIZE, 10)
+		self.monstersDetailedSizer.Add(self.monsterDetailsNotebook, 3, wx.EXPAND)
 
 		# set sizer for the monsters notebook tab
 		self.monstersPanel.SetSizer(self.monstersSizer)
@@ -139,8 +141,8 @@ class Application(wx.Frame):
 		self.summaryTree.AddColumn("")
 		self.summaryTree.AddColumn("")
 		self.summaryTree.SetMainColumn(0)
-		self.summaryTree.SetColumnWidth(0, (self.GetSize().width * 0.66) * 0.25)
-		self.summaryTree.SetColumnWidth(1, (self.GetSize().width * 0.66) * 0.20)
+		self.summaryTree.SetColumnWidth(0, (self.GetSize().width * 0.45) * 0.34)
+		self.summaryTree.SetColumnWidth(1, (self.GetSize().width * 0.45) * 0.27)
 
 		isz = (24,24)
 		il = wx.ImageList(isz[0], isz[1])
@@ -149,15 +151,32 @@ class Application(wx.Frame):
 		self.summaryTree.SetImageList(il)
 		self.il = il
 
-		self.monsterSummarySizer.Add(self.summaryTree, 1, wx.EXPAND)
+		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/256/Nergigante.png"))
+		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Nergigante", style=wx.ALIGN_LEFT)
+		self.monsterSummaryNameLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+		self.monsterSummaryTypeLabel = wx.StaticText(self.summaryPanel, label="Elder Dragon", style=wx.ALIGN_LEFT)
+		self.monsterSummaryTypeLabel.SetFont(wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT, False))
+		self.monsterSummaryDescription = wx.StaticText(self.summaryPanel, label="testing\ntesting\ntesting", style=wx.ALIGN_LEFT)
+		self.monsterSummaryDescription.SetFont(wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+
+		self.monsterSummaryLeftSizer = wx.BoxSizer(wx.VERTICAL)
+		self.monsterSummaryRightSizer = wx.BoxSizer(wx.VERTICAL)
+
+		self.monsterSummaryLeftSizer.Add(self.summaryTree, 1, wx.EXPAND)
+
+		self.monsterSummaryRightSizer.Add(self.monsterSummaryImageLabel, 1, wx.ALIGN_CENTER)
+		self.monsterSummaryRightSizer.Add(self.monsterSummaryNameLabel, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 10))
+		self.monsterSummaryRightSizer.Add(self.monsterSummaryTypeLabel, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 20))
+		self.monsterSummaryRightSizer.Add(self.monsterSummaryDescription, wx.SizerFlags().Proportion(18).Border(wx.LEFT, 30))
+
+		self.monsterSummarySizer.Add(self.monsterSummaryLeftSizer, 1, wx.EXPAND)
+		self.monsterSummarySizer.Add(self.monsterSummaryRightSizer, 1, wx.EXPAND)
 		self.summaryPanel.SetSizer(self.monsterSummarySizer)
 
 		self.loadMonsterSummary(self.currentMonsterID)
 
 	
 	def loadMonsterSummary(self, monsterID):
-		# TODO load image and description
-
 		monster = """
 			SELECT m.*, t.name, t.ecology, t.description, t.alt_state_description
 			from monster m JOIN monster_text t USING (id)
@@ -165,20 +184,10 @@ class Application(wx.Frame):
 			LIMIT 1
 			"""
 
-		habitats = """
-			SELECT h.start_area, h.move_area, h.rest_area,
-				lt.id location_id, lt.name location_name
-			FROM monster_habitat h
-				JOIN location_text lt
-				ON lt.id = h.location_id
-				AND lt.lang_id = :langId
-			WHERE h.monster_id = :monsterId
-			ORDER BY h.id
-			"""
-
 		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
 		data = conn.execute(monster, ("en", monsterID))
 		data = data.fetchone()
+	
 		# 5 - has alt weakness
 		# 6 - fire
 		# 7 - water
@@ -200,6 +209,17 @@ class Application(wx.Frame):
 		# 23 - tremor ailment
 		# -> 37 ailments
 
+		getName = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
+		name = getName.execute("SELECT name FROM monsters WHERE id = :monsterID", (self.currentMonsterID, ))
+		name = name.fetchone()
+		monsterName = name[0]
+		self.monsterSummaryImageLabel.SetBitmap(wx.Bitmap("images/monsters/256/" + str(monsterName) + ".png"))
+		self.monsterSummaryImageLabel.SetBitmap(wx.Bitmap("images/monsters/256/" + str(monsterName) + ".png"))
+		self.monsterSummaryNameLabel.SetLabelText(str(monsterName))
+		self.monsterSummaryTypeLabel.SetLabelText(str(data[39]))
+		self.monsterSummaryDescription.SetLabelText(str(data[40]))
+		self.monsterSummaryDescription.Wrap(300)
+
 		weaknessElements = {
 			"Fire": [6, 16],
 			"Water": [7, 17],
@@ -217,7 +237,7 @@ class Application(wx.Frame):
 		}
 
 		weaknessRating = {
-			"None": "",
+			None: "",
 			0: "☆☆☆",
 			1: "★☆☆",
 			2: "★★☆",
@@ -232,57 +252,69 @@ class Application(wx.Frame):
 		# habitat
 		self.monsterHabitatNode = self.summaryTree.AppendItem(root, "Habitat")
 
-		for weakness, col in weaknessElements.items():
-			if bool(data[5]):
-				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
-				self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
-				self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
-				self.summaryTree.Expand(self.monsterWeaknessNode)
-			else:
-				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
-				self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
-				self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
-				self.summaryTree.Expand(self.monsterWeaknessNode)
-
-		for weakness, col in weaknessStatus.items():
-			genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
-			self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
-			self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
-			self.summaryTree.Expand(self.monsterWeaknessNode)
-
-		ailments = {
-			"Roar": 21,
-			"Wind": 22,
-			"Tremor": 23,
-			"Defense Down": 24,
-			"Fire Blight": 25,
-			"Water Blight":26,
-			"Thunder Blight": 27,
-			"Ice Blight": 28,
-			"Dragon Blight": 29,
-			"Blast Blight": 30,
-			"Poison": 31,
-			"Sleep": 32,
-			"Paralysis": 33,
-			"Bleed": 34,
-			"Stun": 35,
-			"Mud": 36,
-			"Effluvia": 37,
-		}
-
-		textAilments = ["Roar", "Wind", "Tremor"]
-
-		for ailment, col in ailments.items():
-			if str(data[col]) == "None" or not bool(data[col]):
-				pass
-			else:
-				genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, ailment)
-				if ailment not in textAilments:
-					self.summaryTree.SetItemText(genericSummaryNode, "", 1)
+		if str(data[2]) != "small":
+			for weakness, col in weaknessElements.items():
+				if bool(data[5]):
+					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
+					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
+					self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.Expand(self.monsterWeaknessNode)
 				else:
-					self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
-				self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
-				self.summaryTree.Expand(self.monsterAilmentsNode)
+					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
+					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
+					self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.Expand(self.monsterWeaknessNode)
+
+			for weakness, col in weaknessStatus.items():
+				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
+				self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
+				self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODIMAGESO proper icons
+				self.summaryTree.Expand(self.monsterWeaknessNode)
+
+			ailments = {
+				"Roar": 21,
+				"Wind": 22,
+				"Tremor": 23,
+				"Defense Down": 24,
+				"Fire Blight": 25,
+				"Water Blight":26,
+				"Thunder Blight": 27,
+				"Ice Blight": 28,
+				"Dragon Blight": 29,
+				"Blast Blight": 30,
+				"Poison": 31,
+				"Sleep": 32,
+				"Paralysis": 33,
+				"Bleed": 34,
+				"Stun": 35,
+				"Mud": 36,
+				"Effluvia": 37,
+			}
+
+			textAilments = ["Roar", "Wind", "Tremor"]
+
+			for ailment, col in ailments.items():
+				if str(data[col]) == "None" or not bool(data[col]):
+					pass
+				else:
+					genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, ailment)
+					if ailment not in textAilments:
+						self.summaryTree.SetItemText(genericSummaryNode, "", 1)
+					else:
+						self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
+					self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.Expand(self.monsterAilmentsNode)
+
+		habitats = """
+			SELECT h.start_area, h.move_area, h.rest_area,
+				lt.id location_id, lt.name location_name
+			FROM monster_habitat h
+				JOIN location_text lt
+				ON lt.id = h.location_id
+				AND lt.lang_id = :langId
+			WHERE h.monster_id = :monsterId
+			ORDER BY h.id
+			"""
 
 		data = conn.execute(habitats, ("en", monsterID))
 		data = data.fetchall()
@@ -296,7 +328,7 @@ class Application(wx.Frame):
 		for item in data:
 			genericSummaryNode = self.summaryTree.AppendItem(self.monsterHabitatNode, str(item[4]))
 			self.summaryTree.SetItemText(genericSummaryNode, str(item[0]) + " > " + str(item[1]) + " > " + str(item[2]), 1)
-			self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+			self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 			self.summaryTree.Expand(self.monsterHabitatNode)
 
 	
@@ -426,7 +458,6 @@ class Application(wx.Frame):
 
 		breakData = conn.execute(sql, (monsterID, "en"))
 
-		# TODO somethings Fucked!
 		for index, row in enumerate(breakData):
 			self.breakDamageTable.SetCellValue(index, 0, str(row[4]))
 			if str(row[0]) != "None":
@@ -485,8 +516,6 @@ class Application(wx.Frame):
 																  )
 
 		self.initMaterialData(self.currentMonsterMaterialID)
-		
-		icon = wx.Bitmap("images/status effects/mhw-ice-damage_s.png", wx.BITMAP_TYPE_ANY)
 
 		self.materialDetailSizer.Add(self.materialImageLabel, 1, wx.EXPAND)
 		self.materialDetailSizer.Add(self.materialDetailsProperyGrid, 3, wx.EXPAND)
@@ -553,7 +582,7 @@ class Application(wx.Frame):
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -561,7 +590,7 @@ class Application(wx.Frame):
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, lowRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 					self.materialsTree.Expand(rewardCondition)
@@ -574,7 +603,7 @@ class Application(wx.Frame):
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -582,7 +611,7 @@ class Application(wx.Frame):
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, highRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 					self.materialsTree.Expand(rewardCondition)
@@ -596,7 +625,7 @@ class Application(wx.Frame):
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -604,15 +633,16 @@ class Application(wx.Frame):
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
 					self.materialsTree.Expand(rewardCondition)
 
 				categoriesMR.append(currentCategory)
 
-		self.materialsTree.Expand(self.masterRankNode)
-		#self.materialsTree.Expand(self.highRankNode) # TODO maybe make this an option to auto expand a particular option or all of them
+		# TODO maybe make this an option to auto expand a particular option or all of them
+		#self.materialsTree.Expand(self.masterRankNode)
+		#self.materialsTree.Expand(self.highRankNode) 
 		#self.materialsTree.Expand(self.lowRankNode)
 
 
@@ -624,14 +654,14 @@ class Application(wx.Frame):
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[2]), 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[3]), 2)
-				self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+				self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 				self.materialsTree.SetItemBackgroundColour(monsterMaterial, rankColor)
 			else:
 				rewardCondition = self.materialsTree.AppendItem(rankNodes[dataRow[0]], str(dataRow[1]))
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[2]), 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[3]), 2)
-				self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # TODO proper icons
+				self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 				self.materialsTree.SetItemBackgroundColour(rewardCondition, rankColor)
 				self.materialsTree.SetItemBackgroundColour(monsterMaterial, rankColor)
 				self.materialsTree.Expand(rewardCondition)
@@ -691,7 +721,7 @@ class Application(wx.Frame):
 		itemInfo = self.loadMonsterMaterialsummaryPage(itemID, conn)
 		itemObtaining = self.loadMaterialObtainingPage(itemID, conn)
 		itemUsage = self.loadMaterialUsagePage(itemID, conn)
-		# SETTINGS remember the last selected page and select it
+		# PREFERENCES remember the last selected page and select it
 		self.materialDetailsProperyGrid.Clear()
 		self.loadMaterialPropertyGrid(itemInfo, itemObtaining, itemUsage)
 
@@ -859,7 +889,7 @@ class Application(wx.Frame):
 			else:
 				itemInfo[index] = str(item)
 				
-		# TODO replace icon with item icon probably base scale
+		# IMAGES replace icon with item icon probably base scale
 		self.summaryMaterialPage = self.materialDetailsProperyGrid.AddPage("Summary", self.testIcon)
 		self.summaryMaterialPage.Append(wxpg.PropertyCategory("Summary"))
 		self.summaryMaterialPage.Append(wxpg.StringProperty("Name",value=itemInfo[10]))
@@ -867,31 +897,31 @@ class Application(wx.Frame):
 		self.summaryMaterialPage.Append(wxpg.StringProperty("Rarity",value=itemInfo[3]))
 		self.summaryMaterialPage.Append(wxpg.StringProperty("Buy",value=itemInfo[4]))
 		if itemInfo[5] == "-":	
-			# TODO points icon
+			# IMAGES points icon
 			self.summaryMaterialPage.Append(wxpg.StringProperty("Sell",value=itemInfo[7]))
 		else:
-			# TODO zenny icon
+			# IMAGES zenny icon
 			self.summaryMaterialPage.Append(wxpg.StringProperty("Sell",value=itemInfo[5]))
 		self.summaryMaterialPage.Append(wxpg.StringProperty("Carry",value=itemInfo[6]))
 
-		# TODO replace icon with armor icon probably base chest or head
+		# IMAGES replace icon with armor icon probably base chest or head
 		self.usageMaterialPage = self.materialDetailsProperyGrid.AddPage("Usage", self.testIcon)
 		self.usageMaterialPage.Append(wxpg.PropertyCategory("Usage"))
-		# TODO if not null
-		self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Charms"))
-		for item in itemUsage[0]:
-			self.usageMaterialPage.Append(wxpg.StringProperty(str(item[3]),value=str(item[4])))
-		# TODO if not null
-		self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Armor"))
-		for item in itemUsage[1]:
-			self.usageMaterialPage.Append(wxpg.StringProperty(str(item[1]),value=str(item[7])))
-		# TODO if not null
-		self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Weapons"))
-		for item in itemUsage[2]:
-			self.usageMaterialPage.Append(wxpg.StringProperty(str(item[6]),value=str(item[7])))
+		if itemUsage[0]:
+			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Charms"))
+			for item in itemUsage[0]:
+				self.usageMaterialPage.Append(wxpg.StringProperty(str(item[3]),value=str(item[4])))
+		if itemUsage[1]:
+			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Armor"))
+			for item in itemUsage[1]:
+				self.usageMaterialPage.Append(wxpg.StringProperty(str(item[1]),value=str(item[7])))
+		if itemUsage[2]:
+			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Weapons"))
+			for item in itemUsage[2]:
+				self.usageMaterialPage.Append(wxpg.StringProperty(str(item[6]),value=str(item[7])))
 		self.usageMaterialPage.SetSplitterLeft()
 
-		# TODO replace icon with unknow monster icon
+		# IMAGES replace icon with unknow monster icon
 		self.obtainingMaterialPage = self.materialDetailsProperyGrid.AddPage("Obtaining", self.testIcon)
 		self.obtainingMaterialPage.Append(wxpg.PropertyCategory("Obtaining"))
 		for item in itemObtaining:
@@ -929,6 +959,7 @@ class Application(wx.Frame):
 		self.loadMonsterMaterials(self.currentMonsterID)
 
 
+	# TODO make a preferences page
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
 		# The "\t..." syntax defines an accelerator key that also triggers the same event
