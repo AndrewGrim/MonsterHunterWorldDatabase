@@ -22,9 +22,10 @@ class HeaderBitmapRowLabelRenderer(glr.GridLabelRenderer):
 
 
 class HeaderBitmapColLabelRenderer(glr.GridLabelRenderer):
-	def __init__(self, image, imageAlignment = wx.ALIGN_CENTER):
+	def __init__(self, image, label = "default", imageAlignment = wx.ALIGN_CENTER):
 		self._bmp = wx.Bitmap(image, wx.BITMAP_TYPE_ANY)
 		self.imgAlign = imageAlignment
+		self.label = label
 
 	def Draw(self, grid, dc, rect, col):
 		x = rect.left + (rect.width - self._bmp.GetWidth()) / 2
@@ -37,9 +38,10 @@ class HeaderBitmapColLabelRenderer(glr.GridLabelRenderer):
 		else:
 			dc.DrawBitmap(self._bmp, x, y, True)
 		hAlign, vAlign = grid.GetColLabelAlignment()
-		text = grid.GetColLabelValue(col)
-		self.DrawText(grid, dc, rect, text, hAlign, vAlign)
-
+		if self.label == "default":
+			self.DrawText(grid, dc, rect, grid.GetColLabelValue(col), hAlign, vAlign)
+		else:
+			self.DrawText(grid, dc, rect, self.label, hAlign, vAlign)
 
 class HeaderBitmapCornerLabelRenderer(glr.GridLabelRenderer):
 	def __init__(self, image):
