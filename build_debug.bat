@@ -1,0 +1,1 @@
+pyinstaller -F src\main.py & move dist\main.exe ..\MonsterHunterWorld & ren main.exe mhwdb_debug.exe
