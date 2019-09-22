@@ -86,10 +86,10 @@ print(
 #rescaleFolder(sys.argv[2])
 
 image = wx.Image()
-image.LoadFile("images/monsters/original/Nergigante.png", wx.BITMAP_TYPE_PNG)
+image.LoadFile("images/damage types/cut.png", wx.BITMAP_TYPE_PNG)
 #image.SetMaskColour(255, 255, 255)
-image.Rescale(325, 325, wx.IMAGE_QUALITY_HIGH)
-image.SaveFile("images/monsters/325/Nergigante.png", wx.BITMAP_TYPE_PNG)
+image.Rescale(24, 24, wx.IMAGE_QUALITY_HIGH)
+image.SaveFile("images/damage types/cut24.png", wx.BITMAP_TYPE_PNG)
 
 """alpha = os.listdir(os.getcwd() + "/images/VectorDrawable2Svg-master/alpha")
 alpha.remove("trans")

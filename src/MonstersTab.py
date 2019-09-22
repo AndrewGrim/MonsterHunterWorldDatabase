@@ -6,17 +6,16 @@ import wx.propgrid as wxpg
 import sqlite3
 
 
-class MonstersTab(wx.Frame):
+class MonstersTab:
 
 	def __init__(self, root, mainNotebook):
-		super(MonstersTab, self).__init__()
-
+		self.root = root
+		self.mainNotebook = mainNotebook
+		
 		self.currentMonsterID = 43 # nergigante
 		self.currentMonsterMaterialID = 412 # nergigante : immortal dragon scale
 		self.testIcon = wx.Bitmap("Nergigante24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
-		self.root = root
-		self.mainNotebook = mainNotebook
 		self.initMonstersTab()
 		self.loadData()
 		self.initMonsterSummary()

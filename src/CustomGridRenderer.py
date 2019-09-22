@@ -1,6 +1,7 @@
 import wx
 import wx.lib.mixins.gridlabelrenderer as glr
 
+
 class HeaderBitmapGrid(wx.grid.Grid, glr.GridWithLabelRenderersMixin):
 	def __init__(self, *args, **kw):
 		wx.grid.Grid.__init__(self, *args, **kw)

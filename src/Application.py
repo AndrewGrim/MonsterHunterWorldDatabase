@@ -6,6 +6,7 @@ import sqlite3
 
 import CustomGridRenderer as cgr
 import MonstersTab as m
+import WeaponsTab as w
 
 
 class Application(wx.Frame):
@@ -21,8 +22,7 @@ class Application(wx.Frame):
 
 		self.initMainNotebook()
 		m.MonstersTab(root, self.mainNotebook)
-		self.weaponsFrame = wx.Panel(self.mainNotebook) # TODO move to weapons init
-		self.mainNotebook.AddPage(self.weaponsFrame, "Weapons") # TODO move to weapons init
+		w.WeaponsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -33,6 +33,9 @@ class Application(wx.Frame):
 		self.SetSize(1199, 1000)
 		self.Center()
 		self.SetSize(1200, 1000)
+
+		# TEST
+		self.mainNotebook.SetSelection(1) # weapons tab
 
 		self.Show()
 
