@@ -1,33 +1,23 @@
 import wx
 import wx.grid
 import wx.lib.gizmos as gizmos
-import customGridRenderer as cgr
+import CustomGridRenderer as cgr
 import wx.propgrid as wxpg
 import sqlite3
 
 
-class Application(wx.Frame):
+class MonstersTab(wx.Frame):
 
-	def __init__(self, *args, **kw):
-		super(Application, self).__init__(*args, **kw)
+	def __init__(self, root, mainNotebook):
+		super(MonstersTab, self).__init__()
 
-		icon = wx.Icon("images/OfflineDatabase.ico")
-		self.SetIcon(icon)
-		self.SetSize(1200, 1000)
-		self.SetTitle("Database")
-		self.resolutionWidth, self.resolutionHeight = wx.DisplaySize()
 		self.currentMonsterID = 43 # nergigante
 		self.currentMonsterMaterialID = 412 # nergigante : immortal dragon scale
 		self.testIcon = wx.Bitmap("Nergigante24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
-		self.initMainNotebook()
+		self.root = root
+		self.mainNotebook = mainNotebook
 		self.initMonstersTab()
-		self.weaponsFrame = wx.Panel(self.mainNotebook) # TODO move to weapons init
-		self.mainNotebook.AddPage(self.weaponsFrame, "Weapons") # TODO move to weapons init
-		self.makeMenuBar()
-		self.CreateStatusBar()
-
-		self.SetStatusText("Welcome to wxPython!")
 		self.loadData()
 		self.initMonsterSummary()
 		self.initMonsterDamage()
@@ -38,12 +28,6 @@ class Application(wx.Frame):
 		# for scaling the columns
 		self.monstersTable.Bind(wx.EVT_SIZE, self.onSize)
 
-		# to trigger onSize event so the table looks as it should
-		# TODO could probably replace this by calling layout or refresh or something
-		self.SetSize(1199, 1000)
-		# roughly center
-		self.SetPosition(wx.Point(self.resolutionWidth / 1.4 - self.GetSize().width, self.resolutionHeight / 1.5 - self.GetSize().height / 1.3))
-
 		# TEST defaults to materials tab
 		# PREFERENCES make this customizable
 		self.monsterDetailsNotebook.SetSelection(0)
@@ -51,29 +35,12 @@ class Application(wx.Frame):
 		self.usageMaterialPage.SetSplitterLeft() # REMOVE or find a better time/place to do this
 		self.obtainingMaterialPage.SetSplitterLeft()
 
-		self.SetSize(1200, 1000)
-
 		self.physicalDamagePane.Expand()
 		self.elementDamagePane.Expand()
 		self.breakDamagePane.Expand()
 
 		self.damagePanel.SetVirtualSize(600, 1800)
 		self.damagePanel.SetScrollRate(20,20)
-
-
-	def initMainNotebook(self):
-		# the outermost panel holding in all the widgets
-		self.mainPanel = wx.Panel(self)
-		# main geometry manager
-		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
-		# main notebook holding the top tabs ie: monsters, weapons etc.
-		self.mainNotebook = wx.Notebook(self.mainPanel)
-		# add notebook to sizer
-		self.mainSizer.Add(self.mainNotebook, 1, wx.EXPAND)
-
-		# set the sizer for mainWindow
-		self.mainPanel.SetSizer(self.mainSizer)
-
 
 	def initMonstersTab(self):
 		# the outermost panel for the monsters tab
@@ -141,8 +108,8 @@ class Application(wx.Frame):
 		self.summaryTree.AddColumn("")
 		self.summaryTree.AddColumn("")
 		self.summaryTree.SetMainColumn(0)
-		self.summaryTree.SetColumnWidth(0, (self.GetSize().width * 0.45) * 0.34)
-		self.summaryTree.SetColumnWidth(1, (self.GetSize().width * 0.45) * 0.27)
+		self.summaryTree.SetColumnWidth(0, (self.root.GetSize().width * 0.45) * 0.34)
+		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.45) * 0.27)
 
 		isz = (24,24)
 		il = wx.ImageList(isz[0], isz[1])
@@ -487,9 +454,9 @@ class Application(wx.Frame):
 		self.materialsTree.AddColumn("%")
 		self.materialsTree.AddColumn("id")
 		self.materialsTree.SetMainColumn(0)
-		self.materialsTree.SetColumnWidth(0, (self.GetSize().width * 0.44) * 0.65)
-		self.materialsTree.SetColumnWidth(1, (self.GetSize().width * 0.44) * 0.11)
-		self.materialsTree.SetColumnWidth(2, (self.GetSize().width * 0.44) * 0.11)
+		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
+		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)
+		self.materialsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
 		self.materialsTree.SetColumnWidth(3, 0)
 
 		self.materialsTree.SetImageList(self.il)
@@ -670,7 +637,7 @@ class Application(wx.Frame):
 
 
 	def onSize(self, event):
-		width, height = self.GetSize()
+		width, height = self.root.GetSize()
 		numOfColumns = 4
 		numOfColumnsDamage = 14
 		halfOfWindow = 3
@@ -679,15 +646,17 @@ class Application(wx.Frame):
 		self.monstersTable.SetColSize(2, ((width / halfOfWindow) / numOfColumns))
 		self.monstersTable.SetColSize(3, ((width / halfOfWindow) / numOfColumns))
 		self.monstersTable.SetColSize(4, ((width / halfOfWindow) / numOfColumns))
+
+		# TODO adjust cols for summary tree
 			
 		# TODO adjust columns here and account for there being three tables now
 		#for col in range(numOfColumnsDamage):
 		#	self.damageTable.SetColSize(col, ((width * 0.66) / numOfColumnsDamage - 13))
 		#	self.damageTable.SetColSize(0, ((width * 0.66) / numOfColumnsDamage + 80))
 
-		self.materialsTree.SetColumnWidth(0, (self.GetSize().width * 0.44) * 0.65)
-		self.materialsTree.SetColumnWidth(1, (self.GetSize().width * 0.44) * 0.11)
-		self.materialsTree.SetColumnWidth(2, (self.GetSize().width * 0.44) * 0.11)
+		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
+		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)
+		self.materialsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
 		
 	
 	def loadData(self):
@@ -957,48 +926,3 @@ class Application(wx.Frame):
 		self.loadMonsterSummary(self.currentMonsterID)
 		self.loadMonsterDamage(self.currentMonsterID)
 		self.loadMonsterMaterials(self.currentMonsterID)
-
-
-	# TODO make a preferences page
-	def makeMenuBar(self):
-		fileMenu = wx.Menu()
-		# The "\t..." syntax defines an accelerator key that also triggers the same event
-		helloItem = fileMenu.Append(-1, "&Hello...\tCtrl-H",
-				"Help string shown in status bar for this menu item")
-		fileMenu.AppendSeparator()
-
-		exitItem = fileMenu.Append(wx.ID_EXIT)
-
-		helpMenu = wx.Menu()
-		aboutItem = helpMenu.Append(wx.ID_ABOUT)
-
-		menuBar = wx.MenuBar()
-		menuBar.Append(fileMenu, "&File")
-		menuBar.Append(helpMenu, "&Help")
-
-		self.SetMenuBar(menuBar)
-
-		self.Bind(wx.EVT_MENU, self.OnHello, helloItem)
-		self.Bind(wx.EVT_MENU, self.OnExit,  exitItem)
-		self.Bind(wx.EVT_MENU, self.OnAbout, aboutItem)
-
-
-	def OnExit(self, event):
-		self.Close(True)
-
-
-	def OnHello(self, event):
-		wx.MessageBox("Hello again from wxPython")
-
-
-	def OnAbout(self, event):
-		wx.MessageBox("This is a wxPython Hello World sample",
-					  "About Hello World 2",
-					  wx.OK|wx.ICON_INFORMATION)
-
-
-if __name__ == '__main__':
-	app = wx.App()
-	frm = Application(None, title="Database")
-	frm.Show()
-	app.MainLoop()
