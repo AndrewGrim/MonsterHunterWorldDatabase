@@ -4,6 +4,7 @@ import wx.lib.gizmos as gizmos
 import CustomGridRenderer as cgr
 import wx.propgrid as wxpg
 import sqlite3
+import time
 
 
 class WeaponsTab:
@@ -62,20 +63,31 @@ class WeaponsTab:
 
 
 	def loadWeaponsTree(self):
-		self.weaponsTree.AddColumn("Name")
-		self.weaponsTree.AddColumn("#")
-		self.weaponsTree.AddColumn("%")
-		self.weaponsTree.AddColumn("id")
-		self.weaponsTree.SetMainColumn(0)
-		self.weaponsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
-		self.weaponsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)
-		self.weaponsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
-		#self.weaponsTree.SetColumnWidth(3, 0)
-
 		isz = (24,24)
 		il = wx.ImageList(isz[0], isz[1])
 		self.nergidx = il.Add(self.testIcon)
 		self.weaponsTree.SetImageList(il)
+
+		self.weaponsTree.AddColumn("Name")
+		self.weaponsTree.AddColumn("Physical")
+		self.weaponsTree.AddColumn("Element/Status")
+		self.weaponsTree.AddColumn("Affinity")
+		self.weaponsTree.AddColumn("Defense")
+		self.weaponsTree.AddColumn("Slots")
+		self.weaponsTree.AddColumn("Sharpness")
+		self.weaponsTree.AddColumn("id")
+		
+		self.weaponsTree.SetMainColumn(0)
+		self.weaponsTree.SetColumnWidth(0, 400)
+
+		for num in range(1, 7):
+			self.weaponsTree.SetColumnImage(num, self.nergidx)
+			self.weaponsTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
+			self.weaponsTree.SetColumnWidth(num, 40)
+		self.weaponsTree.SetColumnWidth(7, 0)
+		self.weaponsTree.SetColumnWidth(6, 150)
+
+		
 
 
 		root = self.weaponsTree.AddRoot("Weapon")
@@ -105,27 +117,99 @@ class WeaponsTab:
 			1: "images/weapons/",
 		}
 
+		start = time.time()
 		for row in data:
-			print(row)
 			if row[2] != "Kulve":
 				if row[18] == None:
-					weapon = self.weaponsTree.AppendItem(normalWeaponNode,  str(row[34]))
-					self.weaponsTree.SetItemText(weapon, str(row[2]), 1)
-					self.weaponsTree.SetItemText(weapon, str(row[3]), 2)
-					self.weaponsTree.SetItemText(weapon, str(row[0]), 3)
+					print(row)
+					if bool(row[19]):
+						# TODO maybe add rarity in a similar manner?? row[3]
+						name = str(row[34]) + " 🔨" # TODO make this clearer that it means craftable
+					else:
+						name = str(row[34])
+					weapon = self.weaponsTree.AppendItem(normalWeaponNode,  name)
+					self.weaponsTree.SetItemText(weapon, str(row[4]), 1)
+					if row[15] == 0:
+						element = ""
+					elif bool(row[15]): # 11-15
+						element = "(" + str(row[12]) + ")"
+					else:
+						element = str(row[12])
+					if row[6] == 0:
+						affinity = ""
+					else:
+						affinity = str(row[6]) + "%"
+					if row[7] == 0:
+						defense = ""
+					else:
+						defense = "+" + str(row[7])
+					self.weaponsTree.SetItemText(weapon, element, 2) 
+					self.weaponsTree.SetItemText(weapon, affinity, 3)
+					self.weaponsTree.SetItemText(weapon, defense, 4)
+					self.weaponsTree.SetItemText(weapon, str(row[8:11]), 5)
+					self.weaponsTree.SetItemText(weapon, str(row[16]), 6)
+					self.weaponsTree.SetItemText(weapon, str(row[0]), 7)
 					self.weaponsTree.SetItemImage(weapon, self.nergidx, which = wx.TreeItemIcon_Normal)
-					weaponNodes[str(row[0])] = weapon
+					weaponNodes[row[0]] = weapon
 				else:
-					print(weaponNodes)
-					weapon = self.weaponsTree.AppendItem(weaponNodes[str(row[18])],  str(row[34]))
+					if bool(row[19]):
+						name = str(row[34]) + " 🔨" # TODO make this clearer that it means craftable
+					else:
+						name = str(row[34])
+					weapon = self.weaponsTree.AppendItem(weaponNodes[row[18]],  name)
+					self.weaponsTree.SetItemText(weapon, str(row[4]), 1)
+					if row[15] == 0:
+						element = ""
+					elif bool(row[15]): # 11-15
+						element = "(" + str(row[12]) + ")"
+						# TODO if second ele exists place it after \n
+						# special color for dual element?? or alternatively have two columns for elements
+						# element = "(" + str(row[12]) + ")\n 250"
+					else:
+						element = str(row[12])
+					if row[6] == 0:
+						affinity = ""
+					else:
+						affinity = str(row[6]) + "%"
+					if row[7] == 0:
+						defense = ""
+					else:
+						defense = "+" + str(row[7])
+					self.weaponsTree.SetItemText(weapon, element, 2) 
+					self.weaponsTree.SetItemText(weapon, affinity, 3)
+					self.weaponsTree.SetItemText(weapon, defense, 4)
+					self.weaponsTree.SetItemText(weapon, str(row[8:11]), 5) 
+					self.weaponsTree.SetItemText(weapon, str(row[16]), 6)
+					self.weaponsTree.SetItemText(weapon, str(row[0]), 7)
 					self.weaponsTree.SetItemImage(weapon, self.nergidx, which = wx.TreeItemIcon_Normal)
-					weaponNodes[str(row[0])] = weapon
+					weaponNodes[row[0]] = weapon
 			else:
 				weapon = self.weaponsTree.AppendItem(kulveWeaponNode,  str(row[34]))
-				#self.weaponsTree.SetItemText(weapon, str(row[2]), 1)
-				#self.weaponsTree.SetItemText(weapon, str(row[3]), 2)
-				#self.weaponsTree.SetItemText(weapon, str(row[4]), 3)
+				self.weaponsTree.SetItemText(weapon, str(row[4]), 1)
+				if row[15] == 0:
+					element = ""
+				elif bool(row[15]): # 11-15
+					element = "(" + str(row[12]) + ")"
+				else:
+					element = str(row[12])
+				if row[6] == 0:
+					affinity = ""
+				else:
+					affinity = str(row[6]) + "%"
+				if row[7] == 0:
+					defense = ""
+				else:
+					defense = "+" + str(row[7])
+				self.weaponsTree.SetItemText(weapon, element, 2) 
+				self.weaponsTree.SetItemText(weapon, affinity, 3)
+				self.weaponsTree.SetItemText(weapon, defense, 4)
+				self.weaponsTree.SetItemText(weapon, str(row[8:11]), 5)
+				self.weaponsTree.SetItemText(weapon, str(row[16]), 6)
+				self.weaponsTree.SetItemText(weapon, str(row[0]), 7)
 				self.weaponsTree.SetItemImage(weapon, self.nergidx, which = wx.TreeItemIcon_Normal)
+				self.weaponsTree.SetItemImage(weapon, self.nergidx, which = wx.TreeItemIcon_Normal)
+		end = time.time()
+		print("time: " + str(end - start))
 
 		self.weaponsTree.ExpandAll()
 		#self.weaponsTree.Expand(normalWeaponNode)
