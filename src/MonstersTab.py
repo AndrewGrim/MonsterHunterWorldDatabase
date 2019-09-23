@@ -636,6 +636,7 @@ class MonstersTab:
 
 
 	def onSize(self, event):
+		# TODO if monsterstab is selected then resize else dont
 		width, height = self.root.GetSize()
 		numOfColumns = 4
 		numOfColumnsDamage = 14
@@ -653,11 +654,16 @@ class MonstersTab:
 		#	self.damageTable.SetColSize(col, ((width * 0.66) / numOfColumnsDamage - 13))
 		#	self.damageTable.SetColSize(0, ((width * 0.66) / numOfColumnsDamage + 80))
 
+		# TODO set the splitter in property grid
+
 		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
 		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)
 		self.materialsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
 		
 	
+	# TODO when notebook is changed to monsters tab then call the contents of onSize
+	
+
 	def loadData(self):
 		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
 		data = conn.execute("SELECT * FROM monsters ORDER by size DESC, name ASC ")
