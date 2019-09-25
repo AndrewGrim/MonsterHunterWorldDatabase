@@ -18,7 +18,7 @@ class MonstersTab:
 
 		self.initMonstersTab()
 		self.loadData()
-		self.initMonsterSummary()
+		self.initMonsterSummary() # TODO sort weaknesses from highest to low/none
 		self.initMonsterDamage()
 		self.initMonsterMaterials()
 
@@ -31,9 +31,6 @@ class MonstersTab:
 		# PREFERENCES make this customizable
 		self.monsterDetailsNotebook.SetSelection(0)
 
-		self.usageMaterialPage.SetSplitterLeft() # REMOVE or find a better time/place to do this
-		self.obtainingMaterialPage.SetSplitterLeft()
-
 		self.physicalDamagePane.Expand()
 		self.elementDamagePane.Expand()
 		self.breakDamagePane.Expand()
@@ -42,6 +39,8 @@ class MonstersTab:
 		self.damagePanel.SetScrollRate(20,20)
 
 	def initMonstersTab(self):
+		# TODO sort columns on header click
+
 		# the outermost panel for the monsters tab
 		self.monstersPanel = wx.Panel(self.mainNotebook)
 		# add page to notebook
@@ -426,11 +425,11 @@ class MonstersTab:
 
 		for index, row in enumerate(breakData):
 			self.breakDamageTable.SetCellValue(index, 0, str(row[4]))
-			if str(row[0]) != "None":
+			if row[0] != None:
 				self.breakDamageTable.SetCellValue(index, 1, str(row[0]))
-			if str(row[1]) != "None":
+			if row[1] != None:
 				self.breakDamageTable.SetCellValue(index, 2, str(row[1]))
-			if str(row[2]) != "None":
+			if row[2] != None:
 				self.breakDamageTable.SetCellValue(index, 3, str(row[2]))
 			self.breakDamageTable.SetCellValue(index, 4, str(row[3]))
 
@@ -877,6 +876,8 @@ class MonstersTab:
 			# IMAGES zenny icon
 			self.summaryMaterialPage.Append(wxpg.StringProperty("Sell",value=itemInfo[5]))
 		self.summaryMaterialPage.Append(wxpg.StringProperty("Carry",value=itemInfo[6]))
+
+		self.summaryMaterialPage.SetSplitterLeft()
 
 		# IMAGES replace icon with armor icon probably base chest or head
 		self.usageMaterialPage = self.materialDetailsProperyGrid.AddPage("Usage", self.testIcon)

@@ -21,7 +21,7 @@ class Application(wx.Frame):
 		self.SetTitle("Database")
 
 		self.initMainNotebook()
-		m.MonstersTab(root, self.mainNotebook)
+		monsters = m.MonstersTab(root, self.mainNotebook)
 		w.WeaponsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
@@ -38,6 +38,10 @@ class Application(wx.Frame):
 		self.mainNotebook.SetSelection(1) # weapons tab
 
 		self.Show()
+
+		monsters.summaryMaterialPage.SetSplitterLeft()
+		monsters.usageMaterialPage.SetSplitterLeft()
+		monsters.obtainingMaterialPage.SetSplitterLeft() 
 
 
 	def initMainNotebook(self):
