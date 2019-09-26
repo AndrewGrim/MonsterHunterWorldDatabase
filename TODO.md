@@ -3,8 +3,9 @@
 - [x] split source into more files/classes
 - [x] monsters tab
 - [ ] weapons tab
-  - [ ] weapons tree
+  - [x] weapons tree
   - [ ] weapon detail
+    - [ ] add checks for colors
   - [ ] weapon family
 - [ ] armor tab
 - [ ] item tab
@@ -18,9 +19,10 @@
 - [ ] get missing data ie dlc monsters
   - [ ] habitat data
   - [ ] nerg definitely has tremor :( and you can definitely break diablos's head! twice even
+  - [ ] descriptions for small monsters that i added
   - [x] rewards
 - [ ] write tests
-- [ ] update with iceborne info
+- [ ] update with iceborne info - prob make a separate version
 - [ ] wishlist support
 - [ ] write documentation - which might force me to change sql strings??
 - [ ] support for different resolution by changing the font and pixel sizes accordingly - wx.Window ToDIP()
