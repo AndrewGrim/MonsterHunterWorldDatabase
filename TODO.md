@@ -23,6 +23,6 @@
 - [ ] update with iceborne info
 - [ ] wishlist support
 - [ ] write documentation - which might force me to change sql strings??
-- [ ] support for different resolution by changing the font and pixel sizes accordingly
+- [ ] support for different resolution by changing the font and pixel sizes accordingly - wx.Window ToDIP()
 - [ ] on double click show the weapon/armor etc. basically link stuff
   
