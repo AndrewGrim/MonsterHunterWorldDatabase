@@ -473,17 +473,12 @@ class MonstersTab:
 		self.materialImage = wx.Bitmap("images/VectorDrawable2Svg-master/png/ic_items_scale_base128.png", wx.BITMAP_TYPE_ANY)
 		self.materialImageLabel = wx.StaticBitmap(self.materialDetailPanel, bitmap=self.materialImage)
 
-		self.materialDetailsProperyGrid = wxpg.PropertyGridManager(self.materialDetailPanel, 
-																   style=
-																   # wxpg.PG_SPLITTER_AUTO_CENTER
-																   #| wxpg.PG_AUTO_SORT
-																    wxpg.PG_TOOLBAR
-																  )
+		self.materialDetailsPropertyGrid = wxpg.PropertyGridManager(self.materialDetailPanel, style=wxpg.PG_TOOLBAR)
 
 		self.initMaterialData(self.currentMonsterMaterialID)
 
 		self.materialDetailSizer.Add(self.materialImageLabel, 1, wx.EXPAND)
-		self.materialDetailSizer.Add(self.materialDetailsProperyGrid, 3, wx.EXPAND)
+		self.materialDetailSizer.Add(self.materialDetailsPropertyGrid, 3, wx.EXPAND)
 
 		self.materialDetailPanel.SetSizer(self.materialDetailSizer)
 	
@@ -695,7 +690,7 @@ class MonstersTab:
 		itemObtaining = self.loadMaterialObtainingPage(itemID, conn)
 		itemUsage = self.loadMaterialUsagePage(itemID, conn)
 		# PREFERENCES remember the last selected page and select it
-		self.materialDetailsProperyGrid.Clear()
+		self.materialDetailsPropertyGrid.Clear()
 		self.loadMaterialPropertyGrid(itemInfo, itemObtaining, itemUsage)
 
 	def initMaterialData(self, itemID):
@@ -863,7 +858,7 @@ class MonstersTab:
 				itemInfo[index] = str(item)
 				
 		# IMAGES replace icon with item icon probably base scale
-		self.summaryMaterialPage = self.materialDetailsProperyGrid.AddPage("Summary", self.testIcon)
+		self.summaryMaterialPage = self.materialDetailsPropertyGrid.AddPage("Summary", self.testIcon)
 		self.summaryMaterialPage.Append(wxpg.PropertyCategory("Summary"))
 		self.summaryMaterialPage.Append(wxpg.StringProperty("Name",value=itemInfo[10]))
 		self.summaryMaterialPage.Append(wxpg.LongStringProperty("Description",value=itemInfo[11]))
@@ -880,7 +875,7 @@ class MonstersTab:
 		self.summaryMaterialPage.SetSplitterLeft()
 
 		# IMAGES replace icon with armor icon probably base chest or head
-		self.usageMaterialPage = self.materialDetailsProperyGrid.AddPage("Usage", self.testIcon)
+		self.usageMaterialPage = self.materialDetailsPropertyGrid.AddPage("Usage", self.testIcon)
 		self.usageMaterialPage.Append(wxpg.PropertyCategory("Usage"))
 		if itemUsage[0]:
 			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Charms"))
@@ -897,7 +892,7 @@ class MonstersTab:
 		self.usageMaterialPage.SetSplitterLeft()
 
 		# IMAGES replace icon with unknow monster icon
-		self.obtainingMaterialPage = self.materialDetailsProperyGrid.AddPage("Obtaining", self.testIcon)
+		self.obtainingMaterialPage = self.materialDetailsPropertyGrid.AddPage("Obtaining", self.testIcon)
 		self.obtainingMaterialPage.Append(wxpg.PropertyCategory("Obtaining"))
 		for item in itemObtaining:
 			self.obtainingMaterialPage.AppendIn(wxpg.PGPropArgCls("Obtaining"), wxpg.PropertyCategory(str(item[1])))

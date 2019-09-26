@@ -13,6 +13,7 @@ class WeaponsTab:
 		self.root = root
 		self.mainNotebook = mainNotebook
 
+		self.currentlySelectedWeaponID = 795
 		self.testIcon = wx.Bitmap("cut24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.initWeaponsTab()
@@ -64,6 +65,7 @@ class WeaponsTab:
 
 
 	def loadWeaponsTree(self):
+		# REFACTOR split things up into their own functions
 		isz = (24,24)
 		self.il = wx.ImageList(isz[0], isz[1])
 		self.nergidx = self.il.Add(self.testIcon)
@@ -189,16 +191,8 @@ class WeaponsTab:
 		self.weaponsTree.SetItemImage(weapon, self.nergidx, which = wx.TreeItemIcon_Normal)
 		weaponNodes[row[0]] = weapon
 
-		
-	def onWeaponSelection(self, event):
-		print("on selection")
-		# TODO load details based of the weapon id found in the hidden id column
-
 	
 	def loadWeaponDetailTab(self):
-		#self.weaponDetailPanel
-		#self.weaponDetailSizer
-
 		self.weaponDetailList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
 																	| wx.BORDER_NONE
 																	| wx.LC_NO_HEADER
@@ -207,11 +201,9 @@ class WeaponsTab:
 																	)
 
 		self.weaponDetailList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onWeaponDetailSelect)
-
 		self.weaponDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		
-		self.weaponDetailSizer.Add(self.weaponDetailList, 3, wx.EXPAND)
-		self.weaponDetailPanel.SetSizer(self.weaponDetailSizer)
+		self.weaponDetailSizer.Add(self.weaponDetailList, 1, wx.EXPAND)
 
 		sql = """
 			SELECT w.id, w.weapon_type, w.category, w.rarity, w.attack, w.attack_true, w.affinity, w.defense, w.slot_1, w.slot_2, w.slot_3, w.element1, w.element1_attack,
@@ -226,9 +218,8 @@ class WeaponsTab:
 		"""
 
 		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
-		data = conn.execute(sql, (795, "en"))
+		data = conn.execute(sql, (self.currentlySelectedWeaponID, "en"))
 		data = data.fetchone()
-		print(data)
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -253,7 +244,6 @@ class WeaponsTab:
 			"Elderseal": (data[21], self.nergidx),
 			"Defense": ("+" + str(data[7]), self.nergidx),
 			"Phial Type": (data[22], self.nergidx),
-			# TODO Sharpness but thats a separate thing
 		}
 
 		for col, (key, value) in enumerate(weaponDetail.items()):
@@ -275,6 +265,114 @@ class WeaponsTab:
 		self.weaponDetailList.SetItemTextColour(7, c.Find("Khaki")) # or normal if no extra defense
 		self.weaponDetailList.SetItemTextColour(8, c.Find("Gold")) # impact or same color as element
 
+		sharpnessMaxed = bool(data[17])
+		sharpnessLevels = {}
+		for num in (5, 4, 3, 2, 1, 0):
+			sharpnessLevels[num] = self.adjustSharpness(num, sharpnessMaxed, data)	
+
+		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
+		self.weaponSharpnessTable.CreateGrid(6, 7)
+
+		self.weaponSharpnessTable.SetColLabelSize(0)
+		self.weaponSharpnessTable.SetRowLabelSize(0)
+
+		self.weaponSharpnessTable.SetColSize(0, 40)
+		self.weaponSharpnessTable.SetColSize(1, (sharpnessLevels[5][0] / 2 + 27))
+		self.weaponSharpnessTable.SetColSize(2, (sharpnessLevels[5][1] / 2 + 27))
+		self.weaponSharpnessTable.SetColSize(3, (sharpnessLevels[5][2] / 2 + 27))
+		self.weaponSharpnessTable.SetColSize(4, (sharpnessLevels[5][3] / 2 + 27))
+		self.weaponSharpnessTable.SetColSize(5, (sharpnessLevels[5][4] / 2 + 27))
+		self.weaponSharpnessTable.SetColSize(6, (sharpnessLevels[5][5]))
+
+		for row in range(6):
+			self.weaponSharpnessTable.SetCellValue(row, 0, "+" + str(row))
+
+			self.weaponSharpnessTable.SetCellValue(row, 1, str(sharpnessLevels[row][0]))
+			self.weaponSharpnessTable.SetCellBackgroundColour(row, 1, c.Find("red"))
+
+			self.weaponSharpnessTable.SetCellValue(row, 2, str(sharpnessLevels[row][1]))
+			self.weaponSharpnessTable.SetCellBackgroundColour(row, 2, c.Find("coral"))
+
+			self.weaponSharpnessTable.SetCellValue(row, 3, str(sharpnessLevels[row][2]))
+			self.weaponSharpnessTable.SetCellBackgroundColour(row, 3, c.Find("yellow"))
+
+			self.weaponSharpnessTable.SetCellValue(row, 4, str(sharpnessLevels[row][3]))
+			self.weaponSharpnessTable.SetCellBackgroundColour(row, 4, c.Find("green"))
+
+			self.weaponSharpnessTable.SetCellValue(row, 5, str(sharpnessLevels[row][4]))
+			self.weaponSharpnessTable.SetCellBackgroundColour(row, 5, c.Find("slate blue"))
+
+			self.weaponSharpnessTable.SetCellValue(row, 6, str(sharpnessLevels[row][5]))
+			self.weaponSharpnessTable.SetCellBackgroundColour(row, 6, c.Find("white"))
+		
+		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 0, wx.BOTTOM, 15)
+
+		# TODO maybe split sharpness with each row having its own grid or listctrl this way allowing me to show
+		# the difference in in sharpness visually per handicraft level as opposed to just numbers
+
+		sql = """
+			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
+				i.category item_category, i.icon_color item_icon_color, w.quantity, w.recipe_type
+			FROM weapon_recipe w
+				JOIN item i
+					ON w.item_id = i.id
+				JOIN item_text it
+					ON it.id = i.id
+					AND it.lang_id = :langId
+			WHERE it.lang_id = :langId
+			AND w.weapon_id= :weaponId
+			ORDER BY i.id
+    	"""
+
+		data = conn.execute(sql, ("en", self.currentlySelectedWeaponID))
+		data = data.fetchall()
+		print(data)
+
+		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
+
+		for item in data:
+			if item[6] == "Create":
+				self.materialsRequiredPropertyGrid.Append(wxpg.PropertyCategory("Create"))
+				try:
+					self.materialsRequiredPropertyGrid.Append(wxpg.StringProperty(str(item[1]), value=str(item[5])))
+				except:
+					pass
+			elif item[6] == "Upgrade":
+				self.materialsRequiredPropertyGrid.Append(wxpg.PropertyCategory("Upgrade"))
+				try:
+					self.materialsRequiredPropertyGrid.Append(wxpg.StringProperty(str(item[1]), value=str(item[5])))
+				except:
+					pass
+		
+		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 1, wx.EXPAND)
+
+		self.weaponDetailPanel.SetSizer(self.weaponDetailSizer)
+
+
+	def adjustSharpness(self, handicraftLevel, sharpnessMaxed, data):
+			if sharpnessMaxed:
+				return data[16].split(",")
+			else:
+				sharpnessAdjusted = data[16].split(",")
+				index = len(sharpnessAdjusted) - 1
+				handicraftReduction = 10 * (5 - handicraftLevel)
+				for item in sharpnessAdjusted:
+					toRemove = min(int(sharpnessAdjusted[index]), handicraftReduction)
+					sharpnessAdjusted[index] = int(sharpnessAdjusted[index]) - toRemove
+					handicraftReduction -= toRemove
+					index -= 1
+
+				return sharpnessAdjusted
+
 	
 	def onWeaponDetailSelect(self, event):
 		self.weaponDetailList.Select(event.GetIndex(), False)
+
+
+	def onWeaponSelection(self, event):
+		self.currentlySelectedWeaponID = self.weaponsTree.GetItemText(event.GetItem(), 13)
+		print(self.currentlySelectedWeaponID)
+		# clear list
+		# clear grid
+		# clear property grid
+		# load them all again with the new weapon id
