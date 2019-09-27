@@ -15,6 +15,7 @@ class WeaponsTab:
 		self.c = wx.ColourDatabase()
 
 		self.currentlySelectedWeaponID = 795
+		self.currentWeaponTree = "charge-blade"
 		self.testIcon = wx.Bitmap("cut24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.initWeaponsTab()
@@ -26,18 +27,6 @@ class WeaponsTab:
 		self.weaponsSizer = wx.BoxSizer(wx.HORIZONTAL)
 
 		self.weaponsTreeSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponsTree = gizmos.TreeListCtrl(self.weaponsPanel, -1, style=0,
-												agwStyle=
-												  gizmos.TR_DEFAULT_STYLE
-												#| gizmos.TR_TWIST_BUTTONS
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												#| gizmos.TR_NO_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												)
-		self.weaponsTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponSelection)
-		self.weaponsTreeSizer.Add(self.weaponsTree, 1, wx.EXPAND)
 		
 		self.weaponsDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponImage = wx.Bitmap("images/weapons/Diablos Tyrannis.png", wx.BITMAP_TYPE_ANY)
@@ -62,12 +51,77 @@ class WeaponsTab:
 
 		self.weaponsPanel.SetSizer(self.weaponsSizer)
 		
-		self.loadWeaponsTree()
+		self.initWeaponButtons()
+		self.initWeaponsTree()
 		self.initWeaponDetailTab()
 
 
-	def loadWeaponsTree(self):
-		# REFACTOR split things up into their own functions
+	def initWeaponButtons(self):
+		# TODO change to appropriate icons
+		self.greatSwordButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="great-sword")
+		self.longSwordButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="long-sword")
+		self.swordAndShieldButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="sword-and-shield")
+		self.dualBladesButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="dual-blades")
+		self.hammerButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="hammer")
+		self.huntingHornButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="hunting-horn")
+		self.lanceButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="lance")
+		self.gunLanceButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="gunlance")
+		self.switchAxeButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="switch-axe")
+		self.chargeBladeButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="charge-blade")
+		self.insectGlaiveButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="insect-glaive")
+		self.lightBowGunButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="light-bowgun")
+		self.heavyBowGunButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="heavy-bowgun")
+		self.bowButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="bow")
+
+		self.greatSwordButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.longSwordButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.swordAndShieldButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.dualBladesButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.hammerButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.huntingHornButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.lanceButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.gunLanceButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.switchAxeButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.chargeBladeButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.insectGlaiveButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.lightBowGunButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.heavyBowGunButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		self.bowButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+
+		self.weaponButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+		self.weaponButtonsSizer.Add(self.greatSwordButton)
+		self.weaponButtonsSizer.Add(self.longSwordButton)
+		self.weaponButtonsSizer.Add(self.swordAndShieldButton)
+		self.weaponButtonsSizer.Add(self.dualBladesButton)
+		self.weaponButtonsSizer.Add(self.hammerButton)
+		self.weaponButtonsSizer.Add(self.huntingHornButton)
+		self.weaponButtonsSizer.Add(self.lanceButton)
+		self.weaponButtonsSizer.Add(self.gunLanceButton)
+		self.weaponButtonsSizer.Add(self.switchAxeButton)
+		self.weaponButtonsSizer.Add(self.chargeBladeButton)
+		self.weaponButtonsSizer.Add(self.insectGlaiveButton)
+		self.weaponButtonsSizer.Add(self.lightBowGunButton)
+		self.weaponButtonsSizer.Add(self.heavyBowGunButton)
+		self.weaponButtonsSizer.Add(self.bowButton)
+
+		self.weaponsTreeSizer.Add(self.weaponButtonsSizer)
+
+
+	def initWeaponsTree(self):
+		self.weaponsTree = gizmos.TreeListCtrl(self.weaponsPanel, -1, style=0,
+												agwStyle=
+												  gizmos.TR_DEFAULT_STYLE
+												#| gizmos.TR_TWIST_BUTTONS
+												| gizmos.TR_ROW_LINES
+												| gizmos.TR_COLUMN_LINES
+												#| gizmos.TR_NO_LINES
+												| gizmos.TR_FULL_ROW_HIGHLIGHT
+												| gizmos.TR_HIDE_ROOT
+												)
+		self.weaponsTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponSelection)
+		self.weaponsTreeSizer.Add(self.weaponsTree, 1, wx.EXPAND)
+
 		isz = (24,24)
 		self.il = wx.ImageList(isz[0], isz[1])
 		self.nergidx = self.il.Add(self.testIcon)
@@ -106,6 +160,10 @@ class WeaponsTab:
 		self.weaponsTree.SetColumnWidth(5, 50)
 		self.weaponsTree.SetColumnWidth(13, 0)
 
+		self.loadWeaponsTree()
+
+
+	def loadWeaponsTree(self):
 		root = self.weaponsTree.AddRoot("Weapon")
 		normalWeaponNode = self.weaponsTree.AppendItem(root, "Normal")
 		kulveWeaponNode = self.weaponsTree.AppendItem(root, "Kulve")
@@ -124,7 +182,7 @@ class WeaponsTab:
 			"""
 
 		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
-		data = conn.execute(sql, ("en", "charge-blade", ))
+		data = conn.execute(sql, ("en", self.currentWeaponTree, ))
 
 		weaponNodes = {}
 		rarityIcon = {
@@ -268,7 +326,7 @@ class WeaponsTab:
 			self.weaponDetailList.SetItem(index, 1, str(value[0]))
 			self.weaponDetailList.SetItemData(index, 0)
 
-		self.weaponDetailList.SetColumnWidth(0, 300)
+		self.weaponDetailList.SetColumnWidth(0, 275)
 		self.weaponDetailList.SetColumnWidth(1, wx.LIST_AUTOSIZE)
 
 		# TODO weave this into the data load
@@ -289,7 +347,7 @@ class WeaponsTab:
 		self.weaponSharpnessTable.SetColLabelSize(0)
 		self.weaponSharpnessTable.SetRowLabelSize(0)
 
-		extraPixels = 27
+		extraPixels = 20
 		self.weaponSharpnessTable.SetColSize(0, 40)
 		self.weaponSharpnessTable.SetColSize(1, (int(sharpnessLevels[5][0]) / 2 + extraPixels))
 		self.weaponSharpnessTable.SetColSize(2, (int(sharpnessLevels[5][1]) / 2 + extraPixels))
@@ -384,5 +442,12 @@ class WeaponsTab:
 			self.weaponDetailList.ClearAll()
 			self.weaponSharpnessTable.ClearGrid()
 			self.materialsRequiredPropertyGrid.Clear() # propertygrid actually needs a page otherwise clear doesnt work
+	
 			self.loadWeaponDetails()
 			self.loadWeaponMaterials()
+
+		
+	def onWeaponTypeSelection(self, event):
+		self.currentWeaponTree = event.GetEventObject().GetName()
+		self.weaponsTree.DeleteAllItems()
+		self.loadWeaponsTree()
