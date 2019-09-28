@@ -85,17 +85,17 @@ print(
 #rescaleImage(sys.argv[2])
 #rescaleFolder(sys.argv[2])
 
-image = wx.Image()
+"""image = wx.Image()
 image.LoadFile("images/damage types/cut.png", wx.BITMAP_TYPE_PNG)
 #image.SetMaskColour(255, 255, 255)
 image.Rescale(24, 24, wx.IMAGE_QUALITY_HIGH)
-image.SaveFile("images/damage types/cut24.png", wx.BITMAP_TYPE_PNG)
+image.SaveFile("images/damage types/cut24.png", wx.BITMAP_TYPE_PNG)"""
 
-"""alpha = os.listdir(os.getcwd() + "/images/VectorDrawable2Svg-master/alpha")
-alpha.remove("trans")
+alpha = os.listdir(os.getcwd() + "/images/weapons/great-sword/better")
+#alpha.remove("230")
 for img in alpha:
     image = wx.Image()
-    image.LoadFile("images/VectorDrawable2Svg-master/alpha/" + img, wx.BITMAP_TYPE_PNG)
-    image.SetMaskColour(255, 255, 255)
-    image.Rescale(32, 32, wx.IMAGE_QUALITY_HIGH)
-    image.SaveFile("images/VectorDrawable2Svg-master/alpha/trans/" + img, wx.BITMAP_TYPE_PNG)"""
+    image.LoadFile("images/weapons/great-sword/better/" + img, wx.BITMAP_TYPE_PNG)
+    #image.SetMaskColour(255, 255, 255)
+    image.Rescale(24, 24, wx.IMAGE_QUALITY_HIGH)
+    image.SaveFile("images/weapons/great-sword/better/" + img, wx.BITMAP_TYPE_PNG)
