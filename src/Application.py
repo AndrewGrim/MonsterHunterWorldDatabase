@@ -3,6 +3,7 @@ import wx.grid
 import wx.lib.gizmos as gizmos
 import wx.propgrid as wxpg
 import sqlite3
+import time
 
 import CustomGridRenderer as cgr
 import MonstersTab as m
@@ -98,5 +99,8 @@ class Application(wx.Frame):
 
 if __name__ == '__main__':
 	app = wx.App()
+	start = time.time()
 	frm = Application(None, title="Database")
+	end = time.time()
+	print("application load time: " + str(end - start))
 	app.MainLoop()

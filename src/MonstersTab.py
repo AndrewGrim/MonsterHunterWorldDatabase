@@ -12,8 +12,8 @@ class MonstersTab:
 		self.root = root
 		self.mainNotebook = mainNotebook
 		
-		self.currentMonsterID = 43 # nergigante
-		self.currentMonsterMaterialID = 412 # nergigante : immortal dragon scale
+		self.currentMonsterID = 17 # nergigante
+		self.currentMonsterMaterialID = 212 # nergigante : immortal dragon scale
 		self.testIcon = wx.Bitmap("Nergigante24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.initMonstersTab()
@@ -116,7 +116,7 @@ class MonstersTab:
 		self.summaryTree.SetImageList(il)
 		self.il = il
 
-		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/256/Nergigante.png"))
+		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/325/Nergigante.png"))
 		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Nergigante", style=wx.ALIGN_LEFT)
 		self.monsterSummaryNameLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
 		self.monsterSummaryTypeLabel = wx.StaticText(self.summaryPanel, label="Elder Dragon", style=wx.ALIGN_LEFT)
@@ -179,8 +179,7 @@ class MonstersTab:
 		name = name.fetchone()
 		monsterName = name[0]
 		self.monsterSummaryImageLabel.SetBitmap(wx.Bitmap("images/monsters/256/" + str(monsterName) + ".png"))
-		self.monsterSummaryImageLabel.SetBitmap(wx.Bitmap("images/monsters/256/" + str(monsterName) + ".png"))
-		self.monsterSummaryNameLabel.SetLabelText(str(monsterName))
+		self.monsterSummaryNameLabel.SetLabelText(str(monsterName)) 
 		self.monsterSummaryTypeLabel.SetLabelText(str(data[39]))
 		self.monsterSummaryDescription.SetLabelText(str(data[40]))
 		self.monsterSummaryDescription.Wrap(300)
@@ -914,9 +913,9 @@ class MonstersTab:
 
 	def onMonsterSelect(self, event):
 		if str(self.monstersTable.GetCellValue(event.GetRow(), 1)) != "":
-			self.monsterImage.LoadFile("images/monsters/256/" + str(self.monstersTable.GetCellValue(event.GetRow(), 1)) + ".png")
+			self.monsterImage.LoadFile("images/monsters/325/" + str(self.monstersTable.GetCellValue(event.GetRow(), 1)) + ".png")
 		else:
-			self.monsterImage.LoadFile("images/monsters/256/Unknown.png")
+			self.monsterImage.LoadFile("images/monsters/325/Unknown.png")
 		self.monsterImageLabel.SetBitmap(self.monsterImage)
 		self.physicalDamageTable.ClearGrid()
 		self.elementDamageTable.ClearGrid()
