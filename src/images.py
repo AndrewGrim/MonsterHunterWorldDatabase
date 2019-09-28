@@ -91,11 +91,11 @@ image.LoadFile("images/damage types/cut.png", wx.BITMAP_TYPE_PNG)
 image.Rescale(24, 24, wx.IMAGE_QUALITY_HIGH)
 image.SaveFile("images/damage types/cut24.png", wx.BITMAP_TYPE_PNG)"""
 
-alpha = os.listdir(os.getcwd() + "/images/weapons/great-sword/better")
+alpha = os.listdir(os.getcwd() + "/images/monsters/original")
 #alpha.remove("230")
 for img in alpha:
     image = wx.Image()
-    image.LoadFile("images/weapons/great-sword/better/" + img, wx.BITMAP_TYPE_PNG)
+    image.LoadFile("images/monsters/original/" + img, wx.BITMAP_TYPE_PNG)
     #image.SetMaskColour(255, 255, 255)
-    image.Rescale(24, 24, wx.IMAGE_QUALITY_HIGH)
-    image.SaveFile("images/weapons/great-sword/better/" + img, wx.BITMAP_TYPE_PNG)
+    image.Rescale(325, 325, wx.IMAGE_QUALITY_HIGH)
+    image.SaveFile("images/monsters/325/" + img, wx.BITMAP_TYPE_PNG)

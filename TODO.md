@@ -14,7 +14,8 @@
   - [ ] make different sizes for taskbar and window icons
   - [ ] make all the variations of images ie different colors/sizes
   - [ ] make better transparent icons - right now it only works if its on a white background!!!
-  - [ ] make 325px monster images
+  - [x] make 325px monster images
+  - [ ] resize some 325px monster images to have a border around them
 - [x] probably rework damage tab, so that each section is divided into their own collapsible panes: physical, element, break
 - [ ] get missing data ie dlc monsters
   - [ ] habitat data
