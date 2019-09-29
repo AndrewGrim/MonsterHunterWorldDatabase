@@ -14,7 +14,7 @@ class MonstersTab:
 		
 		self.currentMonsterID = 17 # nergigante
 		self.currentMonsterMaterialID = 212 # nergigante : immortal dragon scale
-		self.testIcon = wx.Bitmap("Nergigante24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
+		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.initMonstersTab()
 		self.loadData()
@@ -110,11 +110,50 @@ class MonstersTab:
 		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.45) * 0.27)
 
 		isz = (24,24)
-		il = wx.ImageList(isz[0], isz[1])
-		self.nergidx = il.Add(self.testIcon)
+		self.il = wx.ImageList(isz[0], isz[1])
 
-		self.summaryTree.SetImageList(il)
-		self.il = il
+		self.testidx = self.il.Add(self.testIcon)
+
+		self.ancientForest = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Ancient Forest.png"))
+		self.wildspireWaste = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Wildspire Waste.png"))
+		self.coralHighlands = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Coral Highlands.png"))
+		self.rottenVale = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Rotten Vale.png"))
+		self.eldersRecess = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Elder's Recess.png"))
+
+		self.locationIcons = {
+			"Ancient Forest": self.ancientForest,
+			"Wildspire Waste": self.wildspireWaste,
+			"Coral Highlands": self.coralHighlands,
+			"Rotten Vale": self.rottenVale,
+			"Elder's Recess": self.eldersRecess,
+		}
+
+		self.fire = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/fire.png"))
+		self.water = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/water.png"))
+		self.ice = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/ice.png"))
+		self.thunder = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/thunder.png"))
+		self.dragon = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/dragon.png"))
+
+		self.poison = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/poison.png"))
+		self.sleep = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/sleep.png"))
+		self.paralysis = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/paralysis.png"))
+		self.blast = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/blast.png"))
+		self.stun = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/stun.png"))
+
+		self.damageTypes = {
+			"Fire": self.fire,
+			"Water": self.water,
+			"Ice": self.ice,
+			"Thunder": self.thunder,
+			"Dragon": self.dragon,
+			"Poison": self.poison,
+			"Sleep": self.sleep,
+			"Paralysis": self.paralysis,
+			"Blast": self.blast,
+			"Stun": self.stun,
+		}
+
+		self.summaryTree.SetImageList(self.il)
 
 		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/325/Nergigante.png"))
 		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Nergigante", style=wx.ALIGN_LEFT)
@@ -221,18 +260,18 @@ class MonstersTab:
 				if bool(data[5]):
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.summaryTree.Expand(self.monsterWeaknessNode)
 				else:
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.summaryTree.Expand(self.monsterWeaknessNode)
 
 			for weakness, col in weaknessStatus.items():
 				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 				self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
-				self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # TODIMAGESO proper icons
+				self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal) # TODIMAGESO proper icons
 				self.summaryTree.Expand(self.monsterWeaknessNode)
 
 			ailments = {
@@ -266,7 +305,7 @@ class MonstersTab:
 						self.summaryTree.SetItemText(genericSummaryNode, "", 1)
 					else:
 						self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.summaryTree.Expand(self.monsterAilmentsNode)
 
 		habitats = """
@@ -288,11 +327,13 @@ class MonstersTab:
 		# 3 - location id
 		# 4 - location name
 
-		# TODO if not null
 		for item in data:
 			genericSummaryNode = self.summaryTree.AppendItem(self.monsterHabitatNode, str(item[4]))
 			self.summaryTree.SetItemText(genericSummaryNode, str(item[0]) + " > " + str(item[1]) + " > " + str(item[2]), 1)
-			self.summaryTree.SetItemImage(genericSummaryNode, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+			try:
+				self.summaryTree.SetItemImage(genericSummaryNode, self.locationIcons[item[4]], which = wx.TreeItemIcon_Normal)
+			except:
+				pass
 			self.summaryTree.Expand(self.monsterHabitatNode)
 
 	
@@ -331,21 +372,21 @@ class MonstersTab:
 
 		self.physicalDamageTable.SetColLabelValue(0, "Body Part")
 		self.physicalDamageTable.SetColLabelAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.physicalDamageTable.SetColLabelRenderer(1, cgr.HeaderBitmapColLabelRenderer("images/damage types/cut.png", ""))
-		self.physicalDamageTable.SetColLabelRenderer(2, cgr.HeaderBitmapColLabelRenderer("images/damage types/impact.png", ""))
-		self.physicalDamageTable.SetColLabelRenderer(3, cgr.HeaderBitmapColLabelRenderer("images/damage types/shot.png", ""))
-		self.physicalDamageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/damage types/stun.png", ""))
+		self.physicalDamageTable.SetColLabelRenderer(1, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/cut.png", ""))
+		self.physicalDamageTable.SetColLabelRenderer(2, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/impact.png", ""))
+		self.physicalDamageTable.SetColLabelRenderer(3, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/shot.png", ""))
+		self.physicalDamageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/stun.png", ""))
 		self.physicalDamageTable.SetRowLabelSize(0)
 		self.physicalDamageTable.SetColLabelSize(32)
 		self.physicalDamageTable.SetColSize(0, 200)
 		self.physicalDamageTable.SetDefaultCellAlignment( wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
 		self.elementDamageTable.SetColLabelValue(0, "Body Part")
-		self.elementDamageTable.SetColLabelRenderer(1, cgr.HeaderBitmapColLabelRenderer("images/damage types/fire.png", ""))
-		self.elementDamageTable.SetColLabelRenderer(2, cgr.HeaderBitmapColLabelRenderer("images/damage types/water.png", ""))
-		self.elementDamageTable.SetColLabelRenderer(3, cgr.HeaderBitmapColLabelRenderer("images/damage types/ice.png", ""))
-		self.elementDamageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/damage types/thunder.png", ""))
-		self.elementDamageTable.SetColLabelRenderer(5, cgr.HeaderBitmapColLabelRenderer("images/damage types/dragon.png", ""))
+		self.elementDamageTable.SetColLabelRenderer(1, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/fire.png", ""))
+		self.elementDamageTable.SetColLabelRenderer(2, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/water.png", ""))
+		self.elementDamageTable.SetColLabelRenderer(3, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/ice.png", ""))
+		self.elementDamageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/thunder.png", ""))
+		self.elementDamageTable.SetColLabelRenderer(5, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/dragon.png", ""))
 		self.elementDamageTable.SetColLabelSize(32)
 		self.elementDamageTable.SetRowLabelSize(0)
 		self.elementDamageTable.SetColSize(0, 200)
@@ -355,7 +396,7 @@ class MonstersTab:
 		self.breakDamageTable.SetColLabelValue(1, "Flinch") 
 		self.breakDamageTable.SetColLabelValue(2, "Break")
 		self.breakDamageTable.SetColLabelValue(3, "Sever")
-		self.breakDamageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/kinsect.png", ""))
+		self.breakDamageTable.SetColLabelRenderer(4, cgr.HeaderBitmapColLabelRenderer("images/damage-types-24/kinsect.png", ""))
 		self.breakDamageTable.SetColLabelSize(32)
 		self.breakDamageTable.SetRowLabelSize(0)
 		self.breakDamageTable.SetColSize(0, 200)
@@ -469,7 +510,7 @@ class MonstersTab:
 	def initMaterialDetail(self):
 		self.materialDetailPanel = wx.Panel(self.materialsPanel)
 		self.materialDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.materialImage = wx.Bitmap("images/VectorDrawable2Svg-master/png/ic_items_scale_base128.png", wx.BITMAP_TYPE_ANY)
+		self.materialImage = wx.Bitmap("util/VectorDrawable2Svg-master/png/ic_items_scale_base128.png", wx.BITMAP_TYPE_ANY)
 		self.materialImageLabel = wx.StaticBitmap(self.materialDetailPanel, bitmap=self.materialImage)
 
 		self.materialDetailsPropertyGrid = wxpg.PropertyGridManager(self.materialDetailPanel, style=wxpg.PG_TOOLBAR)
@@ -541,7 +582,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -549,7 +590,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, lowRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 					self.materialsTree.Expand(rewardCondition)
@@ -562,7 +603,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -570,7 +611,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, highRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 					self.materialsTree.Expand(rewardCondition)
@@ -584,7 +625,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -592,7 +633,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
 					self.materialsTree.Expand(rewardCondition)
@@ -613,14 +654,14 @@ class MonstersTab:
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[2]), 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[3]), 2)
-				self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+				self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 				self.materialsTree.SetItemBackgroundColour(monsterMaterial, rankColor)
 			else:
 				rewardCondition = self.materialsTree.AppendItem(rankNodes[dataRow[0]], str(dataRow[1]))
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[2]), 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[3]), 2)
-				self.materialsTree.SetItemImage(monsterMaterial, self.nergidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+				self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 				self.materialsTree.SetItemBackgroundColour(rewardCondition, rankColor)
 				self.materialsTree.SetItemBackgroundColour(monsterMaterial, rankColor)
 				self.materialsTree.Expand(rewardCondition)

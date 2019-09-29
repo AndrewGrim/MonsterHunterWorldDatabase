@@ -17,7 +17,7 @@ class WeaponsTab:
 
 		self.currentlySelectedWeaponID = 1
 		self.currentWeaponTree = "great-sword"
-		self.testIcon = wx.Bitmap("cut24.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
+		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.rarityColors = {
 			1: "C2BFBF",
@@ -192,13 +192,13 @@ class WeaponsTab:
 		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
 
-		self.affinity = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/affinity.png", wx.BITMAP_TYPE_ANY))
-		self.attack = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/attack.png", wx.BITMAP_TYPE_ANY))
-		self.defense = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/defense.png", wx.BITMAP_TYPE_ANY))
-		self.elderseal = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/elderseal.png", wx.BITMAP_TYPE_ANY))
-		self.element = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/element.png", wx.BITMAP_TYPE_ANY))
-		self.phials = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/phials.png", wx.BITMAP_TYPE_ANY))
-		self.slots = self.il.Add(wx.Bitmap("images/weapons/weapon-detail/slots.png", wx.BITMAP_TYPE_ANY))
+		self.affinity = self.il.Add(wx.Bitmap("images/weapon-detail-24/affinity.png", wx.BITMAP_TYPE_ANY))
+		self.attack = self.il.Add(wx.Bitmap("images/weapon-detail-24/attack.png", wx.BITMAP_TYPE_ANY))
+		self.defense = self.il.Add(wx.Bitmap("images/weapon-detail-24/defense.png", wx.BITMAP_TYPE_ANY))
+		self.elderseal = self.il.Add(wx.Bitmap("images/weapon-detail-24/elderseal.png", wx.BITMAP_TYPE_ANY))
+		self.element = self.il.Add(wx.Bitmap("images/weapon-detail-24/element.png", wx.BITMAP_TYPE_ANY))
+		self.phials = self.il.Add(wx.Bitmap("images/weapon-detail-24/phials.png", wx.BITMAP_TYPE_ANY))
+		self.slots = self.il.Add(wx.Bitmap("images/weapon-detail-24/slots.png", wx.BITMAP_TYPE_ANY))
 
 		self.weaponsTree.SetImageList(self.il)
 
@@ -221,21 +221,6 @@ class WeaponsTab:
 		
 		self.weaponsTree.SetMainColumn(0)
 		self.weaponsTree.SetColumnWidth(0, 400)
-
-		self.rarityIcons = {
-			1: self.rarity1,
-			2: self.rarity2,
-			3: self.rarity3,
-			4: self.rarity4,
-			5: self.rarity5,
-			6: self.rarity6,
-			7: self.rarity7,
-			8: self.rarity8,
-			#9: self.rarity9, # TODO iceborne
-			#10: self.rarity10, # TODO iceborne
-			#11: self.rarity11, # TODO iceborne
-			#12: self.rarity12, # TODO iceborne
-		}
 
 		self.weaponTreeIcons = {
 			1: self.attack,
@@ -266,6 +251,7 @@ class WeaponsTab:
 		normalWeaponNode = self.weaponsTree.AppendItem(root, "Normal")
 		kulveWeaponNode = self.weaponsTree.AppendItem(root, "Kulve")
 
+		# TODO icons dont change depending on rarity!!!
 		self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
 		self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
 		self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
@@ -278,6 +264,21 @@ class WeaponsTab:
 		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
+
+		self.rarityIcons = {
+			1: self.rarity1,
+			2: self.rarity2,
+			3: self.rarity3,
+			4: self.rarity4,
+			5: self.rarity5,
+			6: self.rarity6,
+			7: self.rarity7,
+			8: self.rarity8,
+			#9: self.rarity9, # TODO iceborne
+			#10: self.rarity10, # TODO iceborne
+			#11: self.rarity11, # TODO iceborne
+			#12: self.rarity12, # TODO iceborne
+		}
 
 		sql = """
 			SELECT w.id, w.weapon_type, w.category, w.rarity, w.attack, w.attack_true, w.affinity, w.defense, w.slot_1, w.slot_2, w.slot_3, w.element1, w.element1_attack,
@@ -296,9 +297,6 @@ class WeaponsTab:
 		data = conn.execute(sql, ("en", self.currentWeaponTree, ))
 
 		weaponNodes = {}
-		rarityIcon = {
-			1: "images/weapons/",
-		}
 
 		for row in data:
 			if row[2] != "Kulve":
@@ -336,7 +334,7 @@ class WeaponsTab:
 		if row[6] == 0:
 			affinity = ""
 		else:
-			affinity = str(row[6]) + "%"
+			affinity = str(row[6]) + "%" # TODO maybe add a plus in here when affinity is positive
 		if row[7] == 0:
 			defense = ""
 		else:
@@ -359,7 +357,7 @@ class WeaponsTab:
 		# id - hidden, icon
 		self.weaponsTree.SetItemText(weapon, str(row[0]), 13)
 
-		self.weaponsTree.SetItemImage(weapon, self.rarityIcons[row[3]], which = wx.TreeItemIcon_Normal)
+		self.weaponsTree.SetItemImage(weapon, self.rarityIcons[row[3]], which=wx.TreeItemIcon_Normal)
 		weaponNodes[row[0]] = weapon
 
 
@@ -482,17 +480,18 @@ class WeaponsTab:
 		except:
 			pass
 
+		# TODO maybe gray out the element or lighten the color to indicate element that needs awakening
+		#self.weaponDetailList.SetItemTextColour(5, self.c.Find("Gray"))
+		#self.weaponDetailList.SetItemBackgroundColour(5, self.c.Find("Light Gray"))
 		try:
-			element = self.weaponDetailList.GetItemText(4, 1).split(" ")[0]
-			self.weaponDetailList.SetItemBackgroundColour(4, self.hexToRGB(self.elementColors[element]))
+			element1 = self.weaponDetailList.GetItemText(4, 1).split(" ")[0]
+			self.weaponDetailList.SetItemBackgroundColour(4, self.hexToRGB(self.elementColors[element1]))
 		except:
 			pass
 
-		self.weaponDetailList.SetItemTextColour(5, self.c.Find("Gray"))
-		self.weaponDetailList.SetItemBackgroundColour(5, self.c.Find("Light Gray"))
 		try:
-			element = self.weaponDetailList.GetItemText(5, 1).split(" ")[0]
-			self.weaponDetailList.SetItemBackgroundColour(5, self.hexToRGB(self.elementColors[element]))
+			element2 = self.weaponDetailList.GetItemText(5, 1).split(" ")[0]
+			self.weaponDetailList.SetItemBackgroundColour(5, self.hexToRGB(self.elementColors[element2]))
 		except:
 			pass
 	
