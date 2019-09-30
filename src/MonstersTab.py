@@ -63,7 +63,7 @@ class MonstersTab:
 		# sizer containing the monsters details
 		self.monstersDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		# create bitmap from image and load bitmap into a label
-		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
+		conn = sqlite3.connect("MonsterHunter.db")
 		data = conn.execute("SELECT name FROM monsters WHERE id = ?", (self.currentMonsterID, ))
 		monsterIcon = data.fetchone()[0]
 		self.monsterImage = wx.Bitmap("images/monsters/325/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
@@ -114,11 +114,11 @@ class MonstersTab:
 
 		self.testidx = self.il.Add(self.testIcon)
 
-		self.ancientForest = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Ancient Forest.png"))
-		self.wildspireWaste = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Wildspire Waste.png"))
-		self.coralHighlands = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Coral Highlands.png"))
-		self.rottenVale = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Rotten Vale.png"))
-		self.eldersRecess = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/locations-24/Elder's Recess.png"))
+		self.ancientForest = self.il.Add(wx.Bitmap("images/locations-24/Ancient Forest.png"))
+		self.wildspireWaste = self.il.Add(wx.Bitmap("images/locations-24/Wildspire Waste.png"))
+		self.coralHighlands = self.il.Add(wx.Bitmap("images/locations-24/Coral Highlands.png"))
+		self.rottenVale = self.il.Add(wx.Bitmap("images/locations-24/Rotten Vale.png"))
+		self.eldersRecess = self.il.Add(wx.Bitmap("images/locations-24/Elder's Recess.png"))
 
 		self.locationIcons = {
 			"Ancient Forest": self.ancientForest,
@@ -128,17 +128,17 @@ class MonstersTab:
 			"Elder's Recess": self.eldersRecess,
 		}
 
-		self.fire = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/fire.png"))
-		self.water = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/water.png"))
-		self.ice = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/ice.png"))
-		self.thunder = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/thunder.png"))
-		self.dragon = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/dragon.png"))
+		self.fire = self.il.Add(wx.Bitmap("images/damage-types-24/fire.png"))
+		self.water = self.il.Add(wx.Bitmap("images/damage-types-24/water.png"))
+		self.ice = self.il.Add(wx.Bitmap("images/damage-types-24/ice.png"))
+		self.thunder = self.il.Add(wx.Bitmap("images/damage-types-24/thunder.png"))
+		self.dragon = self.il.Add(wx.Bitmap("images/damage-types-24/dragon.png"))
 
-		self.poison = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/poison.png"))
-		self.sleep = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/sleep.png"))
-		self.paralysis = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/paralysis.png"))
-		self.blast = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/blast.png"))
-		self.stun = self.il.Add(wx.Bitmap("../MonsterHunterWorld/images/damage-types-24/stun.png"))
+		self.poison = self.il.Add(wx.Bitmap("images/damage-types-24/poison.png"))
+		self.sleep = self.il.Add(wx.Bitmap("images/damage-types-24/sleep.png"))
+		self.paralysis = self.il.Add(wx.Bitmap("images/damage-types-24/paralysis.png"))
+		self.blast = self.il.Add(wx.Bitmap("images/damage-types-24/blast.png"))
+		self.stun = self.il.Add(wx.Bitmap("images/damage-types-24/stun.png"))
 
 		self.damageTypes = {
 			"Fire": self.fire,
@@ -188,7 +188,7 @@ class MonstersTab:
 			LIMIT 1
 			"""
 
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(monster, ("en", monsterID))
 		data = data.fetchone()
 	
@@ -213,7 +213,7 @@ class MonstersTab:
 		# 23 - tremor ailment
 		# -> 37 ailments
 
-		getName = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
+		getName = sqlite3.connect("MonsterHunter.db")
 		name = getName.execute("SELECT name FROM monsters WHERE id = :monsterID", (self.currentMonsterID, ))
 		name = name.fetchone()
 		monsterName = name[0]
@@ -406,7 +406,7 @@ class MonstersTab:
 
 
 	def loadMonsterDamage(self, monsterID):
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 		
 		sql = """
 			SELECT h.*, pt.name body_part
@@ -557,7 +557,7 @@ class MonstersTab:
 			WHERE r.monster_id = :monsterId ORDER BY r.id
 			"""
 
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", monsterID, ))
 
 		rewardCondition = 0
@@ -699,7 +699,7 @@ class MonstersTab:
 	
 
 	def loadData(self):
-		conn = sqlite3.connect("../MonsterHunterWorld/MonsterHunter.db")
+		conn = sqlite3.connect("MonsterHunter.db")
 		data = conn.execute("SELECT * FROM monsters ORDER by size DESC, name ASC ")
 		i = 0
 
@@ -724,7 +724,7 @@ class MonstersTab:
 
 	def onMaterialSelection(self, event):
 		itemID = self.materialsTree.GetItemText(event.GetItem(), 3)
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 
 		itemInfo = self.loadMonsterMaterialsummaryPage(itemID, conn)
 		itemObtaining = self.loadMaterialObtainingPage(itemID, conn)
@@ -735,7 +735,7 @@ class MonstersTab:
 
 	def initMaterialData(self, itemID):
 		itemID = str(itemID)
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 
 		itemInfo = self.loadMonsterMaterialsummaryPage(itemID, conn)
 		itemObtaining = self.loadMaterialObtainingPage(itemID, conn)

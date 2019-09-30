@@ -293,7 +293,7 @@ class WeaponsTab:
 			ORDER BY w.id ASC
 			"""
 
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentWeaponTree, ))
 
 		weaponNodes = {}
@@ -402,7 +402,7 @@ class WeaponsTab:
 			AND wt.lang_id = :langId
 		"""
 
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, (self.currentlySelectedWeaponID, "en"))
 		data = data.fetchone()
 
@@ -560,7 +560,7 @@ class WeaponsTab:
 			AND w.weapon_id= :weaponId
 			ORDER BY i.id
     	"""
-		conn = sqlite3.connect("../MonsterHunterWorld/mhw.db")
+		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentlySelectedWeaponID))
 		data = data.fetchall()
 
