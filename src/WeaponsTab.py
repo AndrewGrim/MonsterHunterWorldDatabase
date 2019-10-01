@@ -6,7 +6,14 @@ import wx.propgrid as wxpg
 import sqlite3
 import time
 import os
+import typing
+from typing import List
+from typing import Union
+from typing import Tuple
+from typing import Dict
+from typing import NewType
 
+wxTreeListItem = NewType('wxTreeListItem', None)
 
 class WeaponsTab:
 
@@ -313,7 +320,7 @@ class WeaponsTab:
 		#self.weaponsTree.Expand(kulveWeaponNode)
 
 
-	def populateWeaponsTree(self, weaponNode, row, weaponNodes):
+	def populateWeaponsTree(self, weaponNode: wxTreeListItem, row: Tuple[str], weaponNodes: Dict[int, wxTreeListItem]) -> None:
 		if bool(row[19]):
 			# TODO maybe add rarity in a similar manner?? row[3]
 			name = str(row[34]) + " 🔨" # TODO make this clearer that it means craftable
@@ -347,6 +354,7 @@ class WeaponsTab:
 		# sharpness
 		sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
 		self.weaponsTree.SetItemText(weapon, sharpnessSplit[0], 6)
+		weapon.SetImage(6, self.nergidx, wx.TreeItemIcon_Normal)
 		self.weaponsTree.SetItemText(weapon, sharpnessSplit[1], 7)
 		self.weaponsTree.SetItemText(weapon, sharpnessSplit[2], 8)
 		self.weaponsTree.SetItemText(weapon, sharpnessSplit[3], 9)
@@ -458,8 +466,19 @@ class WeaponsTab:
 			"Slots": (data[8:11], self.slots),
 			"Elderseal": (elderseal, self.elderseal),
 			"Defense": (defense, self.defense),
-			"Phial Type": (phial, self.phials),
 		}
+
+		additionalDetails = {
+			"switch-axe": ["Phial Type:", self.phials],
+			"charge-blade": ["Phial Type:", self.phials],
+			"hunting-horn": ["Notes:", self.phials],
+			"gunlance": ["Shelling:", self.phials],
+			"insect-glaive": ["Kinsect Bonus:", self.phials],
+			"light-bowgun": ["Special Ammo:", self.phials, "Deviation:", self.phials],
+			"heavy-bowgun": ["Special Ammo:", self.phials, "Deviation:", self.phials],
+			"bow": ["Coatings:", self.phials],
+		}
+		#"Phial Type": (phial, self.phials),
 
 		for col, (key, value) in enumerate(weaponDetail.items()):
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
@@ -501,8 +520,10 @@ class WeaponsTab:
 		if self.weaponDetailList.GetItemText(8, 1) != "-":
 			self.weaponDetailList.SetItemBackgroundColour(8, self.hexToRGB("#D7CCC8"))
 
-		if self.weaponDetailList.GetItemText(9, 1) != "-":
+		# TODO taken out for the moment as this isnt neccesarilly phial type anymore!
+		"""if self.weaponDetailList.GetItemText(9, 1) != "-":
 			self.weaponDetailList.SetItemBackgroundColour(9, self.hexToRGB("#FFECB3")) # impact still need to do element
+		"""
 
 		sharpnessMaxed = bool(data[17])
 		sharpnessLevels = {}
@@ -581,7 +602,7 @@ class WeaponsTab:
 					pass
 
 
-	def adjustSharpness(self, handicraftLevel, sharpnessMaxed, data):
+	def adjustSharpness(self, handicraftLevel: int, sharpnessMaxed: bool, data: List[str]) -> Union[List[str], List[int]]:
 			if sharpnessMaxed:
 				return data[16].split(",")
 			else:
@@ -626,7 +647,12 @@ class WeaponsTab:
 		self.loadWeaponsTree()
 
 
-	def hexToRGB(self, color):
+	def hexToRGB(self, color: str) -> Tuple[int, int, int]:
+			"""
+			:color = The hexadecimal representation of the color, # hash optional.
+
+			returns = A tuple containing the red, green and blue color information.
+			"""
 			color = color.replace("#", "")
 			red = int(color[0:2], 16)
 			green = int(color[2:4], 16)

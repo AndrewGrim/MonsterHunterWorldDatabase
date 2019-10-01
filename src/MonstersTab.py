@@ -4,6 +4,15 @@ import wx.lib.gizmos as gizmos
 import CustomGridRenderer as cgr
 import wx.propgrid as wxpg
 import sqlite3
+import typing
+from typing import List
+from typing import Union
+from typing import Tuple
+from typing import Dict
+from typing import NewType
+
+wxColour = NewType("wxColour", None)
+sqlite3Connection = NewType("sqlite3Connection", None)
 
 
 class MonstersTab:
@@ -180,7 +189,7 @@ class MonstersTab:
 		self.loadMonsterSummary(self.currentMonsterID)
 
 	
-	def loadMonsterSummary(self, monsterID):
+	def loadMonsterSummary(self, monsterID: int) -> None:
 		monster = """
 			SELECT m.*, t.name, t.ecology, t.description, t.alt_state_description
 			from monster m JOIN monster_text t USING (id)
@@ -405,7 +414,7 @@ class MonstersTab:
 		self.loadMonsterDamage(self.currentMonsterID)
 
 
-	def loadMonsterDamage(self, monsterID):
+	def loadMonsterDamage(self, monsterID: int) -> None:
 		conn = sqlite3.connect("mhw.db")
 		
 		sql = """
@@ -523,7 +532,7 @@ class MonstersTab:
 		self.materialDetailPanel.SetSizer(self.materialDetailSizer)
 	
 
-	def loadMonsterMaterials(self, monsterID):
+	def loadMonsterMaterials(self, monsterID: int) -> None:
 		root = self.materialsTree.AddRoot("Materials")
 
 		# master rank
@@ -648,7 +657,8 @@ class MonstersTab:
 
 	# work in progress
 	# TODO think of a better layout for the data
-	def addMaterialToRank(self, dataRow, rankString, rankCategoriesList, rankColor):
+	def addMaterialToRank(self, dataRow, rankString: str, rankCategoriesList: List[str], rankColor: wxColour) -> None:
+		print(type(dataRow))
 		if dataRow[0] == rankString:
 			if currentCategory in rankCategoriesList:
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
@@ -733,7 +743,7 @@ class MonstersTab:
 		self.materialDetailsPropertyGrid.Clear()
 		self.loadMaterialPropertyGrid(itemInfo, itemObtaining, itemUsage)
 
-	def initMaterialData(self, itemID):
+	def initMaterialData(self, itemID: int) -> None:
 		itemID = str(itemID)
 		conn = sqlite3.connect("mhw.db")
 
@@ -742,7 +752,7 @@ class MonstersTab:
 		itemUsage = self.loadMaterialUsagePage(itemID, conn)
 		self.loadMaterialPropertyGrid(itemInfo, itemObtaining, itemUsage)
 
-	def loadMonsterMaterialsummaryPage(self, itemID, conn):
+	def loadMonsterMaterialsummaryPage(self, itemID: int, conn: sqlite3Connection) -> List[str]:
 		itemDetails = """
 			SELECT i.*, it.name, it.description
 			FROM item i
@@ -774,7 +784,8 @@ class MonstersTab:
 		return itemInfo
 
 	
-	def loadMaterialUsagePage(self, itemID, conn):
+	def loadMaterialUsagePage(self, itemID: int, conn: sqlite3Connection) -> List[List[str]]:
+		# more specifically this: List[List[str], List[str], List[str]]
 
 		charmUsage = """
 			SELECT c.id, c.rarity, c.previous_id, ctext.name, cr.quantity
@@ -855,7 +866,8 @@ class MonstersTab:
 		return [charmUsage, armorUsage, weaponUsage]
 
 
-	def loadMaterialObtainingPage(self, itemID, conn):
+	# TODO missing return type!
+	def loadMaterialObtainingPage(self, itemID: int, conn: sqlite3Connection):
 		itemRewards = """
 			SELECT r.monster_id, mtext.name monster_name, m.size monster_size,
 				rtext.name condition_name, r.rank, r.stack, r.percentage
