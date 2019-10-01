@@ -169,7 +169,7 @@ class WeaponsTab:
 	def initWeaponsTree(self):
 		self.weaponsTree = gizmos.TreeListCtrl(self.weaponsPanel, -1, style=0,
 												agwStyle=
-												  gizmos.TR_DEFAULT_STYLE
+												gizmos.TR_DEFAULT_STYLE
 												#| gizmos.TR_TWIST_BUTTONS
 												| gizmos.TR_ROW_LINES
 												| gizmos.TR_COLUMN_LINES
@@ -204,8 +204,15 @@ class WeaponsTab:
 		self.defense = self.il.Add(wx.Bitmap("images/weapon-detail-24/defense.png", wx.BITMAP_TYPE_ANY))
 		self.elderseal = self.il.Add(wx.Bitmap("images/weapon-detail-24/elderseal.png", wx.BITMAP_TYPE_ANY))
 		self.element = self.il.Add(wx.Bitmap("images/weapon-detail-24/element.png", wx.BITMAP_TYPE_ANY))
-		self.phials = self.il.Add(wx.Bitmap("images/weapon-detail-24/phials.png", wx.BITMAP_TYPE_ANY))
 		self.slots = self.il.Add(wx.Bitmap("images/weapon-detail-24/slots.png", wx.BITMAP_TYPE_ANY))
+
+		self.phialType = self.il.Add(wx.Bitmap("images/weapon-detail-24/phials.png", wx.BITMAP_TYPE_ANY))
+		self.notes = self.il.Add(self.testIcon)
+		self.kinsectBonus = self.il.Add(self.testIcon)
+		self.specialAmmo = self.il.Add(self.testIcon)
+		self.deviation = self.il.Add(self.testIcon)
+		self.coatings = self.il.Add(self.testIcon)
+		self.shelling = self.il.Add(self.testIcon)
 
 		self.weaponsTree.SetImageList(self.il)
 
@@ -352,15 +359,22 @@ class WeaponsTab:
 		self.weaponsTree.SetItemText(weapon, str(row[8:11]), 5)
 		
 		# sharpness
-		sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[0], 6)
-		weapon.SetImage(6, self.nergidx, wx.TreeItemIcon_Normal)
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[1], 7)
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[2], 8)
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[3], 9)
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[4], 10)
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[5], 11)
-		self.weaponsTree.SetItemText(weapon, sharpnessSplit[6], 12)
+		try:
+			sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
+			# TODO work something out with the sharpness graphics
+			# for now just this small icon test
+			weapon.SetImage(6, self.nergidx, wx.TreeItemIcon_Normal)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[0], 6)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[1], 7)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[2], 8)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[3], 9)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[4], 10)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[5], 11)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[6], 12)
+		except:
+			for num in range(6, 13):
+				self.weaponsTree.SetItemText(weapon, "-", num)
+
 		
 		# id - hidden, icon
 		self.weaponsTree.SetItemText(weapon, str(row[0]), 13)
@@ -457,7 +471,7 @@ class WeaponsTab:
 
 		# TODO prob replaces any "None"'s with "-" or ""
 		weaponDetail = {
-			"Rarity": (data[3], self.rarityIcons[data[3]]), # TODO change to svg convert
+			"Rarity": (data[3], self.rarityIcons[data[3]]),
 			"Attack": (data[4], self.attack),
 			"Attack (True)": (data[5], self.attack),
 			"Affinity": (affinity, self.affinity),
@@ -468,22 +482,37 @@ class WeaponsTab:
 			"Defense": (defense, self.defense),
 		}
 
-		additionalDetails = {
-			"switch-axe": ["Phial Type:", self.phials],
-			"charge-blade": ["Phial Type:", self.phials],
-			"hunting-horn": ["Notes:", self.phials],
-			"gunlance": ["Shelling:", self.phials],
-			"insect-glaive": ["Kinsect Bonus:", self.phials],
-			"light-bowgun": ["Special Ammo:", self.phials, "Deviation:", self.phials],
-			"heavy-bowgun": ["Special Ammo:", self.phials, "Deviation:", self.phials],
-			"bow": ["Coatings:", self.phials],
-		}
-		#"Phial Type": (phial, self.phials),
+		# TODO add data[index] to each of them
+		# notes [33] WRB - white red blue
+		# shelling [24:25] - normal 1
+		# phial type [22] - impact / power
+		# kinsect bonus [20] - sever
+		# special ammo [33] - wyvernblast
+		# deviation [32] - ??
+		# 26:31 coatings:
+		# 26 = close
+		# 27 = power
+		# 28 = para
+		# 29 = poison
+		# 30 = sleep
+		# 31 = blast
 
+		additionalDetails = {
+			"switch-axe": ["Phial Type", data[22], self.phialType],
+			"charge-blade": ["Phial Type", data[22], self.phialType],
+			"hunting-horn": ["Notes", data[33], self.notes],
+			"gunlance": ["Shelling", data[24:25], self.shelling],
+			"insect-glaive": ["Kinsect Bonus", data[20], self.kinsectBonus],
+			"light-bowgun": ["Special Ammo", data[33], self.specialAmmo, "Deviation", data[32], self.deviation],
+			"heavy-bowgun": ["Special Ammo", data[33], self.specialAmmo, "Deviation", data[32], self.deviation],
+			"bow": ["Coatings:", data[26:31], self.coatings],
+		}
+
+		# REMOVE col from enumerate isnt used anymore and could be removed
 		for col, (key, value) in enumerate(weaponDetail.items()):
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
 			self.weaponDetailList.SetItem(index, 1, str(value[0]))
-			self.weaponDetailList.SetItemData(index, 0)
+			#self.weaponDetailList.SetItemData(index, 0) # REMOVE seems this doesnt do anything
 
 		self.weaponDetailList.SetColumnWidth(0, 280)
 		self.weaponDetailList.SetColumnWidth(1, 100)
@@ -520,48 +549,72 @@ class WeaponsTab:
 		if self.weaponDetailList.GetItemText(8, 1) != "-":
 			self.weaponDetailList.SetItemBackgroundColour(8, self.hexToRGB("#D7CCC8"))
 
-		# TODO taken out for the moment as this isnt neccesarilly phial type anymore!
 		"""if self.weaponDetailList.GetItemText(9, 1) != "-":
-			self.weaponDetailList.SetItemBackgroundColour(9, self.hexToRGB("#FFECB3")) # impact still need to do element
-		"""
+			self.weaponDetailList.SetItemBackgroundColour(9, self.hexToRGB("#FFECB3")) # impact still need to do element"""
 
-		sharpnessMaxed = bool(data[17])
-		sharpnessLevels = {}
-		for num in (5, 4, 3, 2, 1, 0):
-			sharpnessLevels[num] = self.adjustSharpness(num, sharpnessMaxed, data)	
+		# get the ninth column from the dict, based off of weapon type but if weapon is lbg or hbg then get the 9th and 10th col
+		if self.currentWeaponTree in ["charge-blade", "switch-axe", "hunting-horn", "gunlance", "insect-glaive", "bow"]:
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
+		elif self.currentWeaponTree in ["light-bowgun", "heavy-bowgun"]:
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][5])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][4]))
 
-		self.weaponSharpnessTable.SetColLabelSize(0)
-		self.weaponSharpnessTable.SetRowLabelSize(0)
+		if self.currentWeaponTree not in ["light-bowgun", "heavy-bowgun", "bow"]:
+			# TODO i think we want to do the insert method but actually destroy the widget and note hide it,
+			# unless we can get the sizer to act like its not there
+			if not self.weaponSharpnessTable.IsShown():
+				self.weaponSharpnessTable.Show()
+				print(self.weaponDetailSizer.GetItemCount())
+				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
+				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
+				#self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
 
-		extraPixels = 20
-		self.weaponSharpnessTable.SetColSize(0, 40)
-		self.weaponSharpnessTable.SetColSize(1, (int(sharpnessLevels[5][0]) / 2 + extraPixels))
-		self.weaponSharpnessTable.SetColSize(2, (int(sharpnessLevels[5][1]) / 2 + extraPixels))
-		self.weaponSharpnessTable.SetColSize(3, (int(sharpnessLevels[5][2]) / 2 + extraPixels))
-		self.weaponSharpnessTable.SetColSize(4, (int(sharpnessLevels[5][3]) / 2 + extraPixels))
-		self.weaponSharpnessTable.SetColSize(5, (int(sharpnessLevels[5][4]) / 2 + extraPixels))
-		self.weaponSharpnessTable.SetColSize(6, (int(sharpnessLevels[5][5]) / 2 + extraPixels))
+			sharpnessMaxed = bool(data[17])
+			sharpnessLevels = {}
+			for num in (5, 4, 3, 2, 1, 0):
+				sharpnessLevels[num] = self.adjustSharpness(num, sharpnessMaxed, data)	
 
-		for row in range(6):
-			self.weaponSharpnessTable.SetCellValue(row, 0, "+" + str(row))
+			self.weaponSharpnessTable.SetColLabelSize(0)
+			self.weaponSharpnessTable.SetRowLabelSize(0)
 
-			self.weaponSharpnessTable.SetCellValue(row, 1, str(sharpnessLevels[row][0]))
-			self.weaponSharpnessTable.SetCellBackgroundColour(row, 1, self.c.Find("red"))
+			extraPixels = 20
+			self.weaponSharpnessTable.SetColSize(0, 40)
+			self.weaponSharpnessTable.SetColSize(1, (int(sharpnessLevels[5][0]) / 2 + extraPixels))
+			self.weaponSharpnessTable.SetColSize(2, (int(sharpnessLevels[5][1]) / 2 + extraPixels))
+			self.weaponSharpnessTable.SetColSize(3, (int(sharpnessLevels[5][2]) / 2 + extraPixels))
+			self.weaponSharpnessTable.SetColSize(4, (int(sharpnessLevels[5][3]) / 2 + extraPixels))
+			self.weaponSharpnessTable.SetColSize(5, (int(sharpnessLevels[5][4]) / 2 + extraPixels))
+			self.weaponSharpnessTable.SetColSize(6, (int(sharpnessLevels[5][5]) / 2 + extraPixels))
 
-			self.weaponSharpnessTable.SetCellValue(row, 2, str(sharpnessLevels[row][1]))
-			self.weaponSharpnessTable.SetCellBackgroundColour(row, 2, self.c.Find("coral"))
+			for row in range(6):
+				self.weaponSharpnessTable.SetCellValue(row, 0, "+" + str(row))
 
-			self.weaponSharpnessTable.SetCellValue(row, 3, str(sharpnessLevels[row][2]))
-			self.weaponSharpnessTable.SetCellBackgroundColour(row, 3, self.c.Find("yellow"))
+				self.weaponSharpnessTable.SetCellValue(row, 1, str(sharpnessLevels[row][0]))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 1, self.c.Find("red"))
 
-			self.weaponSharpnessTable.SetCellValue(row, 4, str(sharpnessLevels[row][3]))
-			self.weaponSharpnessTable.SetCellBackgroundColour(row, 4, self.c.Find("green"))
+				self.weaponSharpnessTable.SetCellValue(row, 2, str(sharpnessLevels[row][1]))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 2, self.c.Find("coral"))
 
-			self.weaponSharpnessTable.SetCellValue(row, 5, str(sharpnessLevels[row][4]))
-			self.weaponSharpnessTable.SetCellBackgroundColour(row, 5, self.c.Find("slate blue"))
+				self.weaponSharpnessTable.SetCellValue(row, 3, str(sharpnessLevels[row][2]))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 3, self.c.Find("yellow"))
 
-			self.weaponSharpnessTable.SetCellValue(row, 6, str(sharpnessLevels[row][5]))
-			self.weaponSharpnessTable.SetCellBackgroundColour(row, 6, self.c.Find("white"))
+				self.weaponSharpnessTable.SetCellValue(row, 4, str(sharpnessLevels[row][3]))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 4, self.c.Find("green"))
+
+				self.weaponSharpnessTable.SetCellValue(row, 5, str(sharpnessLevels[row][4]))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 5, self.c.Find("slate blue"))
+
+				self.weaponSharpnessTable.SetCellValue(row, 6, str(sharpnessLevels[row][5]))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 6, self.c.Find("white"))
+		else:
+			if self.weaponSharpnessTable.IsShown():
+				self.weaponSharpnessTable.Hide()
+				#print(self.weaponDetailSizer.GetItem(2))
+				self.weaponDetailSizer.Remove(1)
+				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
 		# TODO maybe split sharpness with each row having its own grid or listctrl this way allowing me to show
 		# the difference in in sharpness visually per handicraft level as opposed to just numbers
@@ -634,7 +687,10 @@ class WeaponsTab:
 				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.ClearAll()
-			self.weaponSharpnessTable.ClearGrid()
+			try:
+				self.weaponSharpnessTable.ClearGrid()
+			except:
+				pass
 			self.materialsRequiredPropertyGrid.Clear() # propertygrid actually needs a page otherwise clear doesnt work
 	
 			self.loadWeaponDetails()
