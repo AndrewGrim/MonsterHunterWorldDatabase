@@ -402,9 +402,41 @@ class WeaponsTab:
 
 		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
 
+		self.notesList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
+																	| wx.BORDER_NONE
+																	| wx.LC_NO_HEADER
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+
+		self.notesList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		
+		self.weaponDetailSizer.Add(self.notesList, 5, wx.EXPAND)
+
+		self.ammoTypesList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
+																	| wx.BORDER_NONE
+																	| wx.LC_NO_HEADER
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+
+		self.ammoTypesList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		
+		self.weaponDetailSizer.Add(self.ammoTypesList, 5, wx.EXPAND)
+
 		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
 
 		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 4, wx.EXPAND)
+
+		# TODO implements this for hunting horn and both bowguns
+		# ie hide the lists when the weapon is something else and display them when the weapon type matches
+		# obviously - hh still has sharpness and only needs notes in addition to that
+		# while bowguns lose both sharpness and notes but get ammo list
+		self.notesList.Hide()
+		self.weaponDetailSizer.Remove(2)
+		self.ammoTypesList.Hide()
+		self.weaponDetailSizer.Remove(2) # 3 goes down to 2?
+		self.weaponDetailSizer.Layout()
 
 		# TODO prob move all the widgets in here into their own foldable panels, and change damage to foldable panel as well
 		self.loadWeaponDetails()
