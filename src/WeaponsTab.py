@@ -185,6 +185,8 @@ class WeaponsTab:
 
 		self.nergidx = self.il.Add(self.testIcon)
 
+		self.sharpnessTest = self.il.Add(wx.Bitmap("sharpnessTest.png"))
+
 		self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
 		self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
 		self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
@@ -206,13 +208,19 @@ class WeaponsTab:
 		self.element = self.il.Add(wx.Bitmap("images/weapon-detail-24/element.png", wx.BITMAP_TYPE_ANY))
 		self.slots = self.il.Add(wx.Bitmap("images/weapon-detail-24/slots.png", wx.BITMAP_TYPE_ANY))
 
+		self.sharpness = self.il.Add(wx.Bitmap("images/weapon-detail-24/whetstone.png", wx.BITMAP_TYPE_ANY))
+
+		self.slots1 = self.il.Add(wx.Bitmap("images/decoration-slots-24/1.png", wx.BITMAP_TYPE_ANY))
+		self.slots2 = self.il.Add(wx.Bitmap("images/decoration-slots-24/2.png", wx.BITMAP_TYPE_ANY))
+		self.slots3 = self.il.Add(wx.Bitmap("images/decoration-slots-24/3.png", wx.BITMAP_TYPE_ANY))
+
 		self.phialType = self.il.Add(wx.Bitmap("images/weapon-detail-24/phials.png", wx.BITMAP_TYPE_ANY))
-		self.notes = self.il.Add(self.testIcon)
-		self.kinsectBonus = self.il.Add(self.testIcon)
-		self.specialAmmo = self.il.Add(self.testIcon)
+		self.notes = self.il.Add(wx.Bitmap("images/weapon-detail-24/notes.png", wx.BITMAP_TYPE_ANY))
+		self.kinsectBonus = self.il.Add(wx.Bitmap("images/damage-types-24/kinsect.png", wx.BITMAP_TYPE_ANY))
+		self.specialAmmo = self.il.Add(wx.Bitmap("images/weapon-detail-24/specialammo.png", wx.BITMAP_TYPE_ANY))
 		self.deviation = self.il.Add(self.testIcon)
 		self.coatings = self.il.Add(self.testIcon)
-		self.shelling = self.il.Add(self.testIcon)
+		self.shelling = self.il.Add(wx.Bitmap("images/weapon-detail-24/shelling.png", wx.BITMAP_TYPE_ANY))
 
 		self.weaponsTree.SetImageList(self.il)
 
@@ -221,15 +229,18 @@ class WeaponsTab:
 		self.weaponsTree.AddColumn("") # Element/Status
 		self.weaponsTree.AddColumn("") # Affinity
 		self.weaponsTree.AddColumn("") # Defense
-		self.weaponsTree.AddColumn("") # Slots
+		self.weaponsTree.AddColumn("") # Slots 1
+		self.weaponsTree.AddColumn("") # Slots 2
+		self.weaponsTree.AddColumn("") # Slots 3
 		
-		self.weaponsTree.AddColumn("R") # R
-		self.weaponsTree.AddColumn("O") # O
-		self.weaponsTree.AddColumn("Y") # Y
-		self.weaponsTree.AddColumn("G") # G
-		self.weaponsTree.AddColumn("B") # B
-		self.weaponsTree.AddColumn("W") # W
-		self.weaponsTree.AddColumn("P") # P
+		# sharpness
+		self.weaponsTree.AddColumn("") # R
+		self.weaponsTree.AddColumn("") # O
+		self.weaponsTree.AddColumn("") # Y
+		self.weaponsTree.AddColumn("") # G
+		self.weaponsTree.AddColumn("") # B
+		self.weaponsTree.AddColumn("") # W
+		self.weaponsTree.AddColumn("") # P
 		
 		self.weaponsTree.AddColumn("id")
 		
@@ -242,20 +253,42 @@ class WeaponsTab:
 			3: self.affinity,
 			4: self.defense,
 			5: self.slots,
+			6: self.slots,
+			7: self.slots,
+			8: self.sharpness,
+			9: self.sharpness,
+			10: self.sharpness,
+			11: self.sharpness,
+			12: self.sharpness,
+			13: self.sharpness,
+			14: self.sharpness,
 		}
 
-		for num in range(1, 6):
+		self.decorationSlotsIcons = {
+			1: self.slots1,
+			2: self.slots2,
+			3: self.slots3,
+		}
+
+		for num in range(1, 8):
 			self.weaponsTree.SetColumnImage(num, self.weaponTreeIcons[num])
 			self.weaponsTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-			self.weaponsTree.SetColumnWidth(num, 35)
+			self.weaponsTree.SetColumnWidth(num, 24)
 
-		for num in range(6, 13):
-			#self.weaponsTree.SetColumnImage(num, self.nergidx)
+		self.weaponsTree.SetColumnWidth(1, 35)
+		self.weaponsTree.SetColumnWidth(2, 35)
+		self.weaponsTree.SetColumnWidth(3, 35)
+		self.weaponsTree.SetColumnWidth(4, 35)
+
+		# TODO either set to 8 or 14 or all or none, i'm gravitating towards none since the images will be self explanatory
+		#self.weaponsTree.SetColumnImage(14, self.weaponTreeIcons[14])
+
+		for num in range(8, 15):
+			#self.weaponsTree.SetColumnImage(num, self.weaponTreeIcons[num]) # REMOVE
 			self.weaponsTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
 			self.weaponsTree.SetColumnWidth(num, 24)
 		
-		self.weaponsTree.SetColumnWidth(5, 50)
-		self.weaponsTree.SetColumnWidth(13, 0)
+		self.weaponsTree.SetColumnWidth(15, 0)
 
 		self.loadWeaponsTree()
 
@@ -353,24 +386,44 @@ class WeaponsTab:
 			defense = ""
 		else:
 			defense = "+" + str(row[7])
+
 		self.weaponsTree.SetItemText(weapon, element, 2) 
 		self.weaponsTree.SetItemText(weapon, affinity, 3)
 		self.weaponsTree.SetItemText(weapon, defense, 4)
-		self.weaponsTree.SetItemText(weapon, str(row[8:11]), 5)
+
+		if row[8] != 0:
+			weapon.SetImage(5, self.decorationSlotsIcons[row[8]], wx.TreeItemIcon_Normal)
+		if row[9] != 0:
+			weapon.SetImage(6, self.decorationSlotsIcons[row[9]], wx.TreeItemIcon_Normal)
+		if row[10] != 0:
+			weapon.SetImage(7, self.decorationSlotsIcons[row[10]], wx.TreeItemIcon_Normal)
+		#self.weaponsTree.SetItemText(weapon, str(row[8]), 5) # TODO split into 3 three cols, with an appropriate image for each
+		#self.weaponsTree.SetItemText(weapon, str(row[9]), 6) # TODO split into 3 three cols, with an appropriate image for each
+		#self.weaponsTree.SetItemText(weapon, str(row[10]), 7) # TODO split into 3 three cols, with an appropriate image for each
 		
 		# sharpness
 		try:
 			sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
 			# TODO work something out with the sharpness graphics
 			# for now just this small icon test
-			weapon.SetImage(6, self.nergidx, wx.TreeItemIcon_Normal)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[0], 6)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[1], 7)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[2], 8)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[3], 9)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[4], 10)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[5], 11)
-			self.weaponsTree.SetItemText(weapon, sharpnessSplit[6], 12)
+			# TODO genius really, divide the total sharpness(400) by 2.38 so that the sharpness is represented...
+			# to scale within 168px and then make that image based off of data from the sharpness attribute
+			# then implement the example below
+			# REMOVE placeholders
+			weapon.SetImage(8, self.sharpnessTest, wx.TreeItemIcon_Normal)
+			weapon.SetImage(9, self.sharpnessTest + 1, wx.TreeItemIcon_Normal)
+			weapon.SetImage(10, self.sharpnessTest + 2, wx.TreeItemIcon_Normal)
+			weapon.SetImage(11, self.sharpnessTest + 3, wx.TreeItemIcon_Normal)
+			weapon.SetImage(12, self.sharpnessTest + 4, wx.TreeItemIcon_Normal)
+			weapon.SetImage(13, self.sharpnessTest + 5, wx.TreeItemIcon_Normal)
+			weapon.SetImage(14, self.sharpnessTest + 6, wx.TreeItemIcon_Normal)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[0], 8)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[1], 9)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[2], 10)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[3], 11)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[4], 12)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[5], 13)
+			self.weaponsTree.SetItemText(weapon, sharpnessSplit[6], 14)
 		except:
 			for num in range(6, 13):
 				self.weaponsTree.SetItemText(weapon, "-", num)
@@ -467,6 +520,9 @@ class WeaponsTab:
 		info.Text = "Attribute"
 		self.weaponDetailList.InsertColumn(0, info)
 
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = "Value"
 		self.weaponDetailList.InsertColumn(1, info)
@@ -544,6 +600,8 @@ class WeaponsTab:
 		for col, (key, value) in enumerate(weaponDetail.items()):
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
 			self.weaponDetailList.SetItem(index, 1, str(value[0]))
+			#self.weaponDetailList.SetItem(index, 1, str(value[0]), col + 16) # REMOVE i dont think this helps
+			# if anything i would show the slots using the unicode characters instead
 			#self.weaponDetailList.SetItemData(index, 0) # REMOVE seems this doesnt do anything
 
 		self.weaponDetailList.SetColumnWidth(0, 280)
