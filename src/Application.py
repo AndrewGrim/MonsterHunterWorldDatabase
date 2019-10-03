@@ -31,9 +31,8 @@ class Application(wx.Frame):
 
 		# to trigger onSize event so the table looks as it should
 		# TODO could probably replace this by calling layout or refresh or something
-		self.SetSize(1199, 1000)
+		self.SetSize(1400, 1150)
 		self.Center()
-		self.SetSize(1200, 1000)
 
 		# TEST
 		self.mainNotebook.SetSelection(1) # weapons tab

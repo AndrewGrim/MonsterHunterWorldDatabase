@@ -92,11 +92,21 @@ class WeaponsTab:
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponsPanel)
 		self.weaponDetailPanel = wx.Panel(self.weaponDetailsNotebook)
+		self.weaponSongsPanel = wx.Panel(self.weaponDetailsNotebook)
+		self.weaponAmmoPanel = wx.Panel(self.weaponDetailsNotebook)
 		#self.weaponFamilyPanel = wx.Panel(self.weaponDetailsNotebook) # REMOVE i dont think this is much use
 		
 		self.weaponDetailSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponDetailsNotebook.AddPage(self.weaponDetailPanel, "Detail")
 		self.weaponDetailPanel.SetSizer(self.weaponDetailSizer)
+
+		self.weaponSongsSizer = wx.BoxSizer(wx.VERTICAL)
+		self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
+		self.weaponSongsPanel.SetSizer(self.weaponSongsSizer)
+
+		self.weaponAmmoSizer = wx.BoxSizer(wx.VERTICAL)
+		self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
+		self.weaponAmmoPanel.SetSizer(self.weaponAmmoSizer)
 		
 		#self.weaponFamilySizer = wx.BoxSizer(wx.VERTICAL) # REMOVE i dont think this is much use
 		#self.weaponDetailsNotebook.AddPage(self.weaponFamilyPanel, "Family") # REMOVE i dont think this is much use
@@ -183,7 +193,7 @@ class WeaponsTab:
 		isz = (24, 24)
 		self.il = wx.ImageList(isz[0], isz[1])
 
-		self.nergidx = self.il.Add(self.testIcon)
+		self.test = self.il.Add(self.testIcon)
 
 		self.sharpnessTest = self.il.Add(wx.Bitmap("sharpnessTest.png"))
 
@@ -215,14 +225,28 @@ class WeaponsTab:
 		self.slots3 = self.il.Add(wx.Bitmap("images/decoration-slots-24/3.png", wx.BITMAP_TYPE_ANY))
 
 		self.phialType = self.il.Add(wx.Bitmap("images/weapon-detail-24/phials.png", wx.BITMAP_TYPE_ANY))
+
 		self.notes = self.il.Add(wx.Bitmap("images/weapon-detail-24/notes.png", wx.BITMAP_TYPE_ANY))
+		self.note1 = self.il.Add(wx.Bitmap("images/weapon-detail-24/note1.png", wx.BITMAP_TYPE_ANY))
+		self.note2 = self.il.Add(wx.Bitmap("images/weapon-detail-24/note2.png", wx.BITMAP_TYPE_ANY))
+		self.note3 = self.il.Add(wx.Bitmap("images/weapon-detail-24/note3.png", wx.BITMAP_TYPE_ANY))
+
 		self.kinsectBonus = self.il.Add(wx.Bitmap("images/damage-types-24/kinsect.png", wx.BITMAP_TYPE_ANY))
+
 		self.specialAmmo = self.il.Add(wx.Bitmap("images/weapon-detail-24/specialammo.png", wx.BITMAP_TYPE_ANY))
-		self.deviation = self.il.Add(self.testIcon)
-		self.coatings = self.il.Add(self.testIcon)
+		self.deviation = self.il.Add(wx.Bitmap("images/weapon-detail-24/deviation.png"))
+
+		self.closeCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+		self.powerCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+		self.paralysisCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+		self.poisonCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+		self.sleepCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+		self.blastCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+
 		self.shelling = self.il.Add(wx.Bitmap("images/weapon-detail-24/shelling.png", wx.BITMAP_TYPE_ANY))
 
 		self.weaponsTree.SetImageList(self.il)
+		self.weaponDetailsNotebook.AssignImageList(self.il)
 
 		self.weaponsTree.AddColumn("Name")
 		self.weaponsTree.AddColumn("") # Physical
@@ -376,8 +400,9 @@ class WeaponsTab:
 		elif row[15] == 1:
 			element = "(" + str(row[12]) + ")"
 			# special color for dual element?? or alternatively have two columns for elements
-			if row[14] != None:
-				element = str(row[12]) + "\n" + str(row[14])
+		# i think just use the generic element icon and leave it at that, element number is the same anyway(always??) and it messes with row height 
+		"""if row[14] != None:
+			element = str(row[12]) + "\n" + str(row[14])"""
 		if row[6] == 0:
 			affinity = ""
 		else:
@@ -438,60 +463,38 @@ class WeaponsTab:
 
 	def initWeaponDetailTab(self):
 		self.weaponDetailList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
-																	| wx.BORDER_NONE
 																	| wx.LC_NO_HEADER
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-
 		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
 		self.weaponDetailList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onWeaponDetailSelect)
 		self.weaponDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		
 		self.weaponDetailSizer.Add(self.weaponDetailList, 5, wx.EXPAND)
 
 		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponSharpnessTable.CreateGrid(6, 7)
-
-		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
-
-		self.notesList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
-																	| wx.BORDER_NONE
-																	| wx.LC_NO_HEADER
-																	| wx.LC_VRULES
-																	| wx.LC_HRULES
-																	)
-
-		self.notesList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		
-		self.weaponDetailSizer.Add(self.notesList, 5, wx.EXPAND)
-
-		self.ammoTypesList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
-																	| wx.BORDER_NONE
-																	| wx.LC_NO_HEADER
-																	| wx.LC_VRULES
-																	| wx.LC_HRULES
-																	)
-
-		self.ammoTypesList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		
-		self.weaponDetailSizer.Add(self.ammoTypesList, 5, wx.EXPAND)
+		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.TOP, 10)
 
 		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
-
 		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 4, wx.EXPAND)
 
-		# TODO implements this for hunting horn and both bowguns
-		# ie hide the lists when the weapon is something else and display them when the weapon type matches
-		# obviously - hh still has sharpness and only needs notes in addition to that
-		# while bowguns lose both sharpness and notes but get ammo list
-		self.notesList.Hide()
-		self.weaponDetailSizer.Remove(2)
-		self.ammoTypesList.Hide()
-		self.weaponDetailSizer.Remove(2) # 3 goes down to 2?
-		self.weaponDetailSizer.Layout()
+		self.weaponSongsList = wx.ListCtrl(self.weaponSongsPanel, style=wx.LC_REPORT
+																	#| wx.LC_NO_HEADER
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.weaponSongsList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.weaponSongsSizer.Add(self.weaponSongsList, 1, wx.EXPAND)
 
-		# TODO prob move all the widgets in here into their own foldable panels, and change damage to foldable panel as well
+		self.weaponAmmoList = wx.ListCtrl(self.weaponAmmoPanel, style=wx.LC_REPORT
+																	#| wx.LC_NO_HEADER
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.weaponAmmoList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.weaponAmmoSizer.Add(self.weaponAmmoList, 1, wx.EXPAND)
+
 		self.loadWeaponDetails()
 		self.loadWeaponMaterials()
 
@@ -501,7 +504,7 @@ class WeaponsTab:
 			SELECT w.id, w.weapon_type, w.category, w.rarity, w.attack, w.attack_true, w.affinity, w.defense, w.slot_1, w.slot_2, w.slot_3, w.element1, w.element1_attack,
 				w.element2, w.element2_attack, w.element_hidden, w.sharpness, w.sharpness_maxed, w.previous_weapon_id, w.craftable, w.kinsect_bonus,
 				w.elderseal, w.phial, w.phial_power, w.shelling, w.shelling_level, w.coating_close, w.coating_power, w.coating_poison, w.coating_paralysis, w.coating_sleep, w.coating_blast,
-				w.notes, wt.name
+				w.notes, wa.special_ammo, wa.deviation, wt.name
 			FROM weapon w
 				JOIN weapon_text wt USING (id)
 				LEFT OUTER JOIN weapon_ammo wa ON w.ammo_id = wa.id
@@ -571,12 +574,12 @@ class WeaponsTab:
 		}
 
 		# TODO add data[index] to each of them
-		# notes [33] WRB - white red blue
+		# notes [32] WRB - white red blue
 		# shelling [24:25] - normal 1
 		# phial type [22] - impact / power
 		# kinsect bonus [20] - sever
 		# special ammo [33] - wyvernblast
-		# deviation [32] - ??
+		# deviation [34] - none / low
 		# 26:31 coatings:
 		# 26 = close
 		# 27 = power
@@ -585,27 +588,49 @@ class WeaponsTab:
 		# 30 = sleep
 		# 31 = blast
 
+	
+		note1 = str(data[32])[0]
+		note2 = str(data[32])[1]
+		note3 = str(data[32])[2]
+		
+
 		additionalDetails = {
 			"switch-axe": ["Phial Type", data[22], self.phialType],
 			"charge-blade": ["Phial Type", data[22], self.phialType],
-			"hunting-horn": ["Notes", data[33], self.notes],
 			"gunlance": ["Shelling", data[24:25], self.shelling],
 			"insect-glaive": ["Kinsect Bonus", data[20], self.kinsectBonus],
-			"light-bowgun": ["Special Ammo", data[33], self.specialAmmo, "Deviation", data[32], self.deviation],
-			"heavy-bowgun": ["Special Ammo", data[33], self.specialAmmo, "Deviation", data[32], self.deviation],
-			"bow": ["Coatings:", data[26:31], self.coatings],
+
+			"hunting-horn": ["Notes", self.notes,
+							"Note 1", note1, self.note1,
+							"Note 2", note2, self.note2,
+							"Note 3", note3, self.note3,],
+
+			"light-bowgun": ["Special Ammo", data[33], self.specialAmmo,
+							"Deviation", data[34], self.deviation,],
+
+			"heavy-bowgun": ["Special Ammo", data[33], self.specialAmmo,
+							"Deviation", data[34], self.deviation],
+
+			"bow": ["Close", data[26], self.closeCoating,
+					"Power", data[27], self.powerCoating,
+					"Paralysis", data[28], self.paralysisCoating,
+					"Poison", data[29], self.poisonCoating,
+					"Sleep", data[30], self.sleepCoating,
+					"Blast", data[31], self.blastCoating,],
 		}
 
 		# REMOVE col from enumerate isnt used anymore and could be removed
 		for col, (key, value) in enumerate(weaponDetail.items()):
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
 			self.weaponDetailList.SetItem(index, 1, str(value[0]))
-			#self.weaponDetailList.SetItem(index, 1, str(value[0]), col + 16) # REMOVE i dont think this helps
-			# if anything i would show the slots using the unicode characters instead
-			#self.weaponDetailList.SetItemData(index, 0) # REMOVE seems this doesnt do anything
+	
+		#index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
+		#self.weaponDetailList.SetItem(index, 1, str(value[0]), col + 16) # REMOVE i dont think this helps
+		# if anything i would show the slots using the unicode characters instead
+		#self.weaponDetailList.SetItemData(index, 0) # REMOVE seems this doesnt do anything
 
 		self.weaponDetailList.SetColumnWidth(0, 280)
-		self.weaponDetailList.SetColumnWidth(1, 100)
+		self.weaponDetailList.SetColumnWidth(1, 170)
 		
 		self.weaponDetailList.SetItemBackgroundColour(0, self.hexToRGB(self.rarityColors[int(self.weaponDetailList.GetItemText(0, 1))]))
 
@@ -639,11 +664,13 @@ class WeaponsTab:
 		if self.weaponDetailList.GetItemText(8, 1) != "-":
 			self.weaponDetailList.SetItemBackgroundColour(8, self.hexToRGB("#D7CCC8"))
 
-		"""if self.weaponDetailList.GetItemText(9, 1) != "-":
-			self.weaponDetailList.SetItemBackgroundColour(9, self.hexToRGB("#FFECB3")) # impact still need to do element"""
+		try:
+			self.weaponDetailsNotebook.RemovePage(1)
+			self.weaponDetailsNotebook.RemovePage(1)
+		except:
+			pass
 
-		# get the ninth column from the dict, based off of weapon type but if weapon is lbg or hbg then get the 9th and 10th col
-		if self.currentWeaponTree in ["charge-blade", "switch-axe", "hunting-horn", "gunlance", "insect-glaive", "bow"]:
+		if self.currentWeaponTree in ["charge-blade", "switch-axe", "gunlance", "insect-glaive"]:
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
 			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
 		elif self.currentWeaponTree in ["light-bowgun", "heavy-bowgun"]:
@@ -651,13 +678,41 @@ class WeaponsTab:
 			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][5])
 			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][4]))
+			self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
+			self.weaponDetailsNotebook.SetPageImage(1, self.deviation)
+			self.loadBowgunAmmo()
+		elif self.currentWeaponTree == "bow":
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][5])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][4]))
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][8])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][7]))
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][9], additionalDetails[self.currentWeaponTree][11])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][10]))
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][12], additionalDetails[self.currentWeaponTree][14])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][13]))
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][15], additionalDetails[self.currentWeaponTree][17])
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][16]))
+		elif self.currentWeaponTree == "hunting-horn":
+			# TODO probably move the note icons in the the second column, and maybe do the same with coatings
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][1])
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][3]), self.note1)
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][6]), self.note2)
+			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
+			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][9]), self.note3)
+			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Notes")
+			self.weaponDetailsNotebook.SetPageImage(1, self.notes)
+			self.loadHuntingHornSongs()
 
 		if self.currentWeaponTree not in ["light-bowgun", "heavy-bowgun", "bow"]:
 			# TODO i think we want to do the insert method but actually destroy the widget and note hide it,
 			# unless we can get the sizer to act like its not there
 			if not self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Show()
-				print(self.weaponDetailSizer.GetItemCount())
+				#print(self.weaponDetailSizer.GetItemCount())
 				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 				#self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
@@ -706,10 +761,134 @@ class WeaponsTab:
 				self.weaponDetailSizer.Remove(1)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
-		# TODO maybe split sharpness with each row having its own grid or listctrl this way allowing me to show
-		# the difference in in sharpness visually per handicraft level as opposed to just numbers
 
+	def loadBowgunAmmo(self):
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Ammo Types"
+		self.weaponAmmoList.InsertColumn(0, info)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Capacity"
+		self.weaponAmmoList.InsertColumn(1, info)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Type+Recoil"
+		self.weaponAmmoList.InsertColumn(2, info)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Reload"
+		self.weaponAmmoList.InsertColumn(3, info)
+
+		self.weaponAmmoList.SetColumnWidth(0, 132)
+		self.weaponAmmoList.SetColumnWidth(1, 102)
+		self.weaponAmmoList.SetColumnWidth(2, 112)
+		self.weaponAmmoList.SetColumnWidth(3, 102)
+
+		sql = """
+			SELECT wa.id AS ammo_id, wa.deviation, wa.special_ammo, wa.normal1_clip, wa.normal1_rapid, wa.normal1_recoil, wa.normal1_reload, wa.normal2_clip, wa.normal2_rapid,
+			wa.normal2_recoil, wa.normal2_reload, wa.normal3_clip, wa.normal3_rapid, wa.normal3_recoil, wa.normal3_reload, wa.pierce1_clip, wa.pierce1_rapid, wa.pierce1_recoil, wa.pierce1_reload,
+			wa.pierce2_clip, wa.pierce2_rapid, wa.pierce2_recoil, wa.pierce2_reload, wa.pierce3_clip, wa.pierce3_rapid, wa.pierce3_recoil, wa.pierce3_reload, wa.spread1_clip, wa.spread1_rapid,
+			wa.spread1_recoil, wa.spread1_reload, wa.spread2_clip, wa.spread2_rapid, wa.spread2_recoil, wa.spread2_reload, wa.spread3_clip, wa.spread3_rapid, wa.spread3_recoil, wa.spread3_reload,
+			wa.sticky1_clip, wa.sticky1_rapid, wa.sticky1_recoil, wa.sticky1_reload, wa.sticky2_clip, wa.sticky2_rapid, wa.sticky2_recoil, wa.sticky2_reload, wa.sticky3_clip, wa.sticky3_rapid, wa.sticky3_recoil, wa.sticky3_reload,
+			wa.cluster1_clip, wa.cluster1_rapid, wa.cluster1_recoil, wa.cluster1_reload, wa.cluster2_clip, wa.cluster2_rapid, wa.cluster2_recoil, wa.cluster2_reload, wa.cluster3_clip, wa.cluster3_rapid, wa.cluster3_recoil, wa.cluster3_reload,
+			wa.recover1_clip, wa.recover1_rapid, wa.recover1_recoil, wa.recover1_reload, wa.recover2_clip, wa.recover2_rapid, wa.recover2_recoil, wa.recover2_reload, wa.poison1_clip, wa.poison1_rapid, wa.poison1_recoil, wa.poison1_reload,
+			wa.poison2_clip, wa.poison2_rapid, wa.poison2_recoil, wa.poison2_reload, wa.paralysis1_clip, wa.paralysis1_rapid, wa.paralysis1_recoil, wa.paralysis1_reload, wa.paralysis2_clip, wa.paralysis2_rapid, wa.paralysis2_recoil, wa.paralysis2_reload,
+			wa.sleep1_clip, wa.sleep1_rapid, wa.sleep1_recoil, wa.sleep1_reload, wa.sleep2_clip, wa.sleep2_rapid, wa.sleep2_recoil, wa.sleep2_reload, wa.exhaust1_clip, wa.exhaust1_rapid, wa.exhaust1_recoil, wa.exhaust1_reload,
+			wa.exhaust2_clip, wa.exhaust2_rapid, wa.exhaust2_recoil, wa.exhaust2_reload, wa.flaming_clip, wa.flaming_rapid, wa.flaming_recoil, wa.flaming_reload, wa.water_clip, wa.water_rapid, wa.water_recoil, wa.water_reload,
+			wa.freeze_clip, wa.freeze_rapid, wa.freeze_recoil, wa.freeze_reload, wa.thunder_clip, wa.thunder_rapid, wa.thunder_recoil, wa.thunder_reload, wa.dragon_clip, wa.dragon_rapid, wa.dragon_recoil, wa.dragon_reload,
+			wa.slicing_clip, wa.slicing_rapid, wa.slicing_recoil, wa.slicing_reload, wa.wyvern_clip, wa.wyvern_reload, wa.demon_clip, wa.demon_recoil, wa.demon_reload, wa.armor_clip, wa.armor_recoil, wa.armor_reload, wa.tranq_clip, wa.tranq_recoil, wa.tranq_reload
+
+			FROM weapon w
+				JOIN weapon_text wt USING (id)
+				LEFT OUTER JOIN weapon_ammo wa ON w.ammo_id = wa.id
+			WHERE w.id = :weaponId
+			AND wt.lang_id = :langId
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedWeaponID, "en"))
+		data = data.fetchone()
 	
+		ammoTypes = [
+					"Normal 1", "Normal 2", "Normal 3",
+					"Pierce 1", "Pierce 2", "Pierce 3",
+					"Spread 1", "Spread 2", "Spread 3",
+					"Sticky 1", "Sticky 2", "Sticky 3",
+					"Cluster 1", "Cluster 2", "Cluster 3",
+					"Recover 1", "Recover 2",
+					"Poison 1", "Poison 2",
+					"Paralysis 1", "Paralysis 2",
+					"Sleep 1", "Sleep 2",
+					"Exhaust 1", "Exhaust 2",
+					"Flaming",
+					"Water",
+					"Freeze",
+					"Thunder",
+					"Dragon",
+					"Slicing",
+					"Wyvern",
+					"Demon",
+					"Armor",
+					"Tranq",
+					]
+
+		col = 3
+		# different checks are used avoid going out of bounds since not all ammo types have the same amount of columns
+		for item in ammoTypes:
+			if col == 127:
+				if data[col] != 0 and data[col] != None:
+					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, self.test)
+					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
+					if self.currentWeaponTree == "heavy-bowgun":
+						self.weaponAmmoList.SetItem(index, 2, "Rapid")
+					self.weaponAmmoList.SetItem(index, 3, str(data[col + 1]).capitalize())
+			elif col > 127:
+				if data[col] != 0 and data[col] != None:
+					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, self.test)
+					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
+					self.weaponAmmoList.SetItem(index, 2, "Normal+" + str(data[col + 1]))
+					self.weaponAmmoList.SetItem(index, 3, str(data[col + 2]).capitalize())
+			else:
+				if data[col] != 0 and data[col] != None:
+					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, self.test)
+					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
+					if data[col + 1] == 1:
+						self.weaponAmmoList.SetItem(index, 2, "Rapid+" + str(data[col + 2]))
+					elif data[col + 2] == - 1:
+						self.weaponAmmoList.SetItem(index, 2, "Auto Reload")
+					else:
+						self.weaponAmmoList.SetItem(index, 2, "Normal+" + str(data[col + 2]))
+					self.weaponAmmoList.SetItem(index, 3, str(data[col + 3]).capitalize())
+			if col == 127:
+				col += 2
+			elif col > 127:
+				col += 3
+			else:
+				col += 4
+
+
+	def loadHuntingHornSongs(self):
+		# TODO finish melodies section
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = 0
+		info.Text = "Attribute"
+		self.weaponSongslList.InsertColumn(0, info)
+
+
 	def loadWeaponMaterials(self):
 		sql = """
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
@@ -723,7 +902,7 @@ class WeaponsTab:
 			WHERE it.lang_id = :langId
 			AND w.weapon_id= :weaponId
 			ORDER BY i.id
-    	"""
+		"""
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentlySelectedWeaponID))
 		data = data.fetchall()
@@ -777,6 +956,8 @@ class WeaponsTab:
 				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.ClearAll()
+			self.weaponSongsList.ClearAll()
+			self.weaponAmmoList.ClearAll()
 			try:
 				self.weaponSharpnessTable.ClearGrid()
 			except:

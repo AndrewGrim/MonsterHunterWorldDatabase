@@ -103,13 +103,13 @@ class MonstersTab:
 
 	def initMonsterSummary(self):
 		self.summaryTree = gizmos.TreeListCtrl(self.summaryPanel, -1, style=0, agwStyle=
-												   gizmos.TR_DEFAULT_STYLE
-												 | gizmos.TR_TWIST_BUTTONS
-												 | gizmos.TR_ROW_LINES
-												 | gizmos.TR_COLUMN_LINES
-												 | gizmos.TR_NO_LINES
-												 | gizmos.TR_FULL_ROW_HIGHLIGHT
-												 | gizmos.TR_HIDE_ROOT
+												gizmos.TR_DEFAULT_STYLE
+												| gizmos.TR_TWIST_BUTTONS
+												| gizmos.TR_ROW_LINES
+												| gizmos.TR_COLUMN_LINES
+												| gizmos.TR_NO_LINES
+												| gizmos.TR_FULL_ROW_HIGHLIGHT
+												| gizmos.TR_HIDE_ROOT
 												)
 
 		self.summaryTree.AddColumn("")
