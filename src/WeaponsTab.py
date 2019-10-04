@@ -479,12 +479,31 @@ class WeaponsTab:
 		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
 		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 4, wx.EXPAND)
 
-		self.weaponSongsList = wx.ListCtrl(self.weaponSongsPanel, style=wx.LC_REPORT
-																	#| wx.LC_NO_HEADER
-																	| wx.LC_VRULES
-																	| wx.LC_HRULES
-																	)
-		self.weaponSongsList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.weaponSongsList = gizmos.TreeListCtrl(self.weaponSongsPanel, -1, style=0,
+												agwStyle=
+												gizmos.TR_DEFAULT_STYLE
+												| gizmos.TR_ROW_LINES
+												| gizmos.TR_COLUMN_LINES
+												| gizmos.TR_NO_LINES
+												| gizmos.TR_FULL_ROW_HIGHLIGHT
+												| gizmos.TR_HIDE_ROOT
+												)
+		self.weaponSongsList.SetImageList(self.il)
+		self.weaponSongsList.AddColumn("")
+		self.weaponSongsList.AddColumn("")
+		self.weaponSongsList.AddColumn("")
+		self.weaponSongsList.AddColumn("")
+		self.weaponSongsList.AddColumn("Duration") 
+		self.weaponSongsList.AddColumn("Extension") 
+		self.weaponSongsList.AddColumn("Effects")
+		self.weaponSongsList.SetColumnWidth(0, 0)
+		self.weaponSongsList.SetColumnWidth(1, 29)
+		self.weaponSongsList.SetColumnWidth(2, 29)
+		self.weaponSongsList.SetColumnWidth(3, 29)
+		self.weaponSongsList.SetColumnWidth(4, 60)
+		self.weaponSongsList.SetColumnWidth(5, 65)
+		for num in range(7):
+			self.weaponSongsList.SetColumnAlignment(num, wx.ALIGN_CENTER)
 		self.weaponSongsSizer.Add(self.weaponSongsList, 1, wx.EXPAND)
 
 		self.weaponAmmoList = wx.ListCtrl(self.weaponAmmoPanel, style=wx.LC_REPORT
@@ -705,7 +724,7 @@ class WeaponsTab:
 			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][9]), self.note3)
 			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Notes")
 			self.weaponDetailsNotebook.SetPageImage(1, self.notes)
-			self.loadHuntingHornSongs()
+			self.loadHuntingHornSongs([additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][9]])
 
 		if self.currentWeaponTree not in ["light-bowgun", "heavy-bowgun", "bow"]:
 			# TODO i think we want to do the insert method but actually destroy the widget and note hide it,
@@ -879,14 +898,45 @@ class WeaponsTab:
 				col += 4
 
 
-	def loadHuntingHornSongs(self):
-		# TODO finish melodies section
-		info = wx.ListItem()
-		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-		info.Image = -1
-		info.Align = 0
-		info.Text = "Attribute"
-		self.weaponSongslList.InsertColumn(0, info)
+	def loadHuntingHornSongs(self, notes):
+		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6
+		self.weaponSongsList.SetColumnWidth(6, size)
+		root = self.weaponSongsList.AddRoot("Songs")
+
+		sql = """
+			SELECT wm.id, wm.notes, wmt.effect1, wmt.effect2, wm.duration, wm.extension
+				FROM weapon_melody wm
+					JOIN weapon_melody_text wmt
+						ON  wm.id = wmt.id
+			WHERE wmt.lang_id = :langId
+			ORDER BY wm.id
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en",))
+		data = data.fetchall()
+
+		addSong = True
+		for song in data:
+			songNotes = self.splitNotes(str(song[1]))
+			for note in songNotes:
+				if note not in notes:
+					addSong = False
+					break
+				else:
+					addSong = True
+			if addSong:
+				songItem = self.weaponSongsList.AppendItem(root,  "Song")
+				songItem.SetImage(1, self.note1, wx.TreeItemIcon_Normal)
+				songItem.SetImage(2, self.note2, wx.TreeItemIcon_Normal)
+				songItem.SetImage(3, self.note3, wx.TreeItemIcon_Normal)
+				self.weaponSongsList.SetItemText(songItem, str(song[4]), 4)
+				self.weaponSongsList.SetItemText(songItem, str(song[5]), 5)
+				self.weaponSongsList.SetItemText(songItem, str(song[2]) + "\n" + str(song[3]), 6)
+
+			
+	def splitNotes(self, notes):
+		return [note for note in notes]
 
 
 	def loadWeaponMaterials(self):
@@ -956,7 +1006,7 @@ class WeaponsTab:
 				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.ClearAll()
-			self.weaponSongsList.ClearAll()
+			self.weaponSongsList.DeleteAllItems()
 			self.weaponAmmoList.ClearAll()
 			try:
 				self.weaponSharpnessTable.ClearGrid()
