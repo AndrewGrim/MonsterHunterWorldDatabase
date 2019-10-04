@@ -126,20 +126,20 @@ class WeaponsTab:
 
 	def initWeaponButtons(self):
 		# TODO change to appropriate icons
-		self.greatSwordButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="great-sword")
-		self.longSwordButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="long-sword")
-		self.swordAndShieldButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="sword-and-shield")
-		self.dualBladesButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="dual-blades")
-		self.hammerButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="hammer")
-		self.huntingHornButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="hunting-horn")
-		self.lanceButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="lance")
-		self.gunLanceButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="gunlance")
-		self.switchAxeButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="switch-axe")
-		self.chargeBladeButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="charge-blade")
-		self.insectGlaiveButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="insect-glaive")
-		self.lightBowGunButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="light-bowgun")
-		self.heavyBowGunButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="heavy-bowgun")
-		self.bowButton = wx.BitmapButton(self.weaponsPanel, bitmap=self.testIcon, name="bow")
+		self.greatSwordButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/great-sword/rarity-24/0.png"), name="great-sword")
+		self.longSwordButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/long-sword/rarity-24/0.png"), name="long-sword")
+		self.swordAndShieldButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/sword-and-shield/rarity-24/0.png"), name="sword-and-shield")
+		self.dualBladesButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/dual-blades/rarity-24/0.png"), name="dual-blades")
+		self.hammerButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/hammer/rarity-24/0.png"), name="hammer")
+		self.huntingHornButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/hunting-horn/rarity-24/0.png"), name="hunting-horn")
+		self.lanceButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/lance/rarity-24/0.png"), name="lance")
+		self.gunLanceButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/gunlance/rarity-24/0.png"), name="gunlance")
+		self.switchAxeButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/switch-axe/rarity-24/0.png"), name="switch-axe")
+		self.chargeBladeButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/charge-blade/rarity-24/0.png"), name="charge-blade")
+		self.insectGlaiveButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/insect-glaive/rarity-24/0.png"), name="insect-glaive")
+		self.lightBowGunButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/light-bowgun/rarity-24/0.png"), name="light-bowgun")
+		self.heavyBowGunButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/heavy-bowgun/rarity-24/0.png"), name="heavy-bowgun")
+		self.bowButton = wx.BitmapButton(self.weaponsPanel, bitmap=wx.Bitmap("images/weapons/bow/rarity-24/0.png"), name="bow")
 
 		self.greatSwordButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
 		self.longSwordButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
@@ -180,12 +180,11 @@ class WeaponsTab:
 		self.weaponsTree = gizmos.TreeListCtrl(self.weaponsPanel, -1, style=0,
 												agwStyle=
 												gizmos.TR_DEFAULT_STYLE
-												#| gizmos.TR_TWIST_BUTTONS
 												| gizmos.TR_ROW_LINES
 												| gizmos.TR_COLUMN_LINES
-												#| gizmos.TR_NO_LINES
 												| gizmos.TR_FULL_ROW_HIGHLIGHT
 												| gizmos.TR_HIDE_ROOT
+												| gizmos.TR_ELLIPSIZE_LONG_ITEMS
 												)
 		self.weaponsTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponSelection)
 		self.weaponsTreeSizer.Add(self.weaponsTree, 1, wx.EXPAND)
@@ -245,6 +244,33 @@ class WeaponsTab:
 
 		self.shelling = self.il.Add(wx.Bitmap("images/weapon-detail-24/shelling.png", wx.BITMAP_TYPE_ANY))
 
+		self.fire = self.il.Add(wx.Bitmap("images/damage-types-24/fire.png"))
+		self.water = self.il.Add(wx.Bitmap("images/damage-types-24/water.png"))
+		self.ice = self.il.Add(wx.Bitmap("images/damage-types-24/ice.png"))
+		self.thunder = self.il.Add(wx.Bitmap("images/damage-types-24/thunder.png"))
+		self.dragon = self.il.Add(wx.Bitmap("images/damage-types-24/dragon.png"))
+
+		self.iceAndBlast = self.il.Add(wx.Bitmap("images/damage-types-24/ice-blast.png"))
+
+		self.poison = self.il.Add(wx.Bitmap("images/damage-types-24/poison.png"))
+		self.sleep = self.il.Add(wx.Bitmap("images/damage-types-24/sleep.png"))
+		self.paralysis = self.il.Add(wx.Bitmap("images/damage-types-24/paralysis.png"))
+		self.blast = self.il.Add(wx.Bitmap("images/damage-types-24/blast.png"))
+		self.stun = self.il.Add(wx.Bitmap("images/damage-types-24/stun.png"))
+
+		self.damageTypes = {
+			"Fire": self.fire,
+			"Water": self.water,
+			"Ice": self.ice,
+			"Thunder": self.thunder,
+			"Dragon": self.dragon,
+			"Poison": self.poison,
+			"Sleep": self.sleep,
+			"Paralysis": self.paralysis,
+			"Blast": self.blast,
+			"Stun": self.stun,
+		}
+
 		self.weaponsTree.SetImageList(self.il)
 		self.weaponDetailsNotebook.AssignImageList(self.il)
 
@@ -300,9 +326,12 @@ class WeaponsTab:
 			self.weaponsTree.SetColumnWidth(num, 24)
 
 		self.weaponsTree.SetColumnWidth(1, 35)
-		self.weaponsTree.SetColumnWidth(2, 35)
+		self.weaponsTree.SetColumnWidth(2, 60)
 		self.weaponsTree.SetColumnWidth(3, 35)
 		self.weaponsTree.SetColumnWidth(4, 35)
+		self.weaponsTree.SetColumnWidth(5, 29)
+		self.weaponsTree.SetColumnWidth(6, 29)
+		self.weaponsTree.SetColumnWidth(7, 29)
 
 		# TODO either set to 8 or 14 or all or none, i'm gravitating towards none since the images will be self explanatory
 		#self.weaponsTree.SetColumnImage(14, self.weaponTreeIcons[14])
@@ -310,7 +339,7 @@ class WeaponsTab:
 		for num in range(8, 15):
 			#self.weaponsTree.SetColumnImage(num, self.weaponTreeIcons[num]) # REMOVE
 			self.weaponsTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-			self.weaponsTree.SetColumnWidth(num, 24)
+			self.weaponsTree.SetColumnWidth(num, 26)
 		
 		self.weaponsTree.SetColumnWidth(15, 0)
 
@@ -399,10 +428,13 @@ class WeaponsTab:
 			element = ""
 		elif row[15] == 1:
 			element = "(" + str(row[12]) + ")"
-			# special color for dual element?? or alternatively have two columns for elements
-		# i think just use the generic element icon and leave it at that, element number is the same anyway(always??) and it messes with row height 
-		"""if row[14] != None:
-			element = str(row[12]) + "\n" + str(row[14])"""
+		try:
+			weapon.SetImage(2, self.damageTypes[row[11]], wx.TreeItemIcon_Normal)
+		except:
+			pass
+		if row[14] != None:
+			# either keep this custom icon or change back to generic element
+			weapon.SetImage(2, self.iceAndBlast, wx.TreeItemIcon_Normal)
 		if row[6] == 0:
 			affinity = ""
 		else:
@@ -474,10 +506,10 @@ class WeaponsTab:
 
 		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponSharpnessTable.CreateGrid(6, 7)
-		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.TOP, 10)
+		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 1.9, wx.EXPAND|wx.TOP, 10)
 
 		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
-		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 4, wx.EXPAND)
+		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 3, wx.EXPAND|wx.TOP, 10)
 
 		self.weaponSongsList = gizmos.TreeListCtrl(self.weaponSongsPanel, -1, style=0,
 												agwStyle=
@@ -545,7 +577,7 @@ class WeaponsTab:
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
-		info.Align = wx.LIST_FORMAT_CENTER
+		info.Align = wx.LIST_FORMAT_RIGHT
 		info.Text = "Value"
 		self.weaponDetailList.InsertColumn(1, info)
 
@@ -587,9 +619,18 @@ class WeaponsTab:
 			"Affinity": (affinity, self.affinity),
 			"Element I": (element1, self.element), # TODO change to data[11] since we'll know the element by the icon
 			"Element II": (element2, self.element), # unless i decide to use the generic "element" icon
-			"Slots": (data[8:11], self.slots),
+			"Slot I": (data[8], self.slots),
+			"Slot II": (data[9], self.slots),
+			"Slot III": (data[10], self.slots),
 			"Elderseal": (elderseal, self.elderseal),
 			"Defense": (defense, self.defense),
+		}
+
+		slots = {
+			0: -1,
+			1: self.slots1,
+			2: self.slots2,
+			3: self.slots3,
 		}
 
 		# TODO add data[index] to each of them
@@ -641,7 +682,15 @@ class WeaponsTab:
 		# REMOVE col from enumerate isnt used anymore and could be removed
 		for col, (key, value) in enumerate(weaponDetail.items()):
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
-			self.weaponDetailList.SetItem(index, 1, str(value[0]))
+			if key in ["Slot I", "Slot II", "Slot II"]:
+				self.weaponDetailList.SetItem(index, 1, str(value[0]), slots[value[0]])
+			if key in ["Element I", "Element II"]:
+				try:
+					self.weaponDetailList.SetItem(index, 1, str(value[0]), self.damageTypes[value[0].split(" ")[0]])
+				except:
+					self.weaponDetailList.SetItem(index, 1, "-")
+			else:
+				self.weaponDetailList.SetItem(index, 1, str(value[0]))
 	
 		#index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
 		#self.weaponDetailList.SetItem(index, 1, str(value[0]), col + 16) # REMOVE i dont think this helps
@@ -676,12 +725,12 @@ class WeaponsTab:
 			self.weaponDetailList.SetItemBackgroundColour(5, self.hexToRGB(self.elementColors[element2]))
 		except:
 			pass
-	
-		if self.weaponDetailList.GetItemText(7, 1) != "-":
-			self.weaponDetailList.SetItemBackgroundColour(7, self.hexToRGB("#D1C4E9"))
 
-		if self.weaponDetailList.GetItemText(8, 1) != "-":
-			self.weaponDetailList.SetItemBackgroundColour(8, self.hexToRGB("#D7CCC8"))
+		if self.weaponDetailList.GetItemText(9, 1) != "-":
+			self.weaponDetailList.SetItemBackgroundColour(9, self.hexToRGB("#D1C4E9"))
+
+		if self.weaponDetailList.GetItemText(10, 1) != "-":
+			self.weaponDetailList.SetItemBackgroundColour(10, self.hexToRGB("#D7CCC8"))
 
 		try:
 			self.weaponDetailsNotebook.RemovePage(1)
@@ -722,7 +771,7 @@ class WeaponsTab:
 			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][6]), self.note2)
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
 			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][9]), self.note3)
-			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Notes")
+			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
 			self.weaponDetailsNotebook.SetPageImage(1, self.notes)
 			self.loadHuntingHornSongs([additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][9]])
 
