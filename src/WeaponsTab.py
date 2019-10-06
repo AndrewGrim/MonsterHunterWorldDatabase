@@ -950,7 +950,6 @@ class WeaponsTab:
 
 
 	def loadHuntingHornSongs(self, notes):
-		print("runs")
 		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6 - 20
 		self.weaponSongsList.SetColumnWidth(6, size)
 		root = self.weaponSongsList.AddRoot("Songs")
