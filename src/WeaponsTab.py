@@ -426,15 +426,15 @@ class WeaponsTab:
 		else:
 			name = str(row[34])
 		weapon = self.weaponsTree.AppendItem(weaponNode,  name)
-		self.weaponsTree.SetItemBackgroundColour(weapon, self.hexToRGB("#90CAF9")) # TODO convert list ctrl to tree since it works better with colors
 		self.weaponsTree.SetItemText(weapon, str(row[4]), 1)
 
 		# TODO change the element implementation to the one below in weapon detail, shorten the name column
-		element = str(row[12])
 		if row[15] == 0 and row[12] == None:
 			element = ""
 		elif row[15] == 1:
 			element = "(" + str(row[12]) + ")"
+		else:
+			element = str(row[12])
 		try:
 			weapon.SetImage(2, self.damageTypes[row[11]], wx.TreeItemIcon_Normal)
 		except:
@@ -502,15 +502,27 @@ class WeaponsTab:
 
 
 	def initWeaponDetailTab(self):
-		self.weaponDetailList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
-																	| wx.LC_NO_HEADER
-																	| wx.LC_VRULES
-																	| wx.LC_HRULES
-																	)
-		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
-		self.weaponDetailList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onWeaponDetailSelect)
-		self.weaponDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.weaponDetailList = gizmos.TreeListCtrl(self.weaponDetailPanel, -1, style=0,
+												agwStyle=
+												gizmos.TR_DEFAULT_STYLE
+												| gizmos.TR_ROW_LINES
+												| gizmos.TR_COLUMN_LINES
+												| gizmos.TR_NO_LINES
+												| gizmos.TR_FULL_ROW_HIGHLIGHT
+												| gizmos.TR_HIDE_ROOT
+												)
+		#self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
+		#self.weaponDetailList.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponDetailSelect)
+		self.weaponDetailList.SetImageList(self.il)
 		self.weaponDetailSizer.Add(self.weaponDetailList, 5, wx.EXPAND)
+		self.weaponDetailList.AddColumn("")
+		self.weaponDetailList.AddColumn("")
+		self.weaponDetailList.AddColumn("")
+		self.weaponDetailList.SetColumnWidth(0, 0)
+		self.weaponDetailList.SetColumnWidth(1, 302)
+		self.weaponDetailList.SetColumnWidth(2, 155 - 20)
+		self.weaponDetailList.SetColumnAlignment(1, wx.ALIGN_LEFT)
+		self.weaponDetailList.SetColumnAlignment(2, wx.ALIGN_CENTER)
 
 		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponSharpnessTable.CreateGrid(6, 7)
@@ -574,20 +586,6 @@ class WeaponsTab:
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, (self.currentlySelectedWeaponID, "en"))
 		data = data.fetchone()
-
-		info = wx.ListItem()
-		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-		info.Image = -1
-		info.Align = 0
-		info.Text = "Attribute"
-		self.weaponDetailList.InsertColumn(0, info)
-
-		info = wx.ListItem()
-		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-		info.Image = -1
-		info.Align = wx.LIST_FORMAT_RIGHT
-		info.Text = "Value"
-		self.weaponDetailList.InsertColumn(1, info)
 
 		affinity = "-"
 		if data[6] != 0:
@@ -671,9 +669,9 @@ class WeaponsTab:
 			"insect-glaive": ["Kinsect Bonus", str(data[20]).capitalize(), self.kinsectBonus],
 
 			"hunting-horn": ["Notes", self.notes,
-							"Note 1", note1, self.note1,
-							"Note 2", note2, self.note2,
-							"Note 3", note3, self.note3,],
+							"Note I", note1, self.note1,
+							"Note II", note2, self.note2,
+							"Note III", note3, self.note3,],
 
 			"light-bowgun": ["Special Ammo", data[33], self.specialAmmo,
 							"Deviation", data[34], self.deviation,],
@@ -689,61 +687,50 @@ class WeaponsTab:
 					"Blast", data[31], self.blastCoating,],
 		}
 
-		# REMOVE col from enumerate isnt used anymore and could be removed
-		for col, (key, value) in enumerate(weaponDetail.items()):
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
+		root = self.weaponDetailList.AddRoot("Details")
+		for key, value in weaponDetail.items():
+			detailItem = self.weaponDetailList.AppendItem(root,  "Detail")
+			if key == "Rarity":
+				self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB(self.rarityColors[data[3]]))
+			elif key == "Affinity":
+				try:
+					if int(affinity.replace("%", "")) > 0:
+						self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB("#C8E6C9"))
+					elif int(affinity.replace("%", "")) < 0:
+						self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB("#FFCDD2"))
+				except:
+					pass
+			elif key == "Element I":
+				try:
+					self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB(self.elementColors[data[11]]))
+				except:
+					pass
+			elif key == "Element II":
+				try:
+					self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB(self.elementColors[data[13]]))
+				except:
+					pass
+			elif key == "Elderseal" and elderseal != "-":
+				self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB("#D1C4E9"))
+			elif key == "Defense" and defense != "-":
+				self.weaponDetailList.SetItemBackgroundColour(detailItem, self.hexToRGB("#D7CCC8"))
+
 			if key in ["Slot I", "Slot II", "Slot III"]:
-				self.weaponDetailList.SetItem(index, 1, str(value[0]), slots[value[0]])
+				detailItem.SetImage(2, slots[value[0]], wx.TreeItemIcon_Normal)
+				self.weaponDetailList.SetItemText(detailItem, str(value[0]), 2)
 			if key in ["Element I", "Element II"]:
 				try:
-					self.weaponDetailList.SetItem(index, 1, str(value[0]), self.damageTypes[value[0].split(" ")[0]])
+					detailItem.SetImage(2, self.damageTypes[value[0].split(" ")[0]], wx.TreeItemIcon_Normal)
+					self.weaponDetailList.SetItemText(detailItem, str(value[0]), 2)
 				except:
-					self.weaponDetailList.SetItem(index, 1, "-")
+					self.weaponDetailList.SetItemText(detailItem, "-", 2)
 			else:
 				if value[0] == 0:
-					self.weaponDetailList.SetItem(index, 1, "-")
+					self.weaponDetailList.SetItemText(detailItem, "-", 2)
 				else:
-					self.weaponDetailList.SetItem(index, 1, str(value[0]))
-	
-		#index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
-		#self.weaponDetailList.SetItem(index, 1, str(value[0]), col + 16) # REMOVE i dont think this helps
-		# if anything i would show the slots using the unicode characters instead
-		#self.weaponDetailList.SetItemData(index, 0) # REMOVE seems this doesnt do anything
-
-		self.weaponDetailList.SetColumnWidth(0, 302)
-		self.weaponDetailList.SetColumnWidth(1, 155 - 20)
-		
-		self.weaponDetailList.SetItemBackgroundColour(0, self.hexToRGB(self.rarityColors[int(self.weaponDetailList.GetItemText(0, 1))]))
-
-		# weapon affinity
-		try:
-			if int(self.weaponDetailList.GetItemText(3, 1).replace("%", "")) > 0:
-				self.weaponDetailList.SetItemBackgroundColour(3, self.hexToRGB("#C8E6C9"))
-			elif int(self.weaponDetailList.GetItemText(3, 1).replace("%", "")) < 0:
-				self.weaponDetailList.SetItemBackgroundColour(3, self.hexToRGB("#FFCDD2"))
-		except:
-			pass
-
-		# TODO maybe gray out the element or lighten the color to indicate element that needs awakening
-		#self.weaponDetailList.SetItemTextColour(5, self.c.Find("Gray"))
-		#self.weaponDetailList.SetItemBackgroundColour(5, self.c.Find("Light Gray"))
-		try:
-			element1 = self.weaponDetailList.GetItemText(4, 1).split(" ")[0]
-			self.weaponDetailList.SetItemBackgroundColour(4, self.hexToRGB(self.elementColors[element1]))
-		except:
-			pass
-
-		try:
-			element2 = self.weaponDetailList.GetItemText(5, 1).split(" ")[0]
-			self.weaponDetailList.SetItemBackgroundColour(5, self.hexToRGB(self.elementColors[element2]))
-		except:
-			pass
-
-		if self.weaponDetailList.GetItemText(9, 1) != "-":
-			self.weaponDetailList.SetItemBackgroundColour(9, self.hexToRGB("#D1C4E9"))
-
-		if self.weaponDetailList.GetItemText(10, 1) != "-":
-			self.weaponDetailList.SetItemBackgroundColour(10, self.hexToRGB("#D7CCC8"))
+					self.weaponDetailList.SetItemText(detailItem, str(value[0]), 2)
+			self.weaponDetailList.SetItemText(detailItem, key, 1)
+			detailItem.SetImage(1, value[1], wx.TreeItemIcon_Normal)
 
 		try:
 			self.weaponDetailsNotebook.RemovePage(1)
@@ -752,38 +739,40 @@ class WeaponsTab:
 			pass
 
 		if self.currentWeaponTree in ["charge-blade", "switch-axe", "gunlance", "insect-glaive"]:
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
+			detailItem = self.weaponDetailList.AppendItem(root,  "Detail")
+			detailItem.SetImage(0, additionalDetails[self.currentWeaponTree][2], wx.TreeItemIcon_Normal)
+			self.weaponDetailList.SetItemText(detailItem, additionalDetails[self.currentWeaponTree][0], 1)
+			self.weaponDetailList.SetItemText(detailItem, str(additionalDetails[self.currentWeaponTree][1]), 2)
+
 		elif self.currentWeaponTree in ["light-bowgun", "heavy-bowgun"]:
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][5])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][4]))
+			detailItem = self.weaponDetailList.AppendItem(root,  "Detail")
+			detailItem.SetImage(1, additionalDetails[self.currentWeaponTree][2], wx.TreeItemIcon_Normal)
+			self.weaponDetailList.SetItemText(detailItem, additionalDetails[self.currentWeaponTree][0], 1)
+			self.weaponDetailList.SetItemText(detailItem, str(additionalDetails[self.currentWeaponTree][1]), 2)
+
+			detailItem = self.weaponDetailList.AppendItem(root,  "Detail")
+			detailItem.SetImage(1, additionalDetails[self.currentWeaponTree][5], wx.TreeItemIcon_Normal)
+			self.weaponDetailList.SetItemText(detailItem, additionalDetails[self.currentWeaponTree][3], 1)
+			self.weaponDetailList.SetItemText(detailItem, str(additionalDetails[self.currentWeaponTree][4]), 2)
+
 			self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
 			self.weaponDetailsNotebook.SetPageImage(1, self.deviation)
 			self.loadBowgunAmmo()
+
 		elif self.currentWeaponTree == "bow":
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][2])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][1]))
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][5])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][4]))
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][8])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][7]))
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][9], additionalDetails[self.currentWeaponTree][11])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][10]))
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][12], additionalDetails[self.currentWeaponTree][14])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][13]))
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][15], additionalDetails[self.currentWeaponTree][17])
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][16]))
+			for num in range(0, 17, 3):
+				detailItem = self.weaponDetailList.AppendItem(root,  "Detail")
+				detailItem.SetImage(1, additionalDetails[self.currentWeaponTree][num + 2], wx.TreeItemIcon_Normal)
+				self.weaponDetailList.SetItemText(detailItem, additionalDetails[self.currentWeaponTree][num], 1)
+				self.weaponDetailList.SetItemText(detailItem, str(additionalDetails[self.currentWeaponTree][num + 1]), 2)
 		elif self.currentWeaponTree == "hunting-horn":
-			# TODO probably move the note icons in the the second column, and maybe do the same with coatings
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), additionalDetails[self.currentWeaponTree][0], additionalDetails[self.currentWeaponTree][1])
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][3]), self.note1)
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][6]), self.note2)
-			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), "", -1)
-			self.weaponDetailList.SetItem(index, 1, str(additionalDetails[self.currentWeaponTree][9]), self.note3)
+			for num in range(0, 9, 3):
+				detailItem = self.weaponDetailList.AppendItem(root,  "Detail")
+				detailItem.SetImage(1, additionalDetails[self.currentWeaponTree][1], wx.TreeItemIcon_Normal)
+				detailItem.SetImage(2, additionalDetails[self.currentWeaponTree][num + 4], wx.TreeItemIcon_Normal)
+				self.weaponDetailList.SetItemText(detailItem, additionalDetails[self.currentWeaponTree][num + 2], 1)
+				self.weaponDetailList.SetItemText(detailItem, str(additionalDetails[self.currentWeaponTree][num + 3]), 2)
+
 			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
 			self.weaponDetailsNotebook.SetPageImage(1, self.notes)
 			self.loadHuntingHornSongs([additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][9]])
@@ -961,6 +950,7 @@ class WeaponsTab:
 
 
 	def loadHuntingHornSongs(self, notes):
+		print("runs")
 		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6 - 20
 		self.weaponSongsList.SetColumnWidth(6, size)
 		root = self.weaponSongsList.AddRoot("Songs")
@@ -1053,7 +1043,8 @@ class WeaponsTab:
 
 	
 	def onWeaponDetailSelect(self, event):
-		self.weaponDetailList.Select(event.GetIndex(), False)
+		#self.weaponDetailList.Select(event.GetIndex(), False) # REMOVE not using this anymore
+		pass
 
 
 	def onWeaponSelection(self, event):
@@ -1067,7 +1058,7 @@ class WeaponsTab:
 			else:
 				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
-			self.weaponDetailList.ClearAll()
+			self.weaponDetailList.DeleteAllItems()
 			self.weaponSongsList.DeleteAllItems()
 			self.weaponAmmoList.ClearAll()
 			try:
@@ -1101,8 +1092,8 @@ class WeaponsTab:
 
 
 	def onSize(self, event):
-		self.weaponDetailList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
-		self.weaponDetailList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.weaponDetailList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.66)
+		self.weaponDetailList.SetColumnWidth(2, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		# TODO make each sharpness column have the appropriate bg colour, i probably need to make a custom class
 		#for num in range(10):
