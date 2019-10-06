@@ -16,7 +16,7 @@ class Application(wx.Frame):
 		super(Application, self).__init__(*args, **kw)
 
 		root = self
-		icon = wx.Icon("images/OfflineDatabase.ico")
+		icon = wx.Icon("images/OfflineDatabase.ico") # TODO possibly change to nerg for base game and velkhana for iceborne, same with pyinstaller icon
 		self.SetIcon(icon)
 		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
@@ -31,7 +31,7 @@ class Application(wx.Frame):
 
 		# to trigger onSize event so the table looks as it should
 		# TODO could probably replace this by calling layout or refresh or something
-		self.SetSize(1400, 1150)
+		self.SetSize(1420, 1150)
 		self.Center()
 
 		# TEST

@@ -194,8 +194,6 @@ class WeaponsTab:
 
 		self.test = self.il.Add(self.testIcon)
 
-		self.sharpnessTest = self.il.Add(wx.Bitmap("sharpnessTest.png"))
-
 		self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
 		self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
 		self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
@@ -365,6 +363,14 @@ class WeaponsTab:
 		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
 
+		if self.currentWeaponTree not in ["bow", "light-bowgun", "heavy-bowgun"]:
+			folder = "images/weapons/" + self.currentWeaponTree + "/sharpness-168-24/"
+			images = os.listdir(folder)
+			self.sharpnessImages = {}
+			for img in images:
+				s = self.il.Add(wx.Bitmap(folder + img))
+				self.sharpnessImages[img] = s
+
 		self.rarityIcons = {
 			1: self.rarity1,
 			2: self.rarity2,
@@ -420,6 +426,7 @@ class WeaponsTab:
 		else:
 			name = str(row[34])
 		weapon = self.weaponsTree.AppendItem(weaponNode,  name)
+		self.weaponsTree.SetItemBackgroundColour(weapon, self.hexToRGB("#90CAF9")) # TODO convert list ctrl to tree since it works better with colors
 		self.weaponsTree.SetItemText(weapon, str(row[4]), 1)
 
 		# TODO change the element implementation to the one below in weapon detail, shorten the name column
@@ -467,13 +474,14 @@ class WeaponsTab:
 			# to scale within 168px and then make that image based off of data from the sharpness attribute
 			# then implement the example below
 			# REMOVE placeholders
-			weapon.SetImage(8, self.sharpnessTest, wx.TreeItemIcon_Normal)
-			weapon.SetImage(9, self.sharpnessTest + 1, wx.TreeItemIcon_Normal)
-			weapon.SetImage(10, self.sharpnessTest + 2, wx.TreeItemIcon_Normal)
-			weapon.SetImage(11, self.sharpnessTest + 3, wx.TreeItemIcon_Normal)
-			weapon.SetImage(12, self.sharpnessTest + 4, wx.TreeItemIcon_Normal)
-			weapon.SetImage(13, self.sharpnessTest + 5, wx.TreeItemIcon_Normal)
-			weapon.SetImage(14, self.sharpnessTest + 6, wx.TreeItemIcon_Normal)
+			weaponName = row[34].replace('"', "'") + ".png"
+			weapon.SetImage(8, self.sharpnessImages[weaponName], wx.TreeItemIcon_Normal)
+			weapon.SetImage(9, self.sharpnessImages[weaponName] + 1, wx.TreeItemIcon_Normal)
+			weapon.SetImage(10, self.sharpnessImages[weaponName] + 2, wx.TreeItemIcon_Normal)
+			weapon.SetImage(11, self.sharpnessImages[weaponName] + 3, wx.TreeItemIcon_Normal)
+			weapon.SetImage(12, self.sharpnessImages[weaponName] + 4, wx.TreeItemIcon_Normal)
+			weapon.SetImage(13, self.sharpnessImages[weaponName] + 5, wx.TreeItemIcon_Normal)
+			weapon.SetImage(14, self.sharpnessImages[weaponName] + 6, wx.TreeItemIcon_Normal)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[0], 8)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[1], 9)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[2], 10)
@@ -601,7 +609,7 @@ class WeaponsTab:
 
 		elderseal = "-"
 		if data[21] != None:
-			elderseal = data[21]
+			elderseal = str(data[21]).capitalize()
 
 		defense = "-"
 		if data[7] > 0:
@@ -652,13 +660,15 @@ class WeaponsTab:
 		note1 = str(data[32])[0]
 		note2 = str(data[32])[1]
 		note3 = str(data[32])[2]
+
+		shelling = str(data[24]).capitalize() + " Lv" + str(data[25])
 		
 
 		additionalDetails = {
-			"switch-axe": ["Phial Type", data[22], self.phialType],
-			"charge-blade": ["Phial Type", data[22], self.phialType],
-			"gunlance": ["Shelling", data[24:25], self.shelling],
-			"insect-glaive": ["Kinsect Bonus", data[20], self.kinsectBonus],
+			"switch-axe": ["Phial Type", str(data[22]).capitalize(), self.phialType],
+			"charge-blade": ["Phial Type", str(data[22]).capitalize(), self.phialType],
+			"gunlance": ["Shelling", shelling, self.shelling],
+			"insect-glaive": ["Kinsect Bonus", str(data[20]).capitalize(), self.kinsectBonus],
 
 			"hunting-horn": ["Notes", self.notes,
 							"Note 1", note1, self.note1,
@@ -682,7 +692,7 @@ class WeaponsTab:
 		# REMOVE col from enumerate isnt used anymore and could be removed
 		for col, (key, value) in enumerate(weaponDetail.items()):
 			index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
-			if key in ["Slot I", "Slot II", "Slot II"]:
+			if key in ["Slot I", "Slot II", "Slot III"]:
 				self.weaponDetailList.SetItem(index, 1, str(value[0]), slots[value[0]])
 			if key in ["Element I", "Element II"]:
 				try:
@@ -690,15 +700,18 @@ class WeaponsTab:
 				except:
 					self.weaponDetailList.SetItem(index, 1, "-")
 			else:
-				self.weaponDetailList.SetItem(index, 1, str(value[0]))
+				if value[0] == 0:
+					self.weaponDetailList.SetItem(index, 1, "-")
+				else:
+					self.weaponDetailList.SetItem(index, 1, str(value[0]))
 	
 		#index = self.weaponDetailList.InsertItem(self.weaponDetailList.GetItemCount(), key, value[1])
 		#self.weaponDetailList.SetItem(index, 1, str(value[0]), col + 16) # REMOVE i dont think this helps
 		# if anything i would show the slots using the unicode characters instead
 		#self.weaponDetailList.SetItemData(index, 0) # REMOVE seems this doesnt do anything
 
-		self.weaponDetailList.SetColumnWidth(0, 280)
-		self.weaponDetailList.SetColumnWidth(1, 170)
+		self.weaponDetailList.SetColumnWidth(0, 302)
+		self.weaponDetailList.SetColumnWidth(1, 155 - 20)
 		
 		self.weaponDetailList.SetItemBackgroundColour(0, self.hexToRGB(self.rarityColors[int(self.weaponDetailList.GetItemText(0, 1))]))
 
@@ -782,7 +795,7 @@ class WeaponsTab:
 				self.weaponSharpnessTable.Show()
 				#print(self.weaponDetailSizer.GetItemCount())
 				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
-				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
+				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize()[0])
 				#self.weaponDetailSizer.Add(self.weaponSharpnessTable, 2, wx.EXPAND|wx.BOTTOM, 15)
 
 			sharpnessMaxed = bool(data[17])
@@ -859,10 +872,10 @@ class WeaponsTab:
 		info.Text = "Reload"
 		self.weaponAmmoList.InsertColumn(3, info)
 
-		self.weaponAmmoList.SetColumnWidth(0, 132)
-		self.weaponAmmoList.SetColumnWidth(1, 102)
-		self.weaponAmmoList.SetColumnWidth(2, 112)
-		self.weaponAmmoList.SetColumnWidth(3, 102)
+		self.weaponAmmoList.SetColumnWidth(0, 132 - 5)
+		self.weaponAmmoList.SetColumnWidth(1, 102 - 5)
+		self.weaponAmmoList.SetColumnWidth(2, 112 - 5)
+		self.weaponAmmoList.SetColumnWidth(3, 102 - 5)
 
 		sql = """
 			SELECT wa.id AS ammo_id, wa.deviation, wa.special_ammo, wa.normal1_clip, wa.normal1_rapid, wa.normal1_recoil, wa.normal1_reload, wa.normal2_clip, wa.normal2_rapid,
@@ -948,7 +961,7 @@ class WeaponsTab:
 
 
 	def loadHuntingHornSongs(self, notes):
-		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6
+		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6 - 20
 		self.weaponSongsList.SetColumnWidth(6, size)
 		root = self.weaponSongsList.AddRoot("Songs")
 
@@ -1089,7 +1102,7 @@ class WeaponsTab:
 
 	def onSize(self, event):
 		self.weaponDetailList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
-		self.weaponDetailList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34)
+		self.weaponDetailList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		# TODO make each sharpness column have the appropriate bg colour, i probably need to make a custom class
 		#for num in range(10):
