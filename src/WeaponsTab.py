@@ -272,25 +272,25 @@ class WeaponsTab:
 		self.weaponsTree.SetImageList(self.il)
 		self.weaponDetailsNotebook.AssignImageList(self.il)
 
-		self.weaponsTree.AddColumn("Name")
-		self.weaponsTree.AddColumn("") # Physical
-		self.weaponsTree.AddColumn("") # Element/Status
-		self.weaponsTree.AddColumn("") # Affinity
-		self.weaponsTree.AddColumn("") # Defense
-		self.weaponsTree.AddColumn("") # Slots 1
-		self.weaponsTree.AddColumn("") # Slots 2
-		self.weaponsTree.AddColumn("") # Slots 3
+		self.weaponsTree.AddColumn("Name") # 0
+		self.weaponsTree.AddColumn("") # Physical 1
+		self.weaponsTree.AddColumn("") # Element/Status 2
+		self.weaponsTree.AddColumn("") # Affinity 3
+		self.weaponsTree.AddColumn("") # Defense 4
+		self.weaponsTree.AddColumn("") # Slots 1 5
+		self.weaponsTree.AddColumn("") # Slots 2 6
+		self.weaponsTree.AddColumn("") # Slots 3 7
 		
 		# sharpness
-		self.weaponsTree.AddColumn("") # R
-		self.weaponsTree.AddColumn("") # O
-		self.weaponsTree.AddColumn("") # Y
-		self.weaponsTree.AddColumn("") # G
-		self.weaponsTree.AddColumn("") # B
-		self.weaponsTree.AddColumn("") # W
-		self.weaponsTree.AddColumn("") # P
+		self.weaponsTree.AddColumn("") # R 8
+		self.weaponsTree.AddColumn("") # O 9
+		self.weaponsTree.AddColumn("") # Y 10
+		self.weaponsTree.AddColumn("") # G 11 
+		self.weaponsTree.AddColumn("") # B 12
+		self.weaponsTree.AddColumn("") # W 13
+		self.weaponsTree.AddColumn("") # P 14
 		
-		self.weaponsTree.AddColumn("id")
+		self.weaponsTree.AddColumn("id") # 15
 		
 		self.weaponsTree.SetMainColumn(0)
 		self.weaponsTree.SetColumnWidth(0, 400)
@@ -466,7 +466,7 @@ class WeaponsTab:
 		#self.weaponsTree.SetItemText(weapon, str(row[10]), 7) # TODO split into 3 three cols, with an appropriate image for each
 		
 		# sharpness
-		try:
+		if self.currentWeaponTree not in ["bow", "light-bowgun", "heavy-bowgun"]:
 			sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
 			# TODO work something out with the sharpness graphics
 			# for now just this small icon test
@@ -489,13 +489,13 @@ class WeaponsTab:
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[4], 12)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[5], 13)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[6], 14)
-		except:
-			for num in range(6, 13):
+		else:
+			for num in range(8, 15):
 				self.weaponsTree.SetItemText(weapon, "-", num)
 
 		
 		# id - hidden, icon
-		self.weaponsTree.SetItemText(weapon, str(row[0]), 13)
+		self.weaponsTree.SetItemText(weapon, str(row[0]), 15)
 
 		self.weaponsTree.SetItemImage(weapon, self.rarityIcons[row[3]], which=wx.TreeItemIcon_Normal)
 		weaponNodes[row[0]] = weapon
@@ -1048,7 +1048,7 @@ class WeaponsTab:
 
 
 	def onWeaponSelection(self, event):
-		self.currentlySelectedWeaponID = self.weaponsTree.GetItemText(event.GetItem(), 13)
+		self.currentlySelectedWeaponID = self.weaponsTree.GetItemText(event.GetItem(), 15)
 		if self.currentlySelectedWeaponID != "":
 			weaponName = (self.weaponsTree.GetItemText(event.GetItem(), 0)).replace(" 🔨", "").replace("\"", "'")
 			weaponType = self.currentWeaponTree
