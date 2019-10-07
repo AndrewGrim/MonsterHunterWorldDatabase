@@ -9,19 +9,21 @@ class HeaderBitmapGrid(wx.grid.Grid, glr.GridWithLabelRenderersMixin):
 
 
 class ImageCellRenderer(wx.grid.GridCellRenderer):
-	def __init__(self, img):
+	def __init__(self, img, colour = wx.WHITE, selectedColour = wx.BLUE):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
+		self.colour = colour
+		self.selectedColour = selectedColour
 	def Draw(self, grid, attr, dc, rect, row, col, isSelected):
 		image = wx.MemoryDC()
 		image.SelectObject(self.img)
 		dc.SetBackgroundMode(wx.SOLID)
 		if isSelected:
-			dc.SetBrush(wx.Brush(wx.BLUE, wx.SOLID))
-			dc.SetPen(wx.Pen(wx.BLUE, 1, wx.SOLID))
+			dc.SetBrush(wx.Brush(self.selectedColour, wx.SOLID))
+			dc.SetPen(wx.Pen(self.selectedColour, 1, wx.SOLID))
 		else:
-			dc.SetBrush(wx.Brush(wx.WHITE, wx.SOLID))
-			dc.SetPen(wx.Pen(wx.WHITE, 1, wx.SOLID))
+			dc.SetBrush(wx.Brush(self.colour, wx.SOLID))
+			dc.SetPen(wx.Pen(self.colour, 1, wx.SOLID))
 		dc.DrawRectangle(rect)
 		width, height = self.img.GetWidth(), self.img.GetHeight()
 		if width > rect.width-2:

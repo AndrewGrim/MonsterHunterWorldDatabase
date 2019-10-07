@@ -963,7 +963,7 @@ class WeaponsTab:
 		data = data.fetchall()
 
 		addSong = True
-		row = 0
+		songList = []
 		for song in data:
 			songNotes = self.splitNotes(str(song[1]))
 			for note in songNotes:
@@ -973,17 +973,21 @@ class WeaponsTab:
 				else:
 					addSong = True
 			if addSong:
-				self.weaponSongsList.SetCellRenderer(row, 1, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note1.png")))
-				self.weaponSongsList.SetCellRenderer(row, 2, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note2.png")))
-				self.weaponSongsList.SetCellRenderer(row, 3, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note3.png")))
-				self.weaponSongsList.SetCellValue(row, 4, str(song[4]))
-				self.weaponSongsList.SetCellValue(row, 5, str(song[5]))
-				self.weaponSongsList.SetCellValue(row, 6, str(song[2]) + "\n" + str(song[3]))
-				row += 1
-				# some weird fucking bug with phantom songs or whatever bullshit, after selecting one horn then selecting another
-				# some horns get extra rows of icons for some reason but not text??
-				# length and contents and iterations match so idk
-
+				songList.append(song)
+	
+		try:
+			self.weaponSongsList.DeleteRows(len(songList), self.weaponSongsList.GetNumberRows())
+		except:
+			pass
+		if self.weaponSongsList.GetNumberRows() < len(songList):
+			self.weaponSongsList.AppendRows(len(songList) - self.weaponSongsList.GetNumberRows())
+		for row, song in enumerate(songList):
+			self.weaponSongsList.SetCellRenderer(row, 1, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note1.png")))
+			self.weaponSongsList.SetCellRenderer(row, 2, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note2.png")))
+			self.weaponSongsList.SetCellRenderer(row, 3, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note3.png")))
+			self.weaponSongsList.SetCellValue(row, 4, str(song[4]))
+			self.weaponSongsList.SetCellValue(row, 5, str(song[5]))
+			self.weaponSongsList.SetCellValue(row, 6, str(song[2]) + "\n" + str(song[3]))
 			
 	def splitNotes(self, notes):
 		return [note for note in notes]
