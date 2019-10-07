@@ -4,6 +4,7 @@ import wx.lib.gizmos as gizmos
 import wx.propgrid as wxpg
 import sqlite3
 import time
+import sys
 
 import CustomGridRenderer as cgr
 import MonstersTab as m
@@ -92,8 +93,8 @@ class Application(wx.Frame):
 
 	def OnAbout(self, event):
 		wx.MessageBox("This is a wxPython Hello World sample",
-					  "About Hello World 2",
-					  wx.OK|wx.ICON_INFORMATION)
+						"About Hello World 2",
+						wx.OK|wx.ICON_INFORMATION)
 
 
 if __name__ == '__main__':
@@ -102,4 +103,6 @@ if __name__ == '__main__':
 	frm = Application(None, title="Database")
 	end = time.time()
 	print("application load time: " + str(end - start))
+	# TEST
+	# sys.exit()
 	app.MainLoop()

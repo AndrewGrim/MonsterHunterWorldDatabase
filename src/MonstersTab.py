@@ -102,7 +102,7 @@ class MonstersTab:
 
 
 	def initMonsterSummary(self):
-		self.summaryTree = gizmos.TreeListCtrl(self.summaryPanel, -1, style=0, agwStyle=
+		self.summaryTree = wx.lib.agw.hypertreelist.HyperTreeList(self.summaryPanel, -1, style=0, agwStyle=
 												gizmos.TR_DEFAULT_STYLE
 												| gizmos.TR_TWIST_BUTTONS
 												| gizmos.TR_ROW_LINES
@@ -484,14 +484,14 @@ class MonstersTab:
 
 	
 	def initMonsterMaterials(self):
-		self.materialsTree = gizmos.TreeListCtrl(self.materialsPanel, -1, style=0, agwStyle=
-												   gizmos.TR_DEFAULT_STYLE
-												 | gizmos.TR_TWIST_BUTTONS
-												 | gizmos.TR_ROW_LINES
-												 | gizmos.TR_COLUMN_LINES
-												 | gizmos.TR_NO_LINES
-												 | gizmos.TR_FULL_ROW_HIGHLIGHT
-												 | gizmos.TR_HIDE_ROOT
+		self.materialsTree = wx.lib.agw.hypertreelist.HyperTreeList(self.materialsPanel, -1, style=0, agwStyle=
+												gizmos.TR_DEFAULT_STYLE
+												| gizmos.TR_TWIST_BUTTONS
+												| gizmos.TR_ROW_LINES
+												| gizmos.TR_COLUMN_LINES
+												| gizmos.TR_NO_LINES
+												| gizmos.TR_FULL_ROW_HIGHLIGHT
+												| gizmos.TR_HIDE_ROOT
 												)
 
 		self.materialsTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onMaterialSelection)

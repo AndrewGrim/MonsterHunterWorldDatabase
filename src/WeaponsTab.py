@@ -177,7 +177,7 @@ class WeaponsTab:
 
 
 	def initWeaponsTree(self):
-		self.weaponsTree = gizmos.TreeListCtrl(self.weaponsPanel, -1, style=0,
+		self.weaponsTree = wx.lib.agw.hypertreelist.HyperTreeList(self.weaponsPanel, -1, style=0,
 												agwStyle=
 												gizmos.TR_DEFAULT_STYLE
 												| gizmos.TR_ROW_LINES
@@ -466,7 +466,7 @@ class WeaponsTab:
 		#self.weaponsTree.SetItemText(weapon, str(row[10]), 7) # TODO split into 3 three cols, with an appropriate image for each
 		
 		# sharpness
-		if self.currentWeaponTree not in ["bow", "light-bowgun", "heavy-bowgun"]:
+		try:
 			sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
 			# TODO work something out with the sharpness graphics
 			# for now just this small icon test
@@ -489,7 +489,7 @@ class WeaponsTab:
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[4], 12)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[5], 13)
 			self.weaponsTree.SetItemText(weapon, sharpnessSplit[6], 14)
-		else:
+		except:
 			for num in range(8, 15):
 				self.weaponsTree.SetItemText(weapon, "-", num)
 
@@ -531,31 +531,27 @@ class WeaponsTab:
 		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
 		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 3, wx.EXPAND|wx.TOP, 10)
 
-		self.weaponSongsList = gizmos.TreeListCtrl(self.weaponSongsPanel, -1, style=0,
-												agwStyle=
-												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												| gizmos.TR_NO_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												)
-		self.weaponSongsList.SetImageList(self.il)
-		self.weaponSongsList.AddColumn("")
-		self.weaponSongsList.AddColumn("")
-		self.weaponSongsList.AddColumn("")
-		self.weaponSongsList.AddColumn("")
-		self.weaponSongsList.AddColumn("Duration") 
-		self.weaponSongsList.AddColumn("Extension") 
-		self.weaponSongsList.AddColumn("Effects")
-		self.weaponSongsList.SetColumnWidth(0, 0)
-		self.weaponSongsList.SetColumnWidth(1, 29)
-		self.weaponSongsList.SetColumnWidth(2, 29)
-		self.weaponSongsList.SetColumnWidth(3, 29)
-		self.weaponSongsList.SetColumnWidth(4, 60)
-		self.weaponSongsList.SetColumnWidth(5, 65)
-		for num in range(7):
-			self.weaponSongsList.SetColumnAlignment(num, wx.ALIGN_CENTER)
+		self.weaponSongsList = cgr.HeaderBitmapGrid(self.weaponSongsPanel)
+		self.weaponSongsList.CreateGrid(15, 7)
+
+		self.weaponSongsList.SetColLabelSize(0)
+		self.weaponSongsList.SetRowLabelSize(0)
+		self.weaponSongsList.SetColLabelValue(0, "")
+		self.weaponSongsList.SetColLabelValue(1, "")
+		self.weaponSongsList.SetColLabelValue(2, "")
+		self.weaponSongsList.SetColLabelValue(3, "Duration")
+		self.weaponSongsList.SetColLabelValue(4, "Extension")
+		self.weaponSongsList.SetColLabelValue(5, "Effects")
+
+		self.weaponSongsList.SetColSize(0, 0)
+		self.weaponSongsList.SetColSize(1, 29)
+		self.weaponSongsList.SetColSize(2, 29)
+		self.weaponSongsList.SetColSize(3, 29)
+		self.weaponSongsList.SetColSize(4, 60)
+		self.weaponSongsList.SetColSize(5, 65)
+
+		self.weaponSongsList.SetDefaultRowSize(32, resizeExistingRows=True)
+		self.weaponSongsList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 		self.weaponSongsSizer.Add(self.weaponSongsList, 1, wx.EXPAND)
 
 		self.weaponAmmoList = wx.ListCtrl(self.weaponAmmoPanel, style=wx.LC_REPORT
@@ -861,10 +857,10 @@ class WeaponsTab:
 		info.Text = "Reload"
 		self.weaponAmmoList.InsertColumn(3, info)
 
-		self.weaponAmmoList.SetColumnWidth(0, 132 - 5)
-		self.weaponAmmoList.SetColumnWidth(1, 102 - 5)
-		self.weaponAmmoList.SetColumnWidth(2, 112 - 5)
-		self.weaponAmmoList.SetColumnWidth(3, 102 - 5)
+		self.weaponAmmoList.SetColumnWidth(0, 132 - 10)
+		self.weaponAmmoList.SetColumnWidth(1, 102)
+		self.weaponAmmoList.SetColumnWidth(2, 112)
+		self.weaponAmmoList.SetColumnWidth(3, 102 - 0)
 
 		sql = """
 			SELECT wa.id AS ammo_id, wa.deviation, wa.special_ammo, wa.normal1_clip, wa.normal1_rapid, wa.normal1_recoil, wa.normal1_reload, wa.normal2_clip, wa.normal2_rapid,
@@ -951,8 +947,7 @@ class WeaponsTab:
 
 	def loadHuntingHornSongs(self, notes):
 		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6 - 20
-		self.weaponSongsList.SetColumnWidth(6, size)
-		root = self.weaponSongsList.AddRoot("Songs")
+		self.weaponSongsList.SetColSize(6, size)
 
 		sql = """
 			SELECT wm.id, wm.notes, wmt.effect1, wmt.effect2, wm.duration, wm.extension
@@ -968,6 +963,7 @@ class WeaponsTab:
 		data = data.fetchall()
 
 		addSong = True
+		row = 0
 		for song in data:
 			songNotes = self.splitNotes(str(song[1]))
 			for note in songNotes:
@@ -977,13 +973,16 @@ class WeaponsTab:
 				else:
 					addSong = True
 			if addSong:
-				songItem = self.weaponSongsList.AppendItem(root,  "Song")
-				songItem.SetImage(1, self.note1, wx.TreeItemIcon_Normal)
-				songItem.SetImage(2, self.note2, wx.TreeItemIcon_Normal)
-				songItem.SetImage(3, self.note3, wx.TreeItemIcon_Normal)
-				self.weaponSongsList.SetItemText(songItem, str(song[4]), 4)
-				self.weaponSongsList.SetItemText(songItem, str(song[5]), 5)
-				self.weaponSongsList.SetItemText(songItem, str(song[2]) + "\n" + str(song[3]), 6)
+				self.weaponSongsList.SetCellRenderer(row, 1, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note1.png")))
+				self.weaponSongsList.SetCellRenderer(row, 2, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note2.png")))
+				self.weaponSongsList.SetCellRenderer(row, 3, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note3.png")))
+				self.weaponSongsList.SetCellValue(row, 4, str(song[4]))
+				self.weaponSongsList.SetCellValue(row, 5, str(song[5]))
+				self.weaponSongsList.SetCellValue(row, 6, str(song[2]) + "\n" + str(song[3]))
+				row += 1
+				# some weird fucking bug with phantom songs or whatever bullshit, after selecting one horn then selecting another
+				# some horns get extra rows of icons for some reason but not text??
+				# length and contents and iterations match so idk
 
 			
 	def splitNotes(self, notes):
@@ -1058,7 +1057,7 @@ class WeaponsTab:
 				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.DeleteAllItems()
-			self.weaponSongsList.DeleteAllItems()
+			self.weaponSongsList.ClearGrid()
 			self.weaponAmmoList.ClearAll()
 			try:
 				self.weaponSharpnessTable.ClearGrid()
