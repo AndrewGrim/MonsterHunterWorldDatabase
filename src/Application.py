@@ -16,6 +16,14 @@ class Application(wx.Frame):
 	def __init__(self, *args, **kw):
 		super(Application, self).__init__(*args, **kw)
 
+		cmdArgs = sys.argv
+		self.windowWidth = 1420
+		self.windowHeight = 1150
+		if "-size" in cmdArgs:
+			index = cmdArgs.index("-size")
+			self.windowWidth = int(cmdArgs[index + 1])
+			self.windowHeight = int(cmdArgs[index + 2])
+
 		root = self
 		icon = wx.Icon("images/OfflineDatabase.ico") # TODO possibly change to nerg for base game and velkhana for iceborne, same with pyinstaller icon
 		self.SetIcon(icon)
@@ -32,7 +40,7 @@ class Application(wx.Frame):
 
 		# to trigger onSize event so the table looks as it should
 		# TODO could probably replace this by calling layout or refresh or something
-		self.SetSize(1420, 1150)
+		self.SetSize(self.windowWidth, self.windowHeight)
 		self.Center()
 
 		# TEST
@@ -98,11 +106,16 @@ class Application(wx.Frame):
 
 
 if __name__ == '__main__':
-	app = wx.App()
 	start = time.time()
+	app = wx.App()
 	frm = Application(None, title="Database")
 	end = time.time()
 	print("application load time: " + str(end - start))
+	if "-speedTest" in sys.argv:
+		speedTest = True
+	else:
+		speedTest = False
 	# TEST
-	# sys.exit()
+	if speedTest:
+		sys.exit()
 	app.MainLoop()
