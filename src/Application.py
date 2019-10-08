@@ -10,6 +10,7 @@ import CustomGridRenderer as cgr
 import MonstersTab as m
 import WeaponsTab as w
 import ArmorTab as a
+import TestTab as t
 
 
 class Application(wx.Frame):
@@ -18,8 +19,8 @@ class Application(wx.Frame):
 		super(Application, self).__init__(*args, **kw)
 
 		cmdArgs = sys.argv
-		self.windowWidth = 1420
-		self.windowHeight = 1150
+		self.windowWidth = 1420 
+		self.windowHeight = 900
 		if "-size" in cmdArgs:
 			index = cmdArgs.index("-size")
 			self.windowWidth = int(cmdArgs[index + 1])
@@ -35,6 +36,7 @@ class Application(wx.Frame):
 		monsters = m.MonstersTab(root, self.mainNotebook)
 		w.WeaponsTab(root, self.mainNotebook)
 		a.ArmorTab(root, self.mainNotebook)
+		t.TestTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 

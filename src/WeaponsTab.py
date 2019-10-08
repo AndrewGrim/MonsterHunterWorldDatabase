@@ -1006,7 +1006,7 @@ class WeaponsTab:
 				col += 4
 
 
-	def loadHuntingHornSongs(self, notes):
+	def loadHuntingHornSongs(self, notes: List[str]):
 		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6 - 20
 		self.weaponSongsList.SetColSize(5, size)
 
@@ -1050,7 +1050,7 @@ class WeaponsTab:
 			self.weaponSongsList.SetCellValue(row, 4, str(song[5]))
 			self.weaponSongsList.SetCellValue(row, 5, str(song[2]) + "\n" + str(song[3]))
 			
-	def splitNotes(self, notes):
+	def splitNotes(self, notes: str) -> List[str]:
 		return [note for note in notes]
 
 
@@ -1089,23 +1089,39 @@ class WeaponsTab:
 					pass
 
 
-	def adjustSharpness(self, handicraftLevel: int, sharpnessMaxed: bool, data: List[str]) -> Union[List[str], List[int]]:
-			if sharpnessMaxed:
-				return data[16].split(",")
-			else:
-				sharpnessAdjusted = data[16].split(",")
-				index = len(sharpnessAdjusted) - 1
-				handicraftReduction = 10 * (5 - handicraftLevel)
-				for item in sharpnessAdjusted:
-					toRemove = min(int(sharpnessAdjusted[index]), handicraftReduction)
-					sharpnessAdjusted[index] = int(sharpnessAdjusted[index]) - toRemove
-					handicraftReduction -= toRemove
-					index -= 1
+	def adjustSharpness(self, handicraftLevel: int, sharpnessMaxed: bool, data: Tuple[str]) -> Union[List[str], List[int]]:
+		"""
+		handicraftLevel = The level of the handicraft weapon skill. From 0 to 5.
 
-				return sharpnessAdjusted
+		sharpnessMaxed = Boolean indicating whether the weapon has reached its sharpness limit or not.
+
+		data = Tuple containing all the information about the specific weapon retrieved from the database.
+
+		returns:
+
+			A list of the unmodified sharpness when sharpnessMaxed is True or
+			A list of the readjusted sharpness values when sharpnessMaxed is False.
+		"""
+		assert handicraftLevel >= 0 and handicraftLevel <= 5, "Handicraft only goes from 0 to 5!"
+		if sharpnessMaxed:
+			return data[16].split(",")
+		else:
+			sharpnessAdjusted = data[16].split(",")
+			index = len(sharpnessAdjusted) - 1
+			handicraftReduction = 10 * (5 - handicraftLevel)
+			for item in sharpnessAdjusted:
+				toRemove = min(int(sharpnessAdjusted[index]), handicraftReduction)
+				sharpnessAdjusted[index] = int(sharpnessAdjusted[index]) - toRemove
+				handicraftReduction -= toRemove
+				index -= 1
+
+			return sharpnessAdjusted
 
 
 	def onWeaponSelection(self, event):
+		"""
+		When a specific weapon is selected in the tree the detail view gets populated with the information from the database.
+		"""
 		self.currentlySelectedWeaponID = self.weaponsTree.GetItemText(event.GetItem(), 15)
 		if self.currentlySelectedWeaponID != "":
 			weaponName = (self.weaponsTree.GetItemText(event.GetItem(), 0)).replace(" 🔨", "").replace("\"", "'")
@@ -1133,6 +1149,9 @@ class WeaponsTab:
 
 		
 	def onWeaponTypeSelection(self, event):
+		"""
+		When a weapon button at the top of the screen is pressed the weapon tree is reloaded with the new weapon type information.
+		"""
 		self.currentWeaponTree = event.GetEventObject().GetName()
 		self.weaponsTree.DeleteAllItems()
 		self.loadWeaponsTree()
@@ -1140,9 +1159,11 @@ class WeaponsTab:
 
 	def hexToRGB(self, color: str) -> Tuple[int, int, int]:
 			"""
-			:color = The hexadecimal representation of the color, # hash optional.
+			color = The hexadecimal representation of the color, # hash optional.
 
-			returns = A tuple containing the red, green and blue color information.
+			returns:
+			
+				A tuple containing the red, green and blue color information.
 			"""
 			color = color.replace("#", "")
 			red = int(color[0:2], 16)
@@ -1153,6 +1174,9 @@ class WeaponsTab:
 
 
 	def onSize(self, event):
+		"""
+		When the application window is resized some columns's width gets readjusted.
+		"""
 		try:
 			self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
 			self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
