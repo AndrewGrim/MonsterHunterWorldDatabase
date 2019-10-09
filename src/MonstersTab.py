@@ -602,7 +602,6 @@ class MonstersTab:
 					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, lowRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
-					self.materialsTree.Expand(rewardCondition)
 
 				categoriesLR.append(currentCategory)
 
@@ -623,8 +622,6 @@ class MonstersTab:
 					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, highRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
-					self.materialsTree.Expand(rewardCondition)
-					
 
 				categoriesHR.append(currentCategory)
 
@@ -645,9 +642,10 @@ class MonstersTab:
 					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
-					self.materialsTree.Expand(rewardCondition)
 
 				categoriesMR.append(currentCategory)
+
+		self.materialsTree.ExpandAll()
 
 		# TODO maybe make this an option to auto expand a particular option or all of them
 		#self.materialsTree.Expand(self.masterRankNode)

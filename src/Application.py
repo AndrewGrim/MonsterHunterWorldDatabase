@@ -34,9 +34,9 @@ class Application(wx.Frame):
 
 		self.initMainNotebook()
 		monsters = m.MonstersTab(root, self.mainNotebook)
-		w.WeaponsTab(root, self.mainNotebook)
+		#w.WeaponsTab(root, self.mainNotebook)
 		a.ArmorTab(root, self.mainNotebook)
-		t.TestTab(root, self.mainNotebook)
+		#t.TestTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -48,7 +48,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(2) # armor tab
+		self.mainNotebook.SetSelection(1) # armor tab
 
 		self.Show()
 

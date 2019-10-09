@@ -13,8 +13,11 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+import Armor as a
+import ArmorImageList as ail
 
 wxTreeListItem = NewType('wxTreeListItem', None)
+Armor = NewType('Armor', None)
 
 class ArmorTab:
 
@@ -23,6 +26,7 @@ class ArmorTab:
 		self.mainNotebook = mainNotebook
 		self.c = wx.ColourDatabase()
 
+		self.currentArmorTree = "LR"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.rarityColors = {
@@ -36,117 +40,193 @@ class ArmorTab:
 			8: "B58377",
 		}
 
-		# TODO maybe have the same button like in weapons tab but for loading only low/high/master rank armro??
-		self.initWeaponsTab()
+		# TODO maybe have the same button like in armor tab but for loading only low/high/master rank armro??
+		self.initArmorTab()
 
 
-	def initWeaponsTab(self):
-		self.weaponsPanel = wx.Panel(self.mainNotebook)
-		self.mainNotebook.AddPage(self.weaponsPanel, "Armor")
-		self.weaponsSizer = wx.BoxSizer(wx.HORIZONTAL)
+	def initArmorTab(self):
+		self.armorPanel = wx.Panel(self.mainNotebook)
+		self.mainNotebook.AddPage(self.armorPanel, "Armor")
+		self.armorSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-		self.weaponsTreeSizer = wx.BoxSizer(wx.VERTICAL) 
+		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
-		self.weaponsDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
-		self.weaponImageLabel = wx.StaticBitmap(self.weaponsPanel, bitmap=self.weaponImage, size=(160, 160))
+		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
+		self.armorImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.armorImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=self.armorImage, size=(160, 160))
 
-		self.weaponDetailsNotebook = wx.Notebook(self.weaponsPanel)
-		self.weaponDetailPanel = wx.Panel(self.weaponDetailsNotebook)
-		self.weaponSongsPanel = wx.Panel(self.weaponDetailsNotebook)
-		self.weaponAmmoPanel = wx.Panel(self.weaponDetailsNotebook)
-		#self.weaponFamilyPanel = wx.Panel(self.weaponDetailsNotebook) # REMOVE i dont think this is much use
+		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
+		self.armorDetailPanel = wx.Panel(self.armorDetailsNotebook)
+		self.armorSongsPanel = wx.Panel(self.armorDetailsNotebook)
+		self.armorAmmoPanel = wx.Panel(self.armorDetailsNotebook)
+		#self.armorFamilyPanel = wx.Panel(self.armorDetailsNotebook) # REMOVE i dont think this is much use
 		
-		self.weaponDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponDetailsNotebook.AddPage(self.weaponDetailPanel, "Detail")
-		self.weaponDetailPanel.SetSizer(self.weaponDetailSizer)
+		self.armorDetailSizer = wx.BoxSizer(wx.VERTICAL)
+		self.armorDetailsNotebook.AddPage(self.armorDetailPanel, "Detail")
+		self.armorDetailPanel.SetSizer(self.armorDetailSizer)
 
-		self.weaponSongsSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
-		self.weaponSongsPanel.SetSizer(self.weaponSongsSizer)
+		self.armorSongsSizer = wx.BoxSizer(wx.VERTICAL)
+		self.armorDetailsNotebook.AddPage(self.armorSongsPanel, "Songs")
+		self.armorSongsPanel.SetSizer(self.armorSongsSizer)
 
-		self.weaponAmmoSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
-		self.weaponAmmoPanel.SetSizer(self.weaponAmmoSizer)
+		self.armorAmmoSizer = wx.BoxSizer(wx.VERTICAL)
+		self.armorDetailsNotebook.AddPage(self.armorAmmoPanel, "Ammo")
+		self.armorAmmoPanel.SetSizer(self.armorAmmoSizer)
 		
-		#self.weaponFamilySizer = wx.BoxSizer(wx.VERTICAL) # REMOVE i dont think this is much use
-		#self.weaponDetailsNotebook.AddPage(self.weaponFamilyPanel, "Family") # REMOVE i dont think this is much use
+		#self.armorFamilySizer = wx.BoxSizer(wx.VERTICAL) # REMOVE i dont think this is much use
+		#self.armorDetailsNotebook.AddPage(self.armorFamilyPanel, "Family") # REMOVE i dont think this is much use
 		
-		self.weaponsDetailedSizer.Add(self.weaponImageLabel, 1, wx.ALIGN_CENTER)
-		self.weaponsDetailedSizer.Add(self.weaponDetailsNotebook, 3, wx.EXPAND)
+		self.armorDetailedSizer.Add(self.armorImageLabel, 1, wx.ALIGN_CENTER)
+		self.armorDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
 
-		self.weaponsSizer.Add(self.weaponsTreeSizer, 2, wx.EXPAND)
-		self.weaponsSizer.Add(self.weaponsDetailedSizer, 1, wx.EXPAND)
+		self.armorSizer.Add(self.armorTreeSizer, 2, wx.EXPAND)
+		self.armorSizer.Add(self.armorDetailedSizer, 1, wx.EXPAND)
 
-		self.weaponsPanel.SetSizer(self.weaponsSizer)
+		self.armorPanel.SetSizer(self.armorSizer)
 		
-		self.initWeaponsTree()
+		self.initArmorButtons()
+		self.initArmorTree()
+		self.loadArmorTree()
 
 
-	def initWeaponsTree(self):
-		self.weaponsTree = wx.lib.agw.hypertreelist.HyperTreeList(self.weaponsPanel, -1, style=0,
+	def initArmorButtons(self):
+		# TODO change to appropriate icons
+		self.lowRankButton = wx.BitmapButton(self.armorPanel, bitmap=self.testIcon, name="LR")
+		self.highRankButton = wx.BitmapButton(self.armorPanel, bitmap=self.testIcon, name="HR")
+		self.masterRankButton = wx.BitmapButton(self.armorPanel, bitmap=self.testIcon, name="MR")
+
+		self.lowRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
+		self.highRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
+		self.masterRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
+	
+		self.armorButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+		self.armorButtonsSizer.Add(self.lowRankButton)
+		self.armorButtonsSizer.Add(self.highRankButton)
+		self.armorButtonsSizer.Add(self.masterRankButton)
+
+		self.armorTreeSizer.Add(self.armorButtonsSizer)
+
+
+	def initArmorTree(self):
+		self.armorTree = wx.lib.agw.hypertreelist.HyperTreeList(self.armorPanel, -1, style=0,
 												agwStyle=
 												gizmos.TR_DEFAULT_STYLE
 												| gizmos.TR_ROW_LINES
 												| gizmos.TR_COLUMN_LINES
 												| gizmos.TR_FULL_ROW_HIGHLIGHT
 												| gizmos.TR_HIDE_ROOT
-												| gizmos.TR_ELLIPSIZE_LONG_ITEMS
+												#| gizmos.TR_ELLIPSIZE_LONG_ITEMS
 												)
-		#self.weaponsTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponSelection)
-		self.weaponsTreeSizer.Add(self.weaponsTree, 1, wx.EXPAND)
+		#self.armorTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onArmorSelection)
+		self.armorTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		self.il = ail.ArmorImageList()
+		self.armorTree.SetImageList(self.il.il)
 
-		self.test = self.il.Add(self.testIcon)
-
-		#self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity4 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/4.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity5 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/5.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity6 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/6.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity7 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/7.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity8 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/8.png", wx.BITMAP_TYPE_ANY))
-		# TODO iceborne
-		#self.rarity9 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/9.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
-
-		self.weaponsTree.SetImageList(self.il)
-		self.weaponDetailsNotebook.AssignImageList(self.il)
-
-		self.weaponsTree.AddColumn("Name") # 0
-		self.weaponsTree.AddColumn("") # Physical 1
-		self.weaponsTree.AddColumn("") # Element/Status 2
-		self.weaponsTree.AddColumn("") # Affinity 3
-		self.weaponsTree.AddColumn("") # Defense 4
-		self.weaponsTree.AddColumn("") # Slots 1 5
-		self.weaponsTree.AddColumn("") # Slots 2 6
-		self.weaponsTree.AddColumn("") # Slots 3 7
+		self.armorTree.AddColumn("Name") # 0
 		
-		self.weaponsTree.AddColumn("id") # 15
+		self.armorTree.AddColumn("Rarity") # 1
+		self.armorTree.AddColumn("Slot I") # 2
+		self.armorTree.AddColumn("Slot II") # 3
+		self.armorTree.AddColumn("Slot III") # 4
+		self.armorTree.AddColumn("Defense") # 5
+		self.armorTree.AddColumn("Defense Max") # 6
+		self.armorTree.AddColumn("Defense Augmented Max") # 7
+		self.armorTree.AddColumn("Fire") # 8
+		self.armorTree.AddColumn("Water") # 9
+		self.armorTree.AddColumn("Ice") # 10
+		self.armorTree.AddColumn("Thunder") # 11
+		self.armorTree.AddColumn("Dragon") # 12
+		self.armorTree.AddColumn("id") # 13
+		self.armorTree.AddColumn("armorSetID") # 14
+
+		for num in range(1, 15):
+			self.armorTree.SetColumnWidth(num, 29)
+			self.armorTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
+		self.armorTree.SetColumnWidth(0, 200)
+
+		for num in range(2, 5):
+			self.armorTree.SetColumnImage(num, self.il.slots)
+
+		for num in range(5, 8):
+			self.armorTree.SetColumnImage(num, self.il.defense)
+
+		self.armorTree.SetColumnImage(8, self.il.fire)
+		self.armorTree.SetColumnImage(9, self.il.water)
+		self.armorTree.SetColumnImage(10, self.il.ice)
+		self.armorTree.SetColumnImage(11, self.il.thunder)
+		self.armorTree.SetColumnImage(12, self.il.dragon)
+
+
+	def loadArmorTree(self):
+		sql = """
+			SELECT a.*, at.name, ast.name armorset_name
+			FROM armor a
+				JOIN armor_text at USING (id)
+				JOIN armorset_text ast
+					ON ast.id = a.armorset_id
+					AND ast.lang_id = at.lang_id
+			WHERE at.lang_id = :langId
+			AND (:rank IS NULL OR a.rank = :rank)
+		"""
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentArmorTree))
+		data = data.fetchall()
+
+		armorList = []
 		
-		self.weaponsTree.SetMainColumn(0)
-		self.weaponsTree.SetColumnWidth(0, 400)
+		for row in data:
+			armorList.append(a.Armor(row))
+		self.populateArmorTree(armorList)
 
-		#self.decorationSlotsIcons = {
-		#	1: self.slots1,
-		#	2: self.slots2,
-		#	3: self.slots3,
-		#}
+		self.armorTree.ExpandAll()
 
-		"""for num in range(1, 8):
-			self.weaponsTree.SetColumnImage(num, self.weaponTreeIcons[num])
-			self.weaponsTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-			self.weaponsTree.SetColumnWidth(num, 24)"""
 
-		self.weaponsTree.SetColumnWidth(1, 35)
-		self.weaponsTree.SetColumnWidth(2, 60)
-		self.weaponsTree.SetColumnWidth(3, 35)
-		self.weaponsTree.SetColumnWidth(4, 35)
-		self.weaponsTree.SetColumnWidth(5, 29)
-		self.weaponsTree.SetColumnWidth(6, 29)
-		self.weaponsTree.SetColumnWidth(7, 29)
+	def populateArmorTree(self, armorList: List[Armor]) -> None:
+		"""
+		armorList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
+		"""
+		root = self.armorTree.AddRoot("Armor")
+		armorSets = []
+		for a in armorList:
+			currentArmorSet = a.armorSetName
+			if currentArmorSet in armorSets:
+				armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
+			else:
+				armorSetNode = self.armorTree.AppendItem(root,  a.armorSetName)
+				self.armorTree.SetItemImage(armorSetNode, self.il.armorIcons["armorset"][a.rarity], which=wx.TreeItemIcon_Normal)
+				armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
+				armorSets.append(currentArmorSet)
+			self.armorTree.SetItemText(armorPiece, str(a.rarity), 1)
+			self.armorTree.SetItemText(armorPiece, str(a.defenseBase), 5)
+			self.armorTree.SetItemText(armorPiece, str(a.defenseMax), 6)
+			self.armorTree.SetItemText(armorPiece, str(a.defenseAugmentedMax), 7)
+			self.armorTree.SetItemText(armorPiece, str(a.fire), 8)
+			self.armorTree.SetItemText(armorPiece, str(a.water), 9)
+			self.armorTree.SetItemText(armorPiece, str(a.ice), 10)
+			self.armorTree.SetItemText(armorPiece, str(a.thunder), 11)
+			self.armorTree.SetItemText(armorPiece, str(a.dragon), 12)
+
+			self.armorTree.SetItemText(armorPiece, str(a.id), 13)
+			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 14)
+
+			self.armorTree.SetItemImage(armorPiece, self.il.armorIcons[a.armorType][a.rarity], which=wx.TreeItemIcon_Normal)
+			if a.slot1 != 0:
+				self.armorTree.SetItemText(armorPiece, str(a.slot1), 2) 
+				armorPiece.SetImage(2, self.il.slotIcons[a.slot1], wx.TreeItemIcon_Normal)
+			if a.slot2 != 0:
+				self.armorTree.SetItemText(armorPiece, str(a.slot2), 3)
+				armorPiece.SetImage(3, self.il.slotIcons[a.slot2], wx.TreeItemIcon_Normal)
+			if a.slot3 != 0:
+				self.armorTree.SetItemText(armorPiece, str(a.slot3), 4)
+				armorPiece.SetImage(4, self.il.slotIcons[a.slot3], wx.TreeItemIcon_Normal)
+
+
+	def onArmorTypeSelection(self, event):
+		"""
+		When an armor rank button at the top of the screen is pressed the armor tree is reloaded with the new armor rank information.
+		"""
+		self.currentArmorTree = event.GetEventObject().GetName()
+		self.armorTree.DeleteAllItems()
+		self.loadArmorTree()
