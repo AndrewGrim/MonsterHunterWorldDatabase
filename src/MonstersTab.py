@@ -10,6 +10,7 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+import Utilities as util
 
 wxColour = NewType("wxColour", None)
 sqlite3Connection = NewType("sqlite3Connection", None)
@@ -537,17 +538,17 @@ class MonstersTab:
 
 		# master rank
 		self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
-		masterRankColour = wx.Colour(255, 230, 0)
+		masterRankColour = util.hexToRGB("#FFEB3B")
 		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, wx.Colour(255, 230, 0))
 		
 		# high rank
 		self.highRankNode = self.materialsTree.AppendItem(root, "High Rank")
-		highRankColour = wx.Colour(255, 140, 0)
+		highRankColour = util.hexToRGB("#FB8C00")
 		self.materialsTree.SetItemBackgroundColour(self.highRankNode, wx.Colour(255, 140, 0))
 		
 		# low rank
 		self.lowRankNode = self.materialsTree.AppendItem(root, "Low Rank")
-		lowRankColour = wx.Colour(30, 190, 255)
+		lowRankColour = util.hexToRGB("#4DD0E1")
 		self.materialsTree.SetItemBackgroundColour(self.lowRankNode, lowRankColour)
 
 		sql = """

@@ -13,6 +13,7 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+import Utilities as util
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 
@@ -711,8 +712,8 @@ class WeaponsTab:
 		}
 
 		for num in range(self.weaponRowNumbers[self.currentWeaponTree]):
-			self.weaponDetailList.SetCellBackgroundColour(num, 0, self.hexToRGB("#FFFFFF"))
-			self.weaponDetailList.SetCellBackgroundColour(num, 1, self.hexToRGB("#FFFFFF"))
+			self.weaponDetailList.SetCellBackgroundColour(num, 0, util.hexToRGB("#FFFFFF"))
+			self.weaponDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#FFFFFF"))
 			self.weaponDetailList.SetCellRenderer(num, 0, wx.grid.GridCellStringRenderer())
 			self.weaponDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
 			self.weaponDetailList.SetCellValue(num, 0, "-")
@@ -720,36 +721,36 @@ class WeaponsTab:
 
 		for row, (key, value) in enumerate(weaponDetail.items()):
 			if key == "Rarity":
-				self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB(self.rarityColors[data[3]]))
-				self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB(self.rarityColors[data[3]]))
+				self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.rarityColors[data[3]]))
+				self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.rarityColors[data[3]]))
 			elif key == "Affinity":
 				try:
 					if int(affinity.replace("%", "")) > 0:
-						self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB("#C8E6C9"))
-						self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB("#C8E6C9"))
+						self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#C8E6C9"))
+						self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#C8E6C9"))
 					elif int(affinity.replace("%", "")) < 0:
-						self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB("#FFCDD2"))
-						self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB("#FFCDD2"))
+						self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#FFCDD2"))
+						self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#FFCDD2"))
 				except:
 					pass
 			elif key == "Element I":
 				try:
-					self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB(self.elementColors[data[11]]))
-					self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB(self.elementColors[data[11]]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[data[11]]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[data[11]]))
 				except:
 					pass
 			elif key == "Element II":
 				try:
-					self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB(self.elementColors[data[13]]))
-					self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB(self.elementColors[data[13]]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[data[13]]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[data[13]]))
 				except:
 					pass
 			elif key == "Elderseal" and elderseal != "-":
-				self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB("#D1C4E9"))
-				self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB("#D1C4E9"))
+				self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#D1C4E9"))
+				self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D1C4E9"))
 			elif key == "Defense" and defense != "-":
-				self.weaponDetailList.SetCellBackgroundColour(row, 0, self.hexToRGB("#D7CCC8"))
-				self.weaponDetailList.SetCellBackgroundColour(row, 1, self.hexToRGB("#D7CCC8"))
+				self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#D7CCC8"))
+				self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D7CCC8"))
 
 			if key in ["Slot I", "Slot II", "Slot III"]:
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/slots.png"), key))	
@@ -762,10 +763,10 @@ class WeaponsTab:
 					if str(value[0].split(" ")[0]) != "-":
 						self.weaponDetailList.SetCellRenderer(row, 0, \
 							cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/element.png") \
-							, key, self.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
+							, key, util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
 						self.weaponDetailList.SetCellRenderer(row, 1, \
 							cgr.ImageTextCellRenderer(wx.Bitmap("images/damage-types-24/" + str(value[0].split(" ")[0]) + ".png") \
-							, value[0], self.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
+							, value[0], util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
 				except:
 					self.weaponDetailList.SetCellValue(row, 1, "-")
 			else:
@@ -867,22 +868,22 @@ class WeaponsTab:
 				self.weaponSharpnessTable.SetCellValue(row, 0, "+" + str(row))
 
 				self.weaponSharpnessTable.SetCellValue(row, 1, str(sharpnessLevels[row][0]))
-				self.weaponSharpnessTable.SetCellBackgroundColour(row, 1, self.c.Find("red"))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 1, util.hexToRGB("#d92c2c"))
 
 				self.weaponSharpnessTable.SetCellValue(row, 2, str(sharpnessLevels[row][1]))
-				self.weaponSharpnessTable.SetCellBackgroundColour(row, 2, self.c.Find("coral"))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 2, util.hexToRGB("#d9662c"))
 
 				self.weaponSharpnessTable.SetCellValue(row, 3, str(sharpnessLevels[row][2]))
-				self.weaponSharpnessTable.SetCellBackgroundColour(row, 3, self.c.Find("yellow"))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 3, util.hexToRGB("#d9d12c"))
 
 				self.weaponSharpnessTable.SetCellValue(row, 4, str(sharpnessLevels[row][3]))
-				self.weaponSharpnessTable.SetCellBackgroundColour(row, 4, self.c.Find("green"))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 4, util.hexToRGB("#70d92c"))
 
 				self.weaponSharpnessTable.SetCellValue(row, 5, str(sharpnessLevels[row][4]))
-				self.weaponSharpnessTable.SetCellBackgroundColour(row, 5, self.c.Find("slate blue"))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 5, util.hexToRGB("#2c86d9"))
 
 				self.weaponSharpnessTable.SetCellValue(row, 6, str(sharpnessLevels[row][5]))
-				self.weaponSharpnessTable.SetCellBackgroundColour(row, 6, self.c.Find("white"))
+				self.weaponSharpnessTable.SetCellBackgroundColour(row, 6, util.hexToRGB("#ffffff"))
 		else:
 			if self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Hide()
@@ -1120,7 +1121,7 @@ class WeaponsTab:
 
 	def onWeaponSelection(self, event):
 		"""
-		When a specific weapon is selected in the tree the detail view gets populated with the information from the database.
+		When a specific weapon is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 		self.currentlySelectedWeaponID = self.weaponsTree.GetItemText(event.GetItem(), 15)
 		if self.currentlySelectedWeaponID != "":
@@ -1155,22 +1156,6 @@ class WeaponsTab:
 		self.currentWeaponTree = event.GetEventObject().GetName()
 		self.weaponsTree.DeleteAllItems()
 		self.loadWeaponsTree()
-
-
-	def hexToRGB(self, color: str) -> Tuple[int, int, int]:
-			"""
-			color = The hexadecimal representation of the color, # hash optional.
-
-			returns:
-			
-				A tuple containing the red, green and blue color information.
-			"""
-			color = color.replace("#", "")
-			red = int(color[0:2], 16)
-			green = int(color[2:4], 16)
-			blue = int(color[4:6], 16)
-
-			return (red, green, blue)
 
 
 	def onSize(self, event):
