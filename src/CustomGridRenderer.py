@@ -15,17 +15,19 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 	colour = (r,g,b)
 	selectedColour = (r,g,b)
 	"""
-	def __init__(self, img, label = "", colour = wx.WHITE, selectedColour = wx.BLUE):
+	def __init__(self, img = wx.NullBitmap, label = "", colour = wx.WHITE, selectedColour = wx.BLUE, autoImageOffset = False, imageOffset = 50):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
 		self.colour = colour
 		self.selectedColour = selectedColour
 		self.label = label
+		self.autoImageOffset = autoImageOffset
+		self.imageOffset = imageOffset
 
 
 	def Draw(self, grid, attr, dc, rect, row, col, isSelected):
-		image = wx.MemoryDC()
-		image.SelectObject(self.img)
+		#image = wx.MemoryDC()
+		#image.SelectObject(self.img) # REMOVE this was being problematic when trying to get bitmap from imagelist
 		dc.SetBackgroundMode(wx.SOLID)
 		if isSelected:
 			dc.SetBrush(wx.Brush(self.selectedColour, wx.SOLID))
@@ -42,7 +44,11 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 		#dc.Blit(rect.x+1, rect.y+1, width, height, image, 0, 0, wx.COPY, True)
 		x = rect.left + (rect.width - self.img.GetWidth()) / 2
 		y = rect.top + (rect.height - self.img.GetHeight()) / 2
-		dc.DrawBitmap(self.img, x - 50, y, True)
+		if self.autoImageOffset:
+			self.imageOffset = dc.GetTextExtent(self.label)
+			dc.DrawBitmap(self.img, x - self.imageOffset[0], y, True)
+		else:
+			dc.DrawBitmap(self.img, x - self.imageOffset, y, True)
 		self.DrawText(grid, dc, rect, self.label, wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
 

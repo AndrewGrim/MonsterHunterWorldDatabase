@@ -5,6 +5,7 @@ class ArmorImageList:
 	def __init__(self):
 		size = (24, 24)
 		self.il = wx.ImageList(size[0], size[1])
+
 		self.test = self.il.Add(wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY))
 
 		# TODO make this into a dict?? and have one for each of the armor pieces and the armor set icons, but also make them
@@ -158,7 +159,12 @@ class ArmorImageList:
 			1: self.slots1,
 			2: self.slots2,
 			3: self.slots3,
+		}
 
+		self.decorationSize = {
+			1: wx.Bitmap("images/decoration-slots-24/1.png", wx.BITMAP_TYPE_ANY),
+			2: wx.Bitmap("images/decoration-slots-24/2.png", wx.BITMAP_TYPE_ANY),
+			3: wx.Bitmap("images/decoration-slots-24/3.png", wx.BITMAP_TYPE_ANY),
 		}
 
 		self.fire = self.il.Add(wx.Bitmap("images/damage-types-24/fire.png"))

@@ -3,9 +3,11 @@
 - [x] split source into more files/classes
 - [x] monsters tab
 - [x] weapons tab
-  - [x] weapons tree
+  - [ ] weapons tree
   - [x] weapon detail
     - [x] add checks for colors
+    - [ ] change all instances of song/songs to melody/melodies since thats the language the game uses
+    - [ ] images for ammo and notes still need to be done
 - [ ] armor tab
 - [ ] item tab
 - [ ] prep all images
