@@ -27,8 +27,8 @@ class ArmorTab:
 		self.c = wx.ColourDatabase()
 
 		self.currentArmorTree = "LR"
-		self.currentlySelectedArmorID = 1
-		self.currentlySelectedArmorSetID = 1
+		self.currentlySelectedArmorID = 778 # 1
+		self.currentlySelectedArmorSetID = 163 # 1
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.rarityColors = {
@@ -50,6 +50,21 @@ class ArmorTab:
 			4: ["images/weapon-detail-24/slots.png", "Slot I"],
 			5: ["images/weapon-detail-24/slots.png", "Slot II"],
 			6: ["images/weapon-detail-24/slots.png", "Slot III"],
+			7: ["images/damage-types-24/fire.png", "Fire"],
+			8: ["images/damage-types-24/water.png", "Water"],
+			9: ["images/damage-types-24/ice.png", "Ice"],
+			10: [ "images/damage-types-24/thunder.png", "Thunder"],
+			11: [ "images/damage-types-24/dragon.png", "Dragon"],
+		}
+
+		self.armorSetDetail = {
+			0: ["images/unknown.png", "Rarity"],
+			1: ["images/weapon-detail-24/defense.png", "Defense"],
+			2: ["images/weapon-detail-24/defense.png", "Defense Max"],
+			3: ["images/weapon-detail-24/defense.png", "Defense Augmented Max"],
+			4: ["images/decoration-slots-24/1.png", "Slots"],
+			5: ["images/decoration-slots-24/2.png", "Slots"],
+			6: ["images/decoration-slots-24/3.png", "Slots"],
 			7: ["images/damage-types-24/fire.png", "Fire"],
 			8: ["images/damage-types-24/water.png", "Water"],
 			9: ["images/damage-types-24/ice.png", "Ice"],
@@ -96,6 +111,7 @@ class ArmorTab:
 		self.initArmorTree()
 		self.loadArmorTree()
 		self.initArmorDetailTab()
+		self.initArmorSetDetails()
 
 
 	def initArmorButtons(self):
@@ -247,8 +263,8 @@ class ArmorTab:
 		self.armorDetailList.SetColSize(0, 302)
 		self.armorDetailList.SetColSize(1, 155 - 20)
 		self.armorDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.armorDetailList.SetColLabelSize(0)
-		self.armorDetailList.SetRowLabelSize(0)
+		self.armorDetailList.SetColLabelSize(2)
+		self.armorDetailList.SetRowLabelSize(1)
 
 		self.armorSkillList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
@@ -380,11 +396,13 @@ class ArmorTab:
 				self.armorSkillList.InsertColumn(1, info)
 
 				self.armorSkillList.SetColumnWidth(0, 302)
-				self.armorSkillList.SetColumnWidth(1, 155 - 22)
+				self.armorSkillList.SetColumnWidth(1, 155 - 21)
 
 				for skill in armorSkills:
+					lvl = skill.skillLevel * "◈"
+					maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
 					index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, self.il.test)
-					self.armorSkillList.SetItem(index, 1, f"{skill.skillLevel} / {skill.skillMaxLevel}")
+					self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 
 	def loadArmorMaterials(self):
@@ -416,7 +434,7 @@ class ArmorTab:
 				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 				info.Image = -1
 				info.Align = wx.LIST_FORMAT_LEFT
-				info.Text = "Skills"
+				info.Text = "Req. Materials"
 				self.armorMaterialsList.InsertColumn(0, info)
 
 				info = wx.ListItem()
@@ -427,11 +445,307 @@ class ArmorTab:
 				self.armorMaterialsList.InsertColumn(1, info)
 
 				self.armorMaterialsList.SetColumnWidth(0, 302)
-				self.armorMaterialsList.SetColumnWidth(1, 155 - 22)
+				self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
 
 				for material in armorMaterials:
 					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, self.il.test)
 					self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
+
+
+	def initArmorSetDetails(self):
+		self.armorSetDetailList = cgr.HeaderBitmapGrid(self.armorSetPanel)
+		self.armorSetSizer.Add(self.armorSetDetailList, 1, wx.EXPAND)
+
+		self.armorSetDetailList.CreateGrid(12, 2)
+		self.armorSetDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.armorSetDetailList.SetColSize(0, 302)
+		self.armorSetDetailList.SetColSize(1, 155 - 20)
+		self.armorSetDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.armorSetDetailList.SetColLabelSize(2)
+		self.armorSetDetailList.SetRowLabelSize(1)
+
+		self.armorSetSkillList = wx.ListCtrl(self.armorSetPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.armorSetSkillList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.armorSetSizer.Add(self.armorSetSkillList, 1, wx.EXPAND)
+
+		self.armorSetMaterialList = wx.ListCtrl(self.armorSetPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.armorSetMaterialList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.armorSetSizer.Add(self.armorSetMaterialList, 1, wx.EXPAND)
+
+		self.loadArmorSetDetails()
+
+
+	def loadArmorSetDetails(self):
+		sql = """
+			SELECT a.*, at.name, ast.name armorset_name
+			FROM armor a
+				JOIN armor_text at USING (id)
+				JOIN armorset_text ast
+					ON ast.id = a.armorset_id
+					AND ast.lang_id = at.lang_id
+			WHERE at.lang_id = :langId
+			AND (a.armorset_id = :armorSetId)
+		"""
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedArmorSetID))
+		data = data.fetchall()
+
+		armorSet = []
+		for row in data:
+			armorSet.append(a.Armor(row))
+
+		defenseBase = 0
+		defenseMax = 0
+		defenseAugmentedMax = 0
+		lvl1Slots = 0
+		lvl2Slots = 0
+		lvl3Slots = 0
+		fire = 0
+		water = 0
+		ice = 0
+		thunder = 0
+		dragon = 0
+
+		armorSetSkills = {}
+		armorSetMaterials = {}
+		armorSetBonus = False
+		armorSetBonusID = 0
+
+		for i, armor in enumerate(armorSet):
+			defenseBase += armor.defenseBase
+			defenseMax += armor.defenseMax
+			defenseAugmentedMax += armor.defenseAugmentedMax
+
+			if armor.slot1 == 1:
+				lvl1Slots += 1
+			if armor.slot2 == 1:
+				lvl1Slots += 1
+			if armor.slot3 == 1:
+				lvl1Slots += 1
+
+			if armor.slot1 == 2:
+				lvl2Slots += 1
+			if armor.slot2 == 2:
+				lvl2Slots += 1
+			if armor.slot3 == 2:
+				lvl2Slots += 1
+
+			if armor.slot1 == 3:
+				lvl3Slots += 1
+			if armor.slot2 == 3:
+				lvl3Slots += 1
+			if armor.slot3 == 3:
+				lvl3Slots += 1
+
+			fire += armor.fire
+			water += armor.water
+			ice += armor.ice
+			thunder += armor.thunder
+			dragon += armor.dragon
+
+			if armor.armorSetBonusID != None:
+				armorSetBonus = True
+				armorSetBonusID = armor.armorSetBonusID
+
+			sql = """
+				SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level, s.icon_color skill_icon_color,
+					askill.level level
+				FROM armor_skill askill
+					JOIN armor a
+						ON askill.armor_id = a.id
+					JOIN skilltree s
+						ON askill.skilltree_id = s.id
+					JOIN skilltree_text stt
+						ON askill.skilltree_id = stt.id
+					WHERE stt.lang_id = :langId
+						AND askill.armor_id = :armorId
+					ORDER BY askill.skilltree_id ASC
+			"""
+
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, ("en", armor.id))
+			data = data.fetchall()
+
+			armorPieceSkills = {}
+			if data != None:
+				armorSkills = []
+				for row in data:
+					armorSkills.append(a.ArmorSkill(row))
+
+				for skill in armorSkills:
+					armorPieceSkills[skill.name] = [0, skill.skillMaxLevel]
+
+				for skill in armorSkills:
+					armorPieceSkills[skill.name][0] += skill.skillLevel
+
+				for k, v in armorPieceSkills.items():
+					if k in armorSetSkills.keys():
+						armorSetSkills[k][0] += v[0]
+					else:
+						armorSetSkills[k] = [v[0], v[1]]
+
+			sql = """
+				SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
+					i.category item_category, i.icon_color item_icon_color, a.quantity
+				FROM armor_recipe a
+					JOIN item i
+						ON a.item_id = i.id
+					JOIN item_text it
+						ON it.id = i.id
+						AND it.lang_id = :langId
+				WHERE it.lang_id = :langId
+				AND a.armor_id= :armorId
+				ORDER BY i.id
+			"""
+
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, ("en", armor.id))
+			data = data.fetchall()
+
+			armorPieceMaterials = {}
+			if data != None:
+				armorMaterials = []
+				for row in data:
+					armorMaterials.append(a.ArmorMaterial(row))
+
+				for mat in armorMaterials:
+					armorPieceMaterials[mat.name] = 0
+
+				for mat in armorMaterials:
+					armorPieceMaterials[mat.name] += mat.quantity
+
+				for k, v in armorPieceMaterials.items():
+					if k in armorSetMaterials.keys():
+						armorSetMaterials[k] += v
+					else:
+						armorSetMaterials[k] = v
+
+		if int(self.currentlySelectedArmorID) > 0:
+			self.armorSetDetailList.DeleteRows(0, self.armorSetDetailList.GetNumberRows())
+			self.armorSetDetailList.AppendRows(12)
+			
+			armorDetail = {
+				0:  str(armor.rarity),
+				1:  str(defenseBase),
+				2:  str(defenseMax),
+				3:  str(defenseAugmentedMax),
+				4:  str(lvl1Slots),
+				5:  str(lvl2Slots),
+				6:  str(lvl3Slots),
+				7:  str(fire),
+				8:  str(water),
+				9:  str(ice),
+				10: str(thunder),
+				11: str(dragon),
+			}
+
+			imageOffset = 85
+			rarityIcon = self.il.il.GetBitmap(self.il.armorIcons["armorset"][armor.rarity])
+
+			for num in range(12):
+				if num == 0:
+					self.armorSetDetailList.SetCellRenderer(num, 0,
+										cgr.ImageTextCellRenderer(
+																	rarityIcon,
+																	self.armorSetDetail[num][1],
+																	imageOffset=imageOffset,
+																))
+				else:
+					self.armorSetDetailList.SetCellRenderer(num, 0,
+										cgr.ImageTextCellRenderer(
+											wx.Bitmap(self.armorSetDetail[num][0]), 
+											self.armorSetDetail[num][1], 
+											imageOffset=imageOffset
+											))
+				if num not in [4, 5, 6]:
+					self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
+				else:
+					if armorDetail[num] != "0":
+						self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
+						self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
+					else:
+						self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
+						self.armorSetDetailList.SetCellValue(num, 1, "-")
+
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_LEFT
+			info.Text = "Skills"
+			self.armorSetSkillList.InsertColumn(0, info)
+
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_CENTER
+			info.Text = ""
+			self.armorSetSkillList.InsertColumn(1, info)
+
+			self.armorSetSkillList.SetColumnWidth(0, 302)
+			self.armorSetSkillList.SetColumnWidth(1, 155 - 22)
+
+			for k, v in armorSetSkills.items():
+				lvl = v[0] * "◈"
+				maxLvl = (v[1] - v[0]) * "◇"
+				index = self.armorSetSkillList.InsertItem(self.armorSetSkillList.GetItemCount(), k, self.il.test)
+				self.armorSetSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+			if armorSetBonus:
+				sql = """
+					SELECT st.id as skilltree_id, stt.name as skilltree_name, st.max_level skilltree_max_level,
+						st.icon_color as skilltree_icon_color,
+						abs.setbonus_id as id, abt.name, abs.required
+					FROM armorset_bonus_skill abs
+						JOIN armorset_bonus_text abt
+							ON abt.id = abs.setbonus_id
+						JOIN skilltree st
+							ON abs.skilltree_id = st.id
+						JOIN skilltree_text stt
+							ON abs.skilltree_id = stt.id
+							AND abt.lang_id = stt.lang_id
+					WHERE abt.lang_id = :langId
+					AND abs.setbonus_id= :setBonusId
+				"""
+
+				conn = sqlite3.Connection("mhw.db")
+				data = conn.execute(sql, ("en", armorSetBonusID))
+				data = data.fetchall()
+
+				setBonuses = []
+				if data != None:
+					for row in data:
+						setBonuses.append(a.ArmorSetBonus(row))
+					for b in setBonuses:
+						index = self.armorSetSkillList.InsertItem(
+							self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
+							self.il.test)
+						self.armorSetSkillList.SetItem(index, 1, "Req. " + str(b.setBonusAmtRequired))
+
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_LEFT
+			info.Text = "Req. Materials"
+			self.armorSetMaterialList.InsertColumn(0, info)
+
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_CENTER
+			info.Text = ""
+			self.armorSetMaterialList.InsertColumn(1, info)
+
+			self.armorSetMaterialList.SetColumnWidth(0, 302)
+			self.armorSetMaterialList.SetColumnWidth(1, 155 - 22)
+
+			for k, v in armorSetMaterials.items():
+				index = self.armorSetMaterialList.InsertItem(self.armorSetMaterialList.GetItemCount(), k, self.il.test)
+				self.armorSetMaterialList.SetItem(index, 1, str(v))
 
 
 	def onArmorTypeSelection(self, event):
@@ -457,13 +771,20 @@ class ArmorTab:
 			self.armorDetailList.ClearGrid()
 			self.armorSkillList.ClearAll()
 			self.armorMaterialsList.ClearAll()
+			self.armorSetDetailList.ClearGrid()
+			self.armorSetSkillList.ClearAll()
+			self.armorSetMaterialList.ClearAll()
 		
 			self.loadArmorDetails()
 			self.loadArmorSkills()
 			self.loadArmorMaterials()
-			"""width, height = self.weaponDetailPanel.GetSize()
-			self.weaponDetailPanel.SetSize(width + 1, height + 1)
-			self.weaponDetailPanel.SetSize(width, height)"""
+			self.loadArmorSetDetails()
+			width, height = self.armorDetailPanel.GetSize()
+			self.armorDetailPanel.SetSize(width + 1, height + 1)
+			self.armorDetailPanel.SetSize(width, height)
+			width, height = self.armorSetPanel.GetSize()
+			self.armorSetPanel.SetSize(width + 1, height + 1)
+			self.armorSetPanel.SetSize(width, height)
 
 
 	def onSize(self, event):
@@ -475,25 +796,54 @@ class ArmorTab:
 			self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
 			try:
 				self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-				self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 22)
+				self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
 			except:
 				pass
 			try:
 				self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-				self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 22)
+				self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
 			except:
 				pass
-			
+			try:
+				self.armorSetDetailList.SetColSize(0, self.armorSetPanel.GetSize()[0] * 0.66)
+				self.armorSetDetailList.SetColSize(1, self.armorSetPanel.GetSize()[0] * 0.34 - 20)
+			except:
+				pass
+			try:
+				self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+				self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
+			except:
+				pass
+			try:
+				self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+				self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
+			except:
+				pass
 		except:
 			self.armorDetailList.SetColSize(0, 302)
 			self.armorDetailList.SetColSize(1, 155 - 20)
 			try:
 				self.armorSkillList.SetColumnWidth(0, 302)
-				self.armorSkillList.SetColumnWidth(1, 155 - 20)
+				self.armorSkillList.SetColumnWidth(1, 155 - 21)
 			except:
 				pass
 			try:
 				self.armorMaterialsList.SetColumnWidth(0, 302)
-				self.armorMaterialsList.SetColumnWidth(1, 155 - 20)
+				self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
+			except:
+				pass
+			try:
+				self.armorSetDetailList.SetColumnWidth(0, 302)
+				self.armorSetDetailList.SetColumnWidth(1, 155 - 20)
+			except:
+				pass
+			try:
+				self.armorSetSkillList.SetColumnWidth(0, 302)
+				self.armorSetSkillList.SetColumnWidth(1, 155 - 21)
+			except:
+				pass
+			try:
+				self.armorSetMaterialList.SetColumnWidth(0, 302)
+				self.armorSetMaterialList.SetColumnWidth(1, 155 - 21)
 			except:
 				pass

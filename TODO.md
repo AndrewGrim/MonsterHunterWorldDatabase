@@ -13,9 +13,14 @@
   - [ ] individual pieces / armor set images - individual easy peasy, set might be annoying or just not up to standard
   - [ ] armor detail
     - [x] detail
-    - [x] req. mats
     - [x] skills
+    - [x] req. mats
+    - [ ] icons for mats and skills
   - [ ] armor set detail
+    - [x] detail
+    - [x] skills
+    - [x] req. mats
+    - [ ] icons for mats and skills
 - [ ] item tab
 - [ ] prep all images
   - [ ] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
