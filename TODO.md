@@ -9,6 +9,13 @@
     - [ ] change all instances of song/songs to melody/melodies since thats the language the game uses
     - [ ] images for ammo and notes still need to be done
 - [ ] armor tab
+  - [x] armor tree
+  - [ ] individual pieces / armor set images - individual easy peasy, set might be annoying or just not up to standard
+  - [ ] armor detail
+    - [x] detail
+    - [x] req. mats
+    - [x] skills
+  - [ ] armor set detail
 - [ ] item tab
 - [ ] prep all images
   - [ ] maybe set the application icon to nergigante for mhw and velkhana for mhwi??

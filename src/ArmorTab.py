@@ -237,34 +237,6 @@ class ArmorTab:
 				armorPiece.SetImage(4, self.il.slotIcons[a.slot3], wx.TreeItemIcon_Normal)
 
 
-	def onArmorTypeSelection(self, event):
-		"""
-		When an armor rank button at the top of the screen is pressed the armor tree is reloaded with the new armor rank information.
-		"""
-
-		self.currentArmorTree = event.GetEventObject().GetName()
-		self.armorTree.DeleteAllItems()
-		self.loadArmorTree()
-
-
-	def onArmorSelection(self, event):
-		"""
-		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
-		"""
-
-		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 13)
-		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 14)
-
-		if self.currentlySelectedArmorID != "":
-			self.armorImageLabel.SetBitmap(self.armorImage)
-			self.armorDetailList.ClearGrid()
-		
-			self.loadArmorDetails()
-			"""width, height = self.weaponDetailPanel.GetSize()
-			self.weaponDetailPanel.SetSize(width + 1, height + 1)
-			self.weaponDetailPanel.SetSize(width, height)"""
-
-
 	def initArmorDetailTab(self):
 		self.armorDetailList = cgr.HeaderBitmapGrid(self.armorDetailPanel)
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
@@ -278,7 +250,23 @@ class ArmorTab:
 		self.armorDetailList.SetColLabelSize(0)
 		self.armorDetailList.SetRowLabelSize(0)
 
+		self.armorSkillList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.armorSkillList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.armorDetailSizer.Add(self.armorSkillList, 1, wx.EXPAND)
+
+		self.armorMaterialsList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.armorMaterialsList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.armorDetailSizer.Add(self.armorMaterialsList, 1, wx.EXPAND)
+
 		self.loadArmorDetails()
+		self.loadArmorSkills()
+		self.loadArmorMaterials()
 
 
 	def loadArmorDetails(self):
@@ -351,6 +339,133 @@ class ArmorTab:
 						self.armorDetailList.SetCellValue(num, 1, "-")
 
 
+	def loadArmorSkills(self):
+		if int(self.currentlySelectedArmorID) > 0:
+			sql = """
+				SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level, s.icon_color skill_icon_color,
+					askill.level level
+				FROM armor_skill askill
+					JOIN armor a
+						ON askill.armor_id = a.id
+					JOIN skilltree s
+						ON askill.skilltree_id = s.id
+					JOIN skilltree_text stt
+						ON askill.skilltree_id = stt.id
+					WHERE stt.lang_id = :langId
+						AND askill.armor_id = :armorId
+					ORDER BY askill.skilltree_id ASC
+			"""
+
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+			data = data.fetchall()
+
+			if data != None:
+				armorSkills = []
+				for row in data:
+					armorSkills.append(a.ArmorSkill(row))
+
+				info = wx.ListItem()
+				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+				info.Image = -1
+				info.Align = wx.LIST_FORMAT_LEFT
+				info.Text = "Skills"
+				self.armorSkillList.InsertColumn(0, info)
+
+				info = wx.ListItem()
+				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+				info.Image = -1
+				info.Align = wx.LIST_FORMAT_CENTER
+				info.Text = ""
+				self.armorSkillList.InsertColumn(1, info)
+
+				self.armorSkillList.SetColumnWidth(0, 302)
+				self.armorSkillList.SetColumnWidth(1, 155 - 22)
+
+				for skill in armorSkills:
+					index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, self.il.test)
+					self.armorSkillList.SetItem(index, 1, f"{skill.skillLevel} / {skill.skillMaxLevel}")
+
+
+	def loadArmorMaterials(self):
+		if int(self.currentlySelectedArmorID) > 0:
+			sql = """
+				SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
+					i.category item_category, i.icon_color item_icon_color, a.quantity
+				FROM armor_recipe a
+					JOIN item i
+						ON a.item_id = i.id
+					JOIN item_text it
+						ON it.id = i.id
+						AND it.lang_id = :langId
+				WHERE it.lang_id = :langId
+				AND a.armor_id= :armorId
+				ORDER BY i.id
+			"""
+
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+			data = data.fetchall()
+
+			if data != None:
+				armorMaterials = []
+				for row in data:
+					armorMaterials.append(a.ArmorMaterial(row))
+
+				info = wx.ListItem()
+				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+				info.Image = -1
+				info.Align = wx.LIST_FORMAT_LEFT
+				info.Text = "Skills"
+				self.armorMaterialsList.InsertColumn(0, info)
+
+				info = wx.ListItem()
+				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+				info.Image = -1
+				info.Align = wx.LIST_FORMAT_CENTER
+				info.Text = ""
+				self.armorMaterialsList.InsertColumn(1, info)
+
+				self.armorMaterialsList.SetColumnWidth(0, 302)
+				self.armorMaterialsList.SetColumnWidth(1, 155 - 22)
+
+				for material in armorMaterials:
+					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, self.il.test)
+					self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
+
+
+	def onArmorTypeSelection(self, event):
+		"""
+		When an armor rank button at the top of the screen is pressed the armor tree is reloaded with the new armor rank information.
+		"""
+
+		self.currentArmorTree = event.GetEventObject().GetName()
+		self.armorTree.DeleteAllItems()
+		self.loadArmorTree()
+
+
+	def onArmorSelection(self, event):
+		"""
+		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
+		"""
+
+		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 13)
+		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 14)
+
+		if self.currentlySelectedArmorID != "":
+			self.armorImageLabel.SetBitmap(self.armorImage)
+			self.armorDetailList.ClearGrid()
+			self.armorSkillList.ClearAll()
+			self.armorMaterialsList.ClearAll()
+		
+			self.loadArmorDetails()
+			self.loadArmorSkills()
+			self.loadArmorMaterials()
+			"""width, height = self.weaponDetailPanel.GetSize()
+			self.weaponDetailPanel.SetSize(width + 1, height + 1)
+			self.weaponDetailPanel.SetSize(width, height)"""
+
+
 	def onSize(self, event):
 		"""
 		When the application window is resized some columns's width gets readjusted.
@@ -358,6 +473,27 @@ class ArmorTab:
 		try:
 			self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 			self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
+			try:
+				self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+				self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 22)
+			except:
+				pass
+			try:
+				self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+				self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 22)
+			except:
+				pass
+			
 		except:
 			self.armorDetailList.SetColSize(0, 302)
 			self.armorDetailList.SetColSize(1, 155 - 20)
+			try:
+				self.armorSkillList.SetColumnWidth(0, 302)
+				self.armorSkillList.SetColumnWidth(1, 155 - 20)
+			except:
+				pass
+			try:
+				self.armorMaterialsList.SetColumnWidth(0, 302)
+				self.armorMaterialsList.SetColumnWidth(1, 155 - 20)
+			except:
+				pass

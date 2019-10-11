@@ -3,7 +3,6 @@ import wx.dataview
 class Armor:
 
 	def __init__(self, dbRow):
-
 		self.id = dbRow[0]
 		self.orderID = dbRow[1]
 		self.rarity = dbRow[2]
@@ -27,3 +26,24 @@ class Armor:
 		self.dragon = dbRow[19]
 		self.name = dbRow[20]
 		self.armorSetName = dbRow[21]
+
+
+class ArmorSkill:
+
+	def __init__(self, dbRow):
+		self.id = dbRow[0]
+		self.name = dbRow[1]
+		self.skillMaxLevel = dbRow[2]
+		self.iconColor = dbRow[3]
+		self.skillLevel = dbRow[4]
+
+
+class ArmorMaterial:
+
+	def __init__(self, dbRow):
+		self.id = dbRow[0]
+		self.name = dbRow[1]
+		self.iconName = dbRow[2]
+		self.category = dbRow[3]
+		self.iconColor = dbRow[4]
+		self.quantity = dbRow[5]
