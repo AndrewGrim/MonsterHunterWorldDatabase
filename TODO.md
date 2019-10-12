@@ -42,4 +42,5 @@
 - [ ] support for different resolution by changing the font and pixel sizes accordingly - wx.Window ToDIP()
 - [ ] on double click show the weapon/armor etc. basically link stuff
 - [ ] change all the awful strings to fstrings
+- [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
   
