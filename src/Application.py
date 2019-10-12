@@ -10,8 +10,7 @@ import CustomGridRenderer as cgr
 import MonstersTab as m
 import WeaponsTab as w
 import ArmorTab as a
-import TestTab as t
-
+import ItemsTab as i
 
 class Application(wx.Frame):
 
@@ -35,8 +34,8 @@ class Application(wx.Frame):
 		self.initMainNotebook()
 		monsters = m.MonstersTab(root, self.mainNotebook)
 		#w.WeaponsTab(root, self.mainNotebook)
-		a.ArmorTab(root, self.mainNotebook)
-		#t.TestTab(root, self.mainNotebook)
+		#a.ArmorTab(root, self.mainNotebook)
+		i.ItemsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -48,7 +47,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(1) # armor tab
+		self.mainNotebook.SetSelection(1) # items tab
 
 		self.Show()
 

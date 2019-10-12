@@ -76,7 +76,7 @@ class MonstersTab:
 		conn = sqlite3.connect("MonsterHunter.db")
 		data = conn.execute("SELECT name FROM monsters WHERE id = ?", (self.currentMonsterID, ))
 		monsterIcon = data.fetchone()[0]
-		self.monsterImage = wx.Bitmap("images/monsters/325/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
+		self.monsterImage = wx.Bitmap("images/monsters/256/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
 		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage)
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
@@ -165,7 +165,7 @@ class MonstersTab:
 
 		self.summaryTree.SetImageList(self.il)
 
-		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/325/Nergigante.png"))
+		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/256/Nergigante.png"))
 		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Nergigante", style=wx.ALIGN_LEFT)
 		self.monsterSummaryNameLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
 		self.monsterSummaryTypeLabel = wx.StaticText(self.summaryPanel, label="Elder Dragon", style=wx.ALIGN_LEFT)
@@ -965,9 +965,9 @@ class MonstersTab:
 
 	def onMonsterSelect(self, event):
 		if str(self.monstersTable.GetCellValue(event.GetRow(), 1)) != "":
-			self.monsterImage.LoadFile("images/monsters/325/" + str(self.monstersTable.GetCellValue(event.GetRow(), 1)) + ".png")
+			self.monsterImage.LoadFile("images/monsters/256/" + str(self.monstersTable.GetCellValue(event.GetRow(), 1)) + ".png")
 		else:
-			self.monsterImage.LoadFile("images/monsters/325/Unknown.png")
+			self.monsterImage.LoadFile("images/monsters/256/Unknown.png")
 		self.monsterImageLabel.SetBitmap(self.monsterImage)
 		self.physicalDamageTable.ClearGrid()
 		self.elementDamageTable.ClearGrid()

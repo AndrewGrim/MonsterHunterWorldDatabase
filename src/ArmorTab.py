@@ -24,11 +24,10 @@ class ArmorTab:
 	def __init__(self, root, mainNotebook):
 		self.root = root
 		self.mainNotebook = mainNotebook
-		self.c = wx.ColourDatabase()
 
 		self.currentArmorTree = "LR"
-		self.currentlySelectedArmorID = 778 # 1
-		self.currentlySelectedArmorSetID = 163 # 1
+		self.currentlySelectedArmorID = 1
+		self.currentlySelectedArmorSetID = 1
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.rarityColors = {
@@ -72,7 +71,6 @@ class ArmorTab:
 			11: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
-		# TODO maybe have the same button like in armor tab but for loading only low/high/master rank armro??
 		self.initArmorTab()
 
 
