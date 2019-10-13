@@ -22,6 +22,21 @@
     - [x] req. mats
     - [ ] icons for mats and skills
 - [ ] item tab
+  - [ ] probably change to listctrl since grid can be painful to work with sometimes
+  - [ ] images
+  - [x] layout
+- [ ] decorations tab
+  - [ ] images
+  - [x] layout
+- [ ] skills tab
+  - [ ] images
+  - [ ] layout
+- [ ] charms tab
+  - [ ] images
+  - [ ] layout
+- [ ] locations tab
+  - [ ] images
+  - [ ] layout
 - [ ] prep all images
   - [ ] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
   - [ ] make different sizes for taskbar and window icons

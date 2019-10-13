@@ -11,6 +11,7 @@ import MonstersTab as m
 import WeaponsTab as w
 import ArmorTab as a
 import ItemsTab as i
+import DecorationsTab as d
 
 class Application(wx.Frame):
 
@@ -36,6 +37,7 @@ class Application(wx.Frame):
 		#w.WeaponsTab(root, self.mainNotebook)
 		#a.ArmorTab(root, self.mainNotebook)
 		#i.ItemsTab(root, self.mainNotebook)
+		d.DecorationsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -47,7 +49,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(0) #  tab
+		self.mainNotebook.SetSelection(1) # decoration tab
 
 		self.Show()
 
