@@ -52,20 +52,10 @@ class ItemsTab:
 
 		self.itemDetailsNotebook = wx.Notebook(self.itemPanel)
 		self.itemDetailPanel = wx.Panel(self.itemDetailsNotebook)
-		self.itemUsagePanel = wx.Panel(self.itemDetailsNotebook)
-		self.itemObtainingPanel = wx.Panel(self.itemDetailsNotebook)
 
 		self.itemDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemDetailsNotebook.AddPage(self.itemDetailPanel, "Summary")
+		self.itemDetailsNotebook.AddPage(self.itemDetailPanel, "Detail")
 		self.itemDetailPanel.SetSizer(self.itemDetailSizer)
-
-		self.itemUsageSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemDetailsNotebook.AddPage(self.itemUsagePanel, "Usage")
-		self.itemUsagePanel.SetSizer(self.itemUsageSizer)
-
-		self.itemObtainingSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemDetailsNotebook.AddPage(self.itemObtainingPanel, "Obtaining")
-		self.itemObtainingPanel.SetSizer(self.itemObtainingSizer)
 		
 		self.itemDetailedSizer.Add(self.itemImageLabel, 1, wx.ALIGN_CENTER)
 		self.itemDetailedSizer.Add(self.itemDetailsNotebook, 3, wx.EXPAND)
@@ -101,11 +91,14 @@ class ItemsTab:
 		self.ammoButton.SetBitmap(wx.Bitmap("images/unknown.png"))
 		self.miscButton = wx.Button(self.itemPanel, label="Misc.", name="misc")
 		self.miscButton.SetBitmap(wx.Bitmap("images/unknown.png"))
+		self.craftingButton = wx.Button(self.itemPanel, label="Crafting", name="crafting")
+		self.craftingButton.SetBitmap(wx.Bitmap("images/unknown.png"))
 
 		self.itemsButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
 		self.materialsButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
 		self.ammoButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
 		self.miscButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
+		self.craftingButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
 	
 		self.itemButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -113,6 +106,7 @@ class ItemsTab:
 		self.itemButtonsSizer.Add(self.materialsButton)
 		self.itemButtonsSizer.Add(self.ammoButton)
 		self.itemButtonsSizer.Add(self.miscButton)
+		self.itemButtonsSizer.Add(self.craftingButton)
 
 		self.itemListSizer.Add(self.itemButtonsSizer)
 
@@ -163,6 +157,57 @@ class ItemsTab:
 			self.itemList.SetCellValue(row, 1, item.name)
 			self.itemList.SetCellValue(row, 2, f"{item.iconName}{item.iconColor}.png")
 			self.itemList.SetCellValue(row, 3, str(item.id))
+
+
+	def loadCraftingList(self):
+		self.itemList.DeleteRows(0, self.itemList.GetNumberRows())
+
+		sql = """
+			SELECT c.id,
+			r.id result_id, rt.name result_name, r.icon_name result_icon_name, r.icon_color result_icon_color, r.category result_category,
+			f.id first_id, ft.name first_name, f.icon_name first_icon_name, f.icon_color first_icon_color, f.category first_category,
+			s.id second_id, st.name second_name, s.icon_name second_icon_name, s.icon_color second_icon_color, s.category second_category,
+			c.quantity quantity
+			FROM item_combination c
+				JOIN item r
+					ON r.id = c.result_id
+				JOIN item_text rt
+					ON rt.id = r.id
+					AND rt.lang_id = :langId
+				JOIN item f
+					ON f.id = c.first_id
+				JOIN item_text ft
+					ON ft.id = f.id
+					AND ft.lang_id = :langId
+				LEFT JOIN item s
+					ON s.id = c.second_id
+				LEFT JOIN item_text st
+					ON st.id = s.id
+					AND st.lang_id = :langId
+			WHERE :itemId IS NULL
+				OR c.result_id = :itemId
+				OR c.first_id = :itemId
+				OR c.second_id = :itemId
+			ORDER BY c.id ASC
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", None))
+		data = data.fetchall()
+
+		combinations = []
+		for row in data:
+			combinations.append(combo.CombinationObtaining(row))
+		self.itemList.AppendRows(len(combinations))
+
+		for row, com in enumerate(combinations):
+			self.itemList.SetCellRenderer(row, 0,cgr.ImageCellRenderer(self.testIcon36))
+			if com.secondName != None:
+				self.itemList.SetCellValue(row, 1, f"{com.resultName} = {com.firstName} + {com.secondName}")
+			else:
+				self.itemList.SetCellValue(row, 1, f"{com.resultName} = {com.firstName}")
+			self.itemList.SetCellValue(row, 2, f"{com.resultIconName}{com.resultIconColor}.png")
+			self.itemList.SetCellValue(row, 3, str(com.resultID))
 
 
 	def initItemDetail(self):
@@ -472,8 +517,12 @@ class ItemsTab:
 		When an item type button at the top of the screen is pressed the item list is reloaded with the new item type information.
 		"""
 
-		self.currentItemCategory = event.GetEventObject().GetName()
-		self.loadItemList()
+		if event.GetEventObject().GetName() != "crafting":
+			self.currentItemCategory = event.GetEventObject().GetName()
+			self.loadItemList()
+		else:
+			self.currentItemCategory = event.GetEventObject().GetName()
+			self.loadCraftingList()
 
 
 	def onItemSelection(self, event):
@@ -482,7 +531,11 @@ class ItemsTab:
 		"""
 		if self.itemList.GetCellValue(event.GetRow(), 3) != "":
 			self.currentlySelectedItemID = self.itemList.GetCellValue(event.GetRow(), 3)
-			self.currentItemName = self.itemList.GetCellValue(event.GetRow(), 1)
+			if self.currentItemCategory == "crafting":
+				name = self.itemList.GetCellValue(event.GetRow(), 1)
+				self.currentItemName = name[:name.find(" =")]
+			else:
+				self.currentItemName = self.itemList.GetCellValue(event.GetRow(), 1)
 			"""iconFile = self.itemList.GetCellValue(event.GetRow(), 2)
 			self.itemImage = wx.Bitmap(f"images/items/{category}/{iconFile}", wx.BITMAP_TYPE_ANY)
 			self.itemImageLabel.SetBitmap(self.itemImage)"""
