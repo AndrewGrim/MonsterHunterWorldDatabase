@@ -252,13 +252,22 @@ class ItemsTab:
 		self.itemDetailList.SetCellValue(0, 1, "")
 		self.itemDetailList.SetCellValue(0, 2, "")
 		self.itemDetailList.SetCellValue(0, 3, "Buy")
-		self.itemDetailList.SetCellValue(0, 4, str(item.buyPrice))
+		if item.buyPrice != 0:
+			self.itemDetailList.SetCellValue(0, 4, str(item.buyPrice))
+		else:
+			self.itemDetailList.SetCellValue(0, 4, "-")
 		self.itemDetailList.SetCellRenderer(0, 5,cgr.ImageTextCellRenderer(self.testIcon36, imageOffset=0))
 		self.itemDetailList.SetCellValue(1, 0, "Carry")
-		self.itemDetailList.SetCellValue(1, 1, str(item.carryLimit))
+		if item.carryLimit != 0:
+			self.itemDetailList.SetCellValue(1, 1, str(item.carryLimit))
+		else:
+			self.itemDetailList.SetCellValue(1, 1, "-")
 		self.itemDetailList.SetCellRenderer(1, 2,cgr.ImageTextCellRenderer(self.testIcon36, imageOffset=0))
 		self.itemDetailList.SetCellValue(1, 3, "Sell")
-		self.itemDetailList.SetCellValue(1, 4, str(item.sellPrice))
+		if item.sellPrice != 0:
+			self.itemDetailList.SetCellValue(1, 4, str(item.sellPrice))
+		else:
+			self.itemDetailList.SetCellValue(1, 4, "-")
 		self.itemDetailList.SetCellRenderer(1, 5,cgr.ImageTextCellRenderer(self.testIcon36, imageOffset=0))
 
 	def initItemUsage(self):
@@ -285,9 +294,60 @@ class ItemsTab:
 
 		self.currentUsageRow = 0
 
+		self.loadUsageCombinations()
 		self.loadUsageCharms()
 		self.loadUsageArmor()
 		self.loadUsageWeapons()
+
+
+	def loadUsageCombinations(self):
+		sql = """
+			SELECT c.id,
+			r.id result_id, rt.name result_name, r.icon_name result_icon_name, r.icon_color result_icon_color, r.category result_category,
+			f.id first_id, ft.name first_name, f.icon_name first_icon_name, f.icon_color first_icon_color, f.category first_category,
+			s.id second_id, st.name second_name, s.icon_name second_icon_name, s.icon_color second_icon_color, s.category second_category,
+			c.quantity quantity
+			FROM item_combination c
+				JOIN item r
+					ON r.id = c.result_id
+				JOIN item_text rt
+					ON rt.id = r.id
+					AND rt.lang_id = :langId
+				JOIN item f
+					ON f.id = c.first_id
+				JOIN item_text ft
+					ON ft.id = f.id
+					AND ft.lang_id = :langId
+				LEFT JOIN item s
+					ON s.id = c.second_id
+				LEFT JOIN item_text st
+					ON st.id = s.id
+					AND st.lang_id = :langId
+			WHERE :itemId IS NULL
+				OR c.result_id = :itemId
+				OR c.first_id = :itemId
+				OR c.second_id = :itemId
+			ORDER BY c.id ASC
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedItemID))
+		data = data.fetchall()
+
+		combinations = []
+		for row in data:
+			if row[2] != self.currentItemName:
+				combinations.append(combo.CombinationObtaining(row))
+		self.itemUsageList.AppendRows(len(combinations))
+
+		for com in combinations:
+			self.itemUsageList.SetCellRenderer(self.currentUsageRow, 0,cgr.ImageCellRenderer(self.testIcon36))
+			if com.secondName != None:
+				self.itemUsageList.SetCellValue(self.currentUsageRow, 1, f"{com.resultName} = {com.firstName} + {com.secondName}")
+			else:
+				self.itemUsageList.SetCellValue(self.currentUsageRow, 1, f"{com.resultName} = {com.firstName}")
+			self.itemUsageList.SetCellValue(self.currentUsageRow, 2, f"x {com.quantity}")
+			self.currentUsageRow += 1
 
 		
 	def loadUsageCharms(self):
@@ -402,7 +462,6 @@ class ItemsTab:
 
 
 	def loadObtainingCombination(self):
-		# TODO add this to UsageList as well!
 		sql = """
 			SELECT c.id,
 			r.id result_id, rt.name result_name, r.icon_name result_icon_name, r.icon_color result_icon_color, r.category result_category,
@@ -448,7 +507,7 @@ class ItemsTab:
 				self.itemObtainingList.SetCellValue(self.currentObtainingRow, 1, f"{com.resultName} = {com.firstName} + {com.secondName}")
 			else:
 				self.itemObtainingList.SetCellValue(self.currentObtainingRow, 1, f"{com.resultName} = {com.firstName}")
-			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 2, f"x{com.quantity}")
+			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 2, f"x {com.quantity}")
 			self.currentObtainingRow += 1
 
 
