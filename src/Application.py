@@ -35,7 +35,7 @@ class Application(wx.Frame):
 		monsters = m.MonstersTab(root, self.mainNotebook)
 		#w.WeaponsTab(root, self.mainNotebook)
 		#a.ArmorTab(root, self.mainNotebook)
-		i.ItemsTab(root, self.mainNotebook)
+		#i.ItemsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -47,7 +47,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(1) # items tab
+		self.mainNotebook.SetSelection(0) #  tab
 
 		self.Show()
 
@@ -63,11 +63,18 @@ class Application(wx.Frame):
 		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 		# main notebook holding the top tabs ie: monsters, weapons etc.
 		self.mainNotebook = wx.Notebook(self.mainPanel)
+		self.mainNotebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChanged)
 		# add notebook to sizer
 		self.mainSizer.Add(self.mainNotebook, 1, wx.EXPAND)
 
 		# set the sizer for mainWindow
 		self.mainPanel.SetSizer(self.mainSizer)
+
+
+	def onTabChanged(self, event):
+		if event.GetEventObject() == self.mainNotebook:
+			self.SetSize(self.windowWidth + 3, self.windowHeight)
+			self.SetSize(self.windowWidth, self.windowHeight)
 
 
 	# TODO make a preferences page
