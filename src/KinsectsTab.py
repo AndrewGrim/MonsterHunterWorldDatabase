@@ -26,7 +26,6 @@ class KinsectsTab:
 		self.mainNotebook = mainNotebook
 
 		self.currentlySelectedKinsectID = 1
-		self.currentlySelectedKinsectName = "Culldrone I"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.initKinsectTab()
@@ -156,38 +155,122 @@ class KinsectsTab:
 
 
 	def initKinsectDetailTab(self):
-		pass		
+		self.kinsectDetailList = wx.ListCtrl(self.kinsectDetailPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.kinsectDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.kinsectDetailSizer.Add(self.kinsectDetailList, 1, wx.EXPAND)
+
+		self.kinsectMaterialList = wx.ListCtrl(self.kinsectDetailPanel, style=wx.LC_REPORT
+																		| wx.LC_VRULES
+																		| wx.LC_HRULES
+																		)
+		self.kinsectMaterialList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.kinsectDetailSizer.Add(self.kinsectMaterialList, 1, wx.EXPAND)
+
+		self.loadKinsectDetails()	
+		self.loadKinsectMaterials()
 
 
 	def loadKinsectDetails(self):
-		pass
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.kinsectDetailList.InsertColumn(0, info)
+		self.kinsectDetailList.SetColumnWidth(0, 480)
+		self.kinsectDetailList.InsertColumn(1, info)
+		self.kinsectDetailList.SetColumnWidth(1, 200)
+
+
+		sql = """
+			SELECT k.*, kt.name
+			FROM kinsect k
+				JOIN kinsect_text kt USING (id)
+			WHERE kt.lang_id = :langId
+				AND k.id = :kinId
+			ORDER BY k.id ASC
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedKinsectID))
+		data = data.fetchone()
+
+		kin = k.Kinsect(data)
+
+		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Rarity", self.test)
+		self.kinsectDetailList.SetItem(index, 1, f"{kin.rarity}")
+		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Attack Type", self.test)
+		self.kinsectDetailList.SetItem(index, 1, f"{kin.attackType}")
+		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Dust Effect", self.test)
+		self.kinsectDetailList.SetItem(index, 1, f"{kin.dustEffect}")
+		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Power", self.test)
+		self.kinsectDetailList.SetItem(index, 1, f"{kin.power}")
+		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Speed", self.test)
+		self.kinsectDetailList.SetItem(index, 1, f"{kin.speed}")
+		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Heal", self.test)
+		self.kinsectDetailList.SetItem(index, 1, f"{kin.heal}")
 
 
 	def loadKinsectMaterials(self):
-		pass
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Req. Materials"
+		self.kinsectMaterialList.InsertColumn(0, info)
+		self.kinsectMaterialList.SetColumnWidth(0, 480)
 
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.kinsectMaterialList.InsertColumn(1, info)
+		self.kinsectMaterialList.SetColumnWidth(1, 200)
+
+
+		sql = """
+			SELECT k.id, kr.item_id, kr.quantity, kt.name,
+				i.category, i.icon_name, i.icon_color, it.name
+			FROM kinsect k
+				JOIN kinsect_recipe kr
+					ON k.id = kr.kinsect_id
+				JOIN item i
+					ON kr.item_id = i.id
+				JOIN item_text it
+					ON kr.item_id = it.id
+				JOIN kinsect_text kt USING (id)
+			WHERE kt.lang_id = :langId
+				AND it.lang_id = :langId
+				AND k.id = :kinId
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedKinsectID))
+		data = data.fetchall()
+
+		materials = []
+		for row in data:
+			materials.append(k.KinsectMaterial(row))
+
+		for mat in materials:
+			index = self.kinsectMaterialList.InsertItem(self.kinsectMaterialList.GetItemCount(), mat.name, self.test)
+			self.kinsectMaterialList.SetItem(index, 1, f"{mat.quantity}")
+		
 
 	def onKinsectSelection(self, event):
 		"""
 		When a specific kinsect is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 		self.currentlySelectedKinsectID = self.kinsectTree.GetItemText(event.GetItem(), 6)
-		self.currentlySelectedKinsectName = self.kinsectTree.GetItemText(event.GetItem(), 0)
 
+		self.kinsectDetailList.ClearAll()
+		self.kinsectMaterialList.ClearAll()
 		self.loadKinsectDetails()
 		self.loadKinsectMaterials()
 		width, height = self.kinsectDetailPanel.GetSize()
 		self.kinsectDetailPanel.SetSize(width + 1, height + 1)
 		self.kinsectDetailPanel.SetSize(width, height)
-
-
-	def onSize(self, event):
-		"""
-		When the application window is resized some columns's width gets readjusted.
-		"""
-		"""try:
-			self.kinsectDetailList.SetColSize(0, self.kinsectDetailPanel.GetSize()[0] * 0.66)
-			self.kinsectDetailList.SetColSize(1, self.kinsectDetailPanel.GetSize()[0] * 0.34 - 20)
-		except:
-			self.kinsectDetailList.SetColSize(0, 302)
-			self.kinsectDetailList.SetColSize(1, 155 - 20)"""

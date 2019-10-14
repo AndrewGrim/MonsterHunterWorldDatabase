@@ -38,7 +38,7 @@
   - [ ] images
   - [x] layout
 - [ ] kinsect tab
-  - [ ] layout
+  - [x] layout
   - [ ] images
 - [ ] prep all images
   - [ ] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
@@ -65,4 +65,3 @@
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
 - [ ] load all the tabs in parallel by utlizing threading
-  
