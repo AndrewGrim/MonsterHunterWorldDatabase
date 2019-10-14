@@ -30,13 +30,16 @@
   - [x] layout
 - [ ] skills tab
   - [ ] images
-  - [ ] layout
+  - [x] layout
 - [ ] charms tab
   - [ ] images
   - [ ] layout
 - [ ] locations tab
   - [ ] images
+  - [x] layout
+- [ ] kinsect tab
   - [ ] layout
+  - [ ] images
 - [ ] prep all images
   - [ ] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
   - [ ] make different sizes for taskbar and window icons
@@ -61,4 +64,5 @@
 - [ ] organize src files into separate folders
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
+- [ ] load all the tabs in parallel by utlizing threading
   

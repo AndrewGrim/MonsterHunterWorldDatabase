@@ -164,8 +164,6 @@ class DecorationsTab:
 		data = data.fetchone()
 
 		deco = dd.DecorationDetail(data)
-		print(data)
-		print(deco)
 		lvl = deco.skillLevel * "◈"
 		maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
 		index = self.skillList.InsertItem(self.skillList.GetItemCount(), deco.skillName, self.test)

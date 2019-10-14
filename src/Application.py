@@ -15,6 +15,7 @@ import DecorationsTab as d
 import SkillsTab as s
 import CharmsTab as c
 import LocationsTab as l
+import KinsectsTab as k
 
 class Application(wx.Frame):
 
@@ -43,7 +44,8 @@ class Application(wx.Frame):
 		#d.DecorationsTab(root, self.mainNotebook)
 		#s.SkillsTab(root, self.mainNotebook)
 		#c.CharmsTab(root, self.mainNotebook)
-		l.LocationsTab(root, self.mainNotebook)
+		#l.LocationsTab(root, self.mainNotebook)
+		k.KinsectsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 

@@ -30,7 +30,7 @@ class CharmsTab:
 
 	def initSkillTab(self):
 		self.charmPanel = wx.Panel(self.mainNotebook)
-		self.mainNotebook.AddPage(self.charmPanel, "Skills")
+		self.mainNotebook.AddPage(self.charmPanel, "Charms")
 		self.charmSizer = wx.BoxSizer(wx.HORIZONTAL)
 
 		self.charmListSizer = wx.BoxSizer(wx.VERTICAL) 

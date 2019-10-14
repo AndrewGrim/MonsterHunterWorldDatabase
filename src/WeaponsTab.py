@@ -683,7 +683,7 @@ class WeaponsTab:
 		note2 = str(data[32])[1]
 		note3 = str(data[32])[2]
 
-		shelling = str(data[24]).capitalize() + " Lv" + str(data[25])
+		shelling = str(data[24]).capitalize() + " Lv " + str(data[25])
 		
 
 		additionalDetails = {
