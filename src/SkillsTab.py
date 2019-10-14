@@ -16,6 +16,8 @@ from typing import NewType
 import Skill as s
 import SkillDetail as sd
 import SkillDecoration as sdeco
+import SkillCharm as sch
+import SkillArmor as aarm
 
 class SkillsTab:
 
@@ -170,21 +172,19 @@ class SkillsTab:
 			index = self.skillDetailList.InsertItem(self.skillDetailList.GetItemCount(), f"{lvl}{maxLvl}", self.test)
 			self.skillDetailList.SetItem(index, 1, skill.skillLevelDescription)
 		if skills[0].skillMaxLevel == 1:
-			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].skillLevelDescription}")
+			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].name}:\n{skills[0].skillLevelDescription}")
 		else:
-			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].description}")
+			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].name}:\n{skills[0].description}")
 
-		self.loadSkillFound(skill)
+		self.loadSkillFound()
 
 
-	def loadSkillFound(self, Skill):
-		skill = Skill
-
+	def loadSkillFound(self):
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
 		info.Align = wx.LIST_FORMAT_LEFT
-		info.Text = "Drop"
+		info.Text = "Found In"
 		self.foundList.InsertColumn(0, info)
 		self.foundList.SetColumnWidth(0, 580)
 		info = wx.ListItem()
@@ -196,6 +196,12 @@ class SkillsTab:
 		self.foundList.InsertColumn(1, info)
 		self.foundList.SetColumnWidth(1, 100)
 
+		self.loadSkillDecorations()
+		self.loadSkillCharms()
+		self.loadSkillArmor()
+		self.loadSkillArmorSetBonuses()
+
+	def loadSkillDecorations(self):
 		sql = """
 			SELECT
 				stt.id skill_id, stext.name skill_name, stt.max_level skill_max_level,
@@ -211,6 +217,8 @@ class SkillsTab:
 			AND dt.lang_id = :langId
 			ORDER BY dt.name ASC
 		"""
+		# ICEBORNE the final select here "1 level" will not be compatible with iceborne as
+		# the game introduces lvl 4 deco which can give 2 lvls of a skill or 1 lvl of 2 separate skill!
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, (self.currentSkillID, "en"))
@@ -218,7 +226,6 @@ class SkillsTab:
 
 		decorations = []
 		for row in data:
-			print(data)
 			decorations.append(sdeco.SkillDecoration(row))
 	
 		for deco in decorations:
@@ -226,6 +233,73 @@ class SkillsTab:
 			maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, self.test)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
+
+		
+	def loadSkillCharms(self):
+		sql = """
+			SELECT c.id AS charm_id, c.rarity AS charm_rarity, ct.name AS charm_name,
+				st.id skill_id, stext.name skill_name, st.max_level skill_max_level,
+				cs.level level
+			FROM charm c
+				JOIN charm_text ct USING (id)
+				JOIN charm_skill cs ON (c.id = charm_id)
+				JOIN skilltree st ON (st.id = skilltree_id)
+				JOIN skilltree_text stext
+				ON stext.id = st.id
+				AND stext.lang_id = ct.lang_id
+			WHERE ct.lang_id = :langId
+				AND cs.skilltree_id = :skillTreeId
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentSkillID))
+		data = data.fetchall()
+
+		charms = []
+		for row in data:
+			charms.append(sch.SkillCharm(row))
+	
+		for charm in charms:
+			lvl = charm.skillLevel * "◈"
+			maxLvl = (charm.skillMaxLevel - charm.skillLevel) * "◇"
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), charm.name, self.test)
+			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
+
+
+	def loadSkillArmor(self):
+		sql = """
+			SELECT stt.id skill_id, stt.max_level skill_max_level,
+				a.id armor_id, at.name armor_name, a.rarity armor_rarity, a.armor_type armor_armor_type,
+				askill.level level
+			FROM armor a
+				JOIN armor_text at ON a.id = at.id
+				JOIN armor_skill askill ON a.id = askill.armor_id
+				JOIN skilltree stt ON askill.skilltree_id = stt.id
+				JOIN skilltree_text stext
+					ON stext.id = stt.id
+					AND stext.lang_id = at.lang_id
+			WHERE at.lang_id = :langId
+			AND askill.skilltree_id = :skillTreeId
+			ORDER BY a.id ASC
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentSkillID))
+		data = data.fetchall()
+
+		armor = []
+		for row in data:
+			armor.append(aarm.SkillArmor(row))
+	
+		for arm in armor:
+			lvl = arm.skillLevel * "◈"
+			maxLvl = (arm.skillMaxLevel - arm.skillLevel) * "◇"
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), arm.armorName, self.test)
+			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
+
+
+	def loadSkillArmorSetBonuses(self):
+		pass
 
 
 	def onSkillSelected(self, event):
