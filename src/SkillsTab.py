@@ -15,6 +15,7 @@ from typing import Dict
 from typing import NewType
 import Skill as s
 import SkillDetail as sd
+import SkillDecoration as sdeco
 
 class SkillsTab:
 
@@ -173,11 +174,11 @@ class SkillsTab:
 		else:
 			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].description}")
 
-		self.loadSkillDrop(skill)
+		self.loadSkillFound(skill)
 
 
-	def loadSkillDrop(self, Skill):
-		"""skill = Skill
+	def loadSkillFound(self, Skill):
+		skill = Skill
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -195,19 +196,41 @@ class SkillsTab:
 		self.foundList.InsertColumn(1, info)
 		self.foundList.SetColumnWidth(1, 100)
 
-		index = self.foundList.InsertItem(self.foundList.GetItemCount(), "Mysterious Feystone", self.test)
-		self.foundList.SetItem(index, 1, f"{skill.mysteriousFeystonePercent}%")
-		index = self.foundList.InsertItem(self.foundList.GetItemCount(), "Glowing Feystone", self.test)
-		self.foundList.SetItem(index, 1, f"{skill.glowingFeystonePercent}%")
-		index = self.foundList.InsertItem(self.foundList.GetItemCount(), "Worn Feystone", self.test)
-		self.foundList.SetItem(index, 1, f"{skill.wornFeystonePercent}%")
-		index = self.foundList.InsertItem(self.foundList.GetItemCount(), "Warped Feystone", self.test)
-		self.foundList.SetItem(index, 1, f"{skill.warpedFeystonePercent}%")"""
+		sql = """
+			SELECT
+				stt.id skill_id, stext.name skill_name, stt.max_level skill_max_level,
+				d.id deco_id, dt.name deco_name, d.slot deco_slot, d.icon_color deco_icon_color,
+				1 level
+			FROM decoration d
+				JOIN decoration_text dt USING (id)
+				JOIN skilltree stt ON (stt.id = d.skilltree_id)
+				JOIN skilltree_text stext
+					ON stext.id = stt.id
+					AND stext.lang_id = dt.lang_id
+			WHERE d.skilltree_id = :skillTreeId
+			AND dt.lang_id = :langId
+			ORDER BY dt.name ASC
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, (self.currentSkillID, "en"))
+		data = data.fetchall()
+
+		decorations = []
+		for row in data:
+			print(data)
+			decorations.append(sdeco.SkillDecoration(row))
+	
+		for deco in decorations:
+			lvl = deco.skillLevel * "◈"
+			maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, self.test)
+			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 
 	def onSkillSelected(self, event):
 		self.currentSkillID = self.skillList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentSkillID) > 0:
 			self.skillDetailList.ClearAll()
-			#self.foundList.ClearAll()
+			self.foundList.ClearAll()
 		self.loadSkillDetail()
