@@ -79,7 +79,7 @@ class ItemsTab:
 		self.initItemObtaining()
 		self.loadItemObtaining()
 
-		self.root.SetSize(self.root.windowWidth, self.root.windowHeight)
+		self.root.SetSize(self.root.windowWidth, self.root.windowHeight) # REMOVE if you move away from grid
 
 
 	def initItemButtons(self):

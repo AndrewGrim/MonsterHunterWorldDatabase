@@ -27,64 +27,62 @@ class DecorationsTab:
 
 
 	def initItemTab(self):
-		self.itemPanel = wx.Panel(self.mainNotebook)
-		self.mainNotebook.AddPage(self.itemPanel, "Decorations")
-		self.itemsSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.decorationPanel = wx.Panel(self.mainNotebook)
+		self.mainNotebook.AddPage(self.decorationPanel, "Decorations")
+		self.decorationSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-		self.itemListSizer = wx.BoxSizer(wx.VERTICAL) 
+		self.decorationListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
-		self.itemDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
-		self.itemImageLabel = wx.StaticBitmap(self.itemPanel, bitmap=self.itemImage, size=(160, 160))
+		self.decorationDetailedSizer = wx.BoxSizer(wx.VERTICAL)
+		self.decorationImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.decorationImageLabel = wx.StaticBitmap(self.decorationPanel, bitmap=self.decorationImage, size=(160, 160))
 
-		self.itemDetailsNotebook = wx.Notebook(self.itemPanel)
-		self.itemDetailPanel = wx.Panel(self.itemDetailsNotebook)
+		self.decorationDetailsNotebook = wx.Notebook(self.decorationPanel)
+		self.decorationDetailPanel = wx.Panel(self.decorationDetailsNotebook)
 
-		self.itemDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemDetailsNotebook.AddPage(self.itemDetailPanel, "Detail")
-		self.itemDetailPanel.SetSizer(self.itemDetailSizer)
+		self.decorationDetailSizer = wx.BoxSizer(wx.VERTICAL)
+		self.decorationDetailsNotebook.AddPage(self.decorationDetailPanel, "Detail")
+		self.decorationDetailPanel.SetSizer(self.decorationDetailSizer)
 		
-		self.itemDetailedSizer.Add(self.itemImageLabel, 1, wx.ALIGN_CENTER)
-		self.itemDetailedSizer.Add(self.itemDetailsNotebook, 3, wx.EXPAND)
+		self.decorationDetailedSizer.Add(self.decorationImageLabel, 1, wx.ALIGN_CENTER)
+		self.decorationDetailedSizer.Add(self.decorationDetailsNotebook, 3, wx.EXPAND)
 
-		self.itemsSizer.Add(self.itemListSizer, 1, wx.EXPAND)
-		self.itemsSizer.Add(self.itemDetailedSizer, 1, wx.EXPAND)
+		self.decorationSizer.Add(self.decorationListSizer, 1, wx.EXPAND)
+		self.decorationSizer.Add(self.decorationDetailedSizer, 1, wx.EXPAND)
 
-		self.itemPanel.SetSizer(self.itemsSizer)
+		self.decorationPanel.SetSizer(self.decorationSizer)
 
-		self.initItemList()
-		self.loadItemList()
+		self.initDecorationList()
+		self.loadDecorationList()
 
-		self.initItemDetail()
-		self.loadItemDetail()
-
-		self.root.SetSize(self.root.windowWidth, self.root.windowHeight)
+		self.initDecorationDetail()
+		self.loadDecorationDetail()
 
 
-	def initItemList(self):
-		self.itemList = wx.ListCtrl(self.itemPanel, style=wx.LC_REPORT
+	def initDecorationList(self):
+		self.decorationList = wx.ListCtrl(self.decorationPanel, style=wx.LC_REPORT
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
-		self.itemListSizer.Add(self.itemList, 1, wx.EXPAND)
-		self.itemList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onDecorationSelected)
+		self.decorationListSizer.Add(self.decorationList, 1, wx.EXPAND)
+		self.decorationList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onDecorationSelected)
 
 		isz = (24, 24)
 		self.il = wx.ImageList(isz[0], isz[1])
 		self.test = self.il.Add(self.testIcon)
-		self.itemList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.decorationList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
 
-	def loadItemList(self):
+	def loadDecorationList(self):
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
-		self.itemList.InsertColumn(0, info)
-		self.itemList.SetColumnWidth(0, 680)
-		self.itemList.InsertColumn(1, info)
-		self.itemList.SetColumnWidth(1, 0)
+		self.decorationList.InsertColumn(0, info)
+		self.decorationList.SetColumnWidth(0, 680)
+		self.decorationList.InsertColumn(1, info)
+		self.decorationList.SetColumnWidth(1, 0)
 
 
 		sql = """
@@ -105,27 +103,27 @@ class DecorationsTab:
 			decorations.append(d.Decoration(row))
 
 		for deco in decorations:
-			index = self.itemList.InsertItem(self.itemList.GetItemCount(), deco.name, self.test)
-			self.itemList.SetItem(index, 1, f"{deco.id}")
+			index = self.decorationList.InsertItem(self.decorationList.GetItemCount(), deco.name, self.test)
+			self.decorationList.SetItem(index, 1, f"{deco.id}")
 
 
-	def initItemDetail(self):
-		self.skillList = wx.ListCtrl(self.itemDetailPanel, style=wx.LC_REPORT
+	def initDecorationDetail(self):
+		self.skillList = wx.ListCtrl(self.decorationDetailPanel, style=wx.LC_REPORT
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
-		self.itemDetailSizer.Add(self.skillList, 1, wx.EXPAND)
+		self.decorationDetailSizer.Add(self.skillList, 1, wx.EXPAND)
 		self.skillList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
-		self.dropList = wx.ListCtrl(self.itemDetailPanel, style=wx.LC_REPORT
+		self.dropList = wx.ListCtrl(self.decorationDetailPanel, style=wx.LC_REPORT
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
-		self.itemDetailSizer.Add(self.dropList, 7, wx.EXPAND)
+		self.decorationDetailSizer.Add(self.dropList, 7, wx.EXPAND)
 		self.dropList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
 
-	def loadItemDetail(self):
+	def loadDecorationDetail(self):
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -206,8 +204,8 @@ class DecorationsTab:
 
 
 	def onDecorationSelected(self, event):
-		self.currentDecorationID = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
+		self.currentDecorationID = self.decorationList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentDecorationID) > 0:
 			self.skillList.ClearAll()
 			self.dropList.ClearAll()
-		self.loadItemDetail()
+		self.loadDecorationDetail()
