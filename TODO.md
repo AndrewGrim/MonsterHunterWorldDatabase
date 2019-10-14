@@ -58,4 +58,6 @@
 - [ ] on double click show the weapon/armor etc. basically link stuff
 - [ ] change all the awful strings to fstrings
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
+- [ ] organize src files into separate folders
+- [ ] remove unnecessary import
   

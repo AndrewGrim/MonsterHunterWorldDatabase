@@ -12,6 +12,7 @@ import WeaponsTab as w
 import ArmorTab as a
 import ItemsTab as i
 import DecorationsTab as d
+import SkillsTab as s
 
 class Application(wx.Frame):
 
@@ -37,7 +38,8 @@ class Application(wx.Frame):
 		#w.WeaponsTab(root, self.mainNotebook)
 		#a.ArmorTab(root, self.mainNotebook)
 		#i.ItemsTab(root, self.mainNotebook)
-		d.DecorationsTab(root, self.mainNotebook)
+		#d.DecorationsTab(root, self.mainNotebook)
+		s.SkillsTab(root, self.mainNotebook)
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
