@@ -18,6 +18,7 @@ import SkillDetail as sd
 import SkillDecoration as sdeco
 import SkillCharm as sch
 import SkillArmor as aarm
+import SkillArmorSetBonus as aarmsb
 
 class SkillsTab:
 
@@ -299,7 +300,31 @@ class SkillsTab:
 
 
 	def loadSkillArmorSetBonuses(self):
-		pass
+		sql = """
+			SELECT stt.id skilltree_id, stext.name skill_name, stt.max_level skilltree_max_level,
+				abs.setbonus_id as id, abt.name, abs.required
+			FROM armorset_bonus_skill abs
+				JOIN armorset_bonus_text abt ON (abt.id = abs.setbonus_id)
+				JOIN skilltree stt ON (stt.id = abs.skilltree_id)
+				JOIN skilltree_text stext
+					ON stext.id = stt.id
+					AND stext.lang_id = abt.lang_id
+			WHERE abs.skilltree_id = :skillTreeId
+			AND abt.lang_id = :langId
+			ORDER BY abt.name ASC
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, (self.currentSkillID, "en"))
+		data = data.fetchall()
+
+		setBonuses = []
+		for row in data:
+			setBonuses.append(aarmsb.SkillArmorSetBonus(row))
+	
+		for bonus in setBonuses:
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), f"{bonus.name} / {bonus.setBonusName}", self.test)
+			self.foundList.SetItem(index, 1, f"Req. {bonus.setBonusRequired}")
 
 
 	def onSkillSelected(self, event):
