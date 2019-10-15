@@ -15,7 +15,7 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 	colour = (r,g,b)
 	selectedColour = (r,g,b)
 	"""
-	def __init__(self, img = wx.NullBitmap, label = "", colour = wx.WHITE, selectedColour = wx.BLUE, autoImageOffset = False, imageOffset = 50):
+	def __init__(self, img = wx.NullBitmap, label = "", colour = wx.WHITE, selectedColour = (0, 120, 215), autoImageOffset = False, imageOffset = 50):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
 		self.colour = colour
