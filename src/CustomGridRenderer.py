@@ -67,7 +67,7 @@ class ImageCellRenderer(wx.grid.GridCellRenderer):
 	colour = (r,g,b)
 	selectedColour = (r,g,b)
 	"""
-	def __init__(self, img, colour = wx.WHITE, selectedColour = wx.BLUE):
+	def __init__(self, img, colour = wx.WHITE, selectedColour = (0, 120, 215)):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
 		self.colour = colour

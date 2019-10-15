@@ -246,6 +246,7 @@ class KinsectsTab:
 			WHERE kt.lang_id = :langId
 				AND it.lang_id = :langId
 				AND k.id = :kinId
+			ORDER BY i.id
 		"""
 
 		conn = sqlite3.connect("mhw.db")

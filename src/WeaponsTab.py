@@ -328,7 +328,7 @@ class WeaponsTab:
 		self.weaponsTree.AddColumn("id") # 15
 		
 		self.weaponsTree.SetMainColumn(0)
-		self.weaponsTree.SetColumnWidth(0, 400)
+		self.weaponsTree.SetColumnWidth(0, 472)
 
 		self.weaponTreeIcons = {
 			1: self.attack,
@@ -533,6 +533,7 @@ class WeaponsTab:
 	def initWeaponDetailTab(self):
 		self.weaponDetailList = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
+		self.weaponDetailList.EnableEditing(False)
 		self.weaponDetailSizer.Add(self.weaponDetailList, 1, wx.EXPAND)
 
 		self.weaponDetailList.CreateGrid(17, 2)
@@ -545,12 +546,18 @@ class WeaponsTab:
 
 		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponSharpnessTable.CreateGrid(6, 7)
-		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 1, wx.EXPAND|wx.TOP, 10)
+		self.weaponSharpnessTable.EnableEditing(False)
+		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 1, wx.EXPAND)
 
-		self.materialsRequiredPropertyGrid = wxpg.PropertyGridManager(self.weaponDetailPanel, style=wxpg.PG_SPLITTER_AUTO_CENTER)
-		self.weaponDetailSizer.Add(self.materialsRequiredPropertyGrid, 1, wx.EXPAND|wx.TOP, 10)
+		self.materialsRequiredList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
+																			| wx.LC_VRULES
+																			| wx.LC_HRULES
+																			)
+		self.materialsRequiredList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.weaponDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND)
 
 		self.weaponSongsList = cgr.HeaderBitmapGrid(self.weaponSongsPanel)
+		self.weaponSongsList.EnableEditing(False)
 		self.weaponSongsList.CreateGrid(15, 6)
 
 		self.weaponSongsList.SetColLabelSize(0)
@@ -588,7 +595,7 @@ class WeaponsTab:
 				self.weaponDetailSizer.Remove(1)
 		if not self.weaponSharpnessTable.IsShown():
 			self.weaponSharpnessTable.Show()
-			self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND|wx.TOP, 15)
+			self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND)
 			self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())		
 
 
@@ -641,6 +648,25 @@ class WeaponsTab:
 		phial = "-"
 		if data[22] != None:
 			phial = data[22]
+
+		close = ""
+		power = ""
+		paralysis = ""
+		poison = ""
+		sleep = ""
+		blast = ""
+		if data[26] == 1:
+			close = "✓"
+		if data[27] == 1:
+			power = "✓"
+		if data[28] == 1:
+			paralysis = "✓"
+		if data[29] == 1:
+			poison = "✓"
+		if data[30] == 1:
+			sleep = "✓"
+		if data[31] == 1:
+			blast = "✓"
 
 		# TODO prob replaces any "None"'s with "-" or ""
 		weaponDetail = {
@@ -703,12 +729,12 @@ class WeaponsTab:
 			"heavy-bowgun": ["Special Ammo", data[33], self.specialAmmo,
 							"Deviation", data[34], self.deviation],
 
-			"bow": ["Close", data[26], self.closeCoating,
-					"Power", data[27], self.powerCoating,
-					"Paralysis", data[28], self.paralysisCoating,
-					"Poison", data[29], self.poisonCoating,
-					"Sleep", data[30], self.sleepCoating,
-					"Blast", data[31], self.blastCoating,],
+			"bow": ["Close", close, self.closeCoating,
+					"Power", power, self.powerCoating,
+					"Paralysis", paralysis, self.paralysisCoating,
+					"Poison", poison, self.poisonCoating,
+					"Sleep", sleep, self.sleepCoating,
+					"Blast", blast, self.blastCoating,],
 		}
 
 		for num in range(self.weaponRowNumbers[self.currentWeaponTree]):
@@ -844,7 +870,7 @@ class WeaponsTab:
 			# unless we can get the sizer to act like its not there
 			if not self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Show()
-				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND|wx.TOP, 15)
+				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
 			sharpnessMaxed = bool(data[17])
@@ -1056,6 +1082,22 @@ class WeaponsTab:
 
 
 	def loadWeaponMaterials(self):
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Req. Materials"
+		self.materialsRequiredList.InsertColumn(0, info)
+		self.materialsRequiredList.SetColumnWidth(0, 300)
+		info = wx.ListItem()
+
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.materialsRequiredList.InsertColumn(1, info)
+		self.materialsRequiredList.SetColumnWidth(1, 137)
+
 		sql = """
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
 				i.category item_category, i.icon_color item_icon_color, w.quantity, w.recipe_type
@@ -1066,28 +1108,26 @@ class WeaponsTab:
 					ON it.id = i.id
 					AND it.lang_id = :langId
 			WHERE it.lang_id = :langId
-			AND w.weapon_id= :weaponId
-			ORDER BY i.id
+				AND w.weapon_id= :weaponId
+			ORDER BY 
+				w.recipe_type ASC,
+				i.id ASC
+				
+
 		"""
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentlySelectedWeaponID))
 		data = data.fetchall()
 
-		mainPage = self.materialsRequiredPropertyGrid.AddPage("Materials Required", self.testIcon)
-
 		for item in data:
 			if item[6] == "Create":
-				mainPage.Append(wxpg.PropertyCategory("Create"))
-				try:
-					mainPage.Append(wxpg.StringProperty(str(item[1]), value=str(item[5])))
-				except:
-					pass
-			elif item[6] == "Upgrade":
-				mainPage.Append(wxpg.PropertyCategory("Upgrade"))
-				try:
-					mainPage.Append(wxpg.StringProperty(str(item[1]), value=str(item[5])))
-				except:
-					pass
+				index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
+					f"Create:    {item[1]}", self.test)
+				self.materialsRequiredList.SetItem(index, 1, f"{item[5]}")
+			else:
+				index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
+					f"Upgrade:    {item[1]}", self.test)
+				self.materialsRequiredList.SetItem(index, 1, f"{item[5]}")
 
 
 	def adjustSharpness(self, handicraftLevel: int, sharpnessMaxed: bool, data: Tuple[str]) -> Union[List[str], List[int]]:
@@ -1140,7 +1180,7 @@ class WeaponsTab:
 				self.weaponSharpnessTable.ClearGrid()
 			except:
 				pass
-			self.materialsRequiredPropertyGrid.Clear() # propertygrid actually needs a page otherwise clear doesnt work
+			self.materialsRequiredList.ClearAll() # propertygrid actually needs a page otherwise clear doesnt work
 	
 			self.loadWeaponDetails()
 			self.loadWeaponMaterials()
