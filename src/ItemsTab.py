@@ -112,26 +112,31 @@ class ItemsTab:
 
 
 	def initItemList(self):
-		self.itemList = cgr.HeaderBitmapGrid(self.itemPanel)
-		self.itemList.Bind(wx.EVT_SIZE, self.onSize)
-		self.itemList.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onItemSelection)
+		self.itemList = wx.ListCtrl(self.itemPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.itemList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelection)
 		self.itemListSizer.Add(self.itemList, 1, wx.EXPAND)
 
-		self.itemList.CreateGrid(1, 4)
-		self.itemList.SetDefaultRowSize(48, resizeExistingRows=True)
-		self.itemList.SetColSize(0, 48)
-		self.itemList.SetColSize(1, 628)
-		self.itemList.SetColSize(2, 0)
-		self.itemList.SetColSize(3, 0)
-		self.itemList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.itemList.SetDefaultCellFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.itemList.SetColLabelSize(2)
-		self.itemList.SetRowLabelSize(1)
-
+		isz = (24, 24)
+		self.il = wx.ImageList(isz[0], isz[1])
+		self.test = self.il.Add(self.testIcon)
+		self.itemList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
 
 	def loadItemList(self):
-		self.itemList.DeleteRows(0, self.itemList.GetNumberRows())
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.itemList.InsertColumn(0, info)
+		self.itemList.SetColumnWidth(0, 680)
+		self.itemList.InsertColumn(1, info)
+		self.itemList.SetColumnWidth(1, 0)
+		self.itemList.InsertColumn(2, info)
+		self.itemList.SetColumnWidth(2, 0)
 		
 		sql = """
 			SELECT i.*, it.name, it.description
@@ -150,17 +155,25 @@ class ItemsTab:
 		items = []
 		for row in data:
 			items.append(i.Item(row))
-		self.itemList.AppendRows(len(items))
 
-		for row, item in enumerate(items):
-			self.itemList.SetCellRenderer(row, 0,cgr.ImageCellRenderer(self.testIcon48))
-			self.itemList.SetCellValue(row, 1, item.name)
-			self.itemList.SetCellValue(row, 2, f"{item.iconName}{item.iconColor}.png")
-			self.itemList.SetCellValue(row, 3, str(item.id))
+		for item in items:
+			index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{item.name}", self.test)
+			self.itemList.SetItem(index, 1, f"{item.iconName}{item.iconColor}.png")
+			self.itemList.SetItem(index, 2, f"{item.id}")
 
 
 	def loadCraftingList(self):
-		self.itemList.DeleteRows(0, self.itemList.GetNumberRows())
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.itemList.InsertColumn(0, info)
+		self.itemList.SetColumnWidth(0, 680)
+		self.itemList.InsertColumn(1, info)
+		self.itemList.SetColumnWidth(1, 0)
+		self.itemList.InsertColumn(2, info)
+		self.itemList.SetColumnWidth(2, 0)
 
 		sql = """
 			SELECT c.id,
@@ -198,38 +211,52 @@ class ItemsTab:
 		combinations = []
 		for row in data:
 			combinations.append(combo.CombinationObtaining(row))
-		self.itemList.AppendRows(len(combinations))
 
-		for row, com in enumerate(combinations):
-			self.itemList.SetCellRenderer(row, 0,cgr.ImageCellRenderer(self.testIcon36))
+		for com in combinations:
 			if com.secondName != None:
-				self.itemList.SetCellValue(row, 1, f"{com.resultName} = {com.firstName} + {com.secondName}")
+				index = self.itemList.InsertItem(self.itemList.GetItemCount(),
+					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
 			else:
-				self.itemList.SetCellValue(row, 1, f"{com.resultName} = {com.firstName}")
-			self.itemList.SetCellValue(row, 2, f"{com.resultIconName}{com.resultIconColor}.png")
-			self.itemList.SetCellValue(row, 3, str(com.resultID))
+				index = self.itemList.InsertItem(self.itemList.GetItemCount(),
+					f"{com.resultName} = {com.firstName}", self.test)
+			self.itemList.SetItem(index, 1, f"{com.resultIconName}{com.resultIconColor}.png")
+			self.itemList.SetItem(index, 2, f"{com.resultID}")
 
 
 	def initItemDetail(self):
-		self.itemNameLabel = wx.StaticText(self.itemDetailPanel, label="Name", style=wx.ALIGN_LEFT)
-		self.itemNameLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
+		self.itemNameLabel = wx.StaticText(self.itemDetailPanel, label="Name:", style=wx.ALIGN_LEFT)
 		self.itemDetailSizer.Add(self.itemNameLabel, 1, wx.EXPAND)
 		self.itemDescriptionLabel = wx.StaticText(self.itemDetailPanel, label="Description", style=wx.ALIGN_LEFT)
-		self.itemDescriptionLabel.SetFont(wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
 		self.itemDetailSizer.Add(self.itemDescriptionLabel, 2, wx.EXPAND)
 
-		self.itemDetailList = cgr.HeaderBitmapGrid(self.itemDetailPanel)
-		self.itemDetailSizer.Add(self.itemDetailList, 3, wx.EXPAND)
-
-		self.itemDetailList.CreateGrid(2, 6)
-		self.itemDetailList.SetDefaultRowSize(36, resizeExistingRows=True)
-		self.itemDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.itemDetailList.SetDefaultCellFont(wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.itemDetailList.SetColLabelSize(2)
-		self.itemDetailList.SetRowLabelSize(1)
+		self.itemDetailList = wx.ListCtrl(self.itemDetailPanel, size=(600, 124), style=wx.LC_REPORT
+																		| wx.LC_VRULES
+																		| wx.LC_HRULES
+																		| wx.LC_NO_HEADER
+																		)
+		self.itemDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.itemDetailSizer.Add(self.itemDetailList, 1, wx.EXPAND)
 
 
 	def loadItemDetail(self):
+		self.itemDetailList.ClearAll()
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = ""
+		self.itemDetailList.InsertColumn(0, info)
+		self.itemDetailList.SetColumnWidth(0, 430)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.itemDetailList.InsertColumn(1, info)
+		self.itemDetailList.SetColumnWidth(1, 240)
+
 		sql = """
 			SELECT i.*, it.name, it.description
 			FROM item i
@@ -245,54 +272,55 @@ class ItemsTab:
 
 		item = i.Item(data)
 		
-		self.itemNameLabel.SetLabelText(item.name)
+		self.itemNameLabel.SetLabelText(f"\n{item.name}:")
 		self.itemDescriptionLabel.SetLabelText(item.description)
 		self.itemDescriptionLabel.Wrap(650)
-		self.itemDetailList.SetCellValue(0, 0, f"Rarity {item.rarity}")
-		self.itemDetailList.SetCellValue(0, 1, "")
-		self.itemDetailList.SetCellValue(0, 2, "")
-		self.itemDetailList.SetCellValue(0, 3, "Buy")
+
+		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Rarity", self.test)
+		self.itemDetailList.SetItem(index, 1, f"{item.rarity}")
+		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Buy", self.test)
 		if item.buyPrice != 0:
-			self.itemDetailList.SetCellValue(0, 4, str(item.buyPrice))
+			self.itemDetailList.SetItem(index, 1, f"{item.buyPrice}")
 		else:
-			self.itemDetailList.SetCellValue(0, 4, "-")
-		self.itemDetailList.SetCellRenderer(0, 5,cgr.ImageTextCellRenderer(self.testIcon36, imageOffset=0))
-		self.itemDetailList.SetCellValue(1, 0, "Carry")
-		if item.carryLimit != 0:
-			self.itemDetailList.SetCellValue(1, 1, str(item.carryLimit))
-		else:
-			self.itemDetailList.SetCellValue(1, 1, "-")
-		self.itemDetailList.SetCellRenderer(1, 2,cgr.ImageTextCellRenderer(self.testIcon36, imageOffset=0))
-		self.itemDetailList.SetCellValue(1, 3, "Sell")
+			self.itemDetailList.SetItem(index, 1, "-")
+		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Sell", self.test)
 		if item.sellPrice != 0:
-			self.itemDetailList.SetCellValue(1, 4, str(item.sellPrice))
+			self.itemDetailList.SetItem(index, 1, f"{item.sellPrice}")
 		else:
-			self.itemDetailList.SetCellValue(1, 4, "-")
-		self.itemDetailList.SetCellRenderer(1, 5,cgr.ImageTextCellRenderer(self.testIcon36, imageOffset=0))
+			self.itemDetailList.SetItem(index, 1, "-")
+		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Carry", self.test)
+		if item.carryLimit != 0:
+			self.itemDetailList.SetItem(index, 1, f"{item.carryLimit}")
+		else:
+			self.itemDetailList.SetItem(index, 1, "-")
 
 	def initItemUsage(self):
-		self.itemUsageLabel = wx.StaticText(self.itemDetailPanel, label="Usage", style=wx.ALIGN_LEFT)
-		self.itemUsageLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
-		self.itemDetailSizer.Add(self.itemUsageLabel, 1, wx.EXPAND)
-
-		self.itemUsageList = cgr.HeaderBitmapGrid(self.itemDetailPanel)
-		self.itemDetailSizer.Add(self.itemUsageList, 8, wx.EXPAND)
-
-		self.itemUsageList.CreateGrid(1, 3)
-		self.itemUsageList.SetDefaultRowSize(36, resizeExistingRows=True)
-		self.itemUsageList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.itemUsageList.SetDefaultCellFont(wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.itemUsageList.SetColLabelSize(2)
-		self.itemUsageList.SetRowLabelSize(1)
+		self.itemUsageList = wx.ListCtrl(self.itemDetailPanel, style=wx.LC_REPORT
+																| wx.LC_VRULES
+																| wx.LC_HRULES
+																)
+		self.itemUsageList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.itemDetailSizer.Add(self.itemUsageList, 12, wx.EXPAND)
 
 
 	def loadItemUsage(self):
-		try:
-			self.itemUsageList.DeleteRows(0, self.itemList.GetNumberRows())
-		except:
-			pass
+		self.itemUsageList.ClearAll()
 
-		self.currentUsageRow = 0
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Usage"
+		self.itemUsageList.InsertColumn(0, info)
+		self.itemUsageList.SetColumnWidth(0, 480)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.itemUsageList.InsertColumn(1, info)
+		self.itemUsageList.SetColumnWidth(1, 190)
 
 		self.loadUsageCombinations()
 		self.loadUsageCharms()
@@ -338,16 +366,15 @@ class ItemsTab:
 		for row in data:
 			if row[2] != self.currentItemName:
 				combinations.append(combo.CombinationObtaining(row))
-		self.itemUsageList.AppendRows(len(combinations))
 
 		for com in combinations:
-			self.itemUsageList.SetCellRenderer(self.currentUsageRow, 0,cgr.ImageCellRenderer(self.testIcon36))
 			if com.secondName != None:
-				self.itemUsageList.SetCellValue(self.currentUsageRow, 1, f"{com.resultName} = {com.firstName} + {com.secondName}")
+				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(),
+					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
 			else:
-				self.itemUsageList.SetCellValue(self.currentUsageRow, 1, f"{com.resultName} = {com.firstName}")
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 2, f"x {com.quantity}")
-			self.currentUsageRow += 1
+				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(),
+					f"{com.resultName} = {com.firstName}", self.test)
+			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
 
 		
 	def loadUsageCharms(self):
@@ -369,13 +396,10 @@ class ItemsTab:
 		charms = []
 		for row in data:
 			charms.append(c.CharmUsage(row))
-		self.itemUsageList.AppendRows(len(charms))
 
 		for charm in charms:
-			self.itemUsageList.SetCellRenderer(self.currentUsageRow, 0,cgr.ImageCellRenderer(self.testIcon36))
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 1, charm.name)
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 2, str(charm.quantity))
-			self.currentUsageRow += 1
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), charm.name, self.test)
+			self.itemUsageList.SetItem(index, 1, f"{charm.quantity}")
 
 
 	def loadUsageArmor(self):
@@ -397,13 +421,10 @@ class ItemsTab:
 		armor = []
 		for row in data:
 			armor.append(a.ArmorUsage(row))
-		self.itemUsageList.AppendRows(len(armor))
 
 		for arm in armor:
-			self.itemUsageList.SetCellRenderer(self.currentUsageRow, 0,cgr.ImageCellRenderer(self.testIcon36))
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 1, arm.name)
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 2, str(arm.quantity))
-			self.currentUsageRow += 1
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), arm.name, self.test)
+			self.itemUsageList.SetItem(index, 1, f"{arm.quantity}")
 
 
 	def loadUsageWeapons(self):
@@ -423,38 +444,39 @@ class ItemsTab:
 		weapons = []
 		for row in data:
 			weapons.append(w.WeaponUsage(row))
-		self.itemUsageList.AppendRows(len(weapons))
 
 		for weapon in weapons:
-			self.itemUsageList.SetCellRenderer(self.currentUsageRow, 0,cgr.ImageCellRenderer(self.testIcon36))
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 1, weapon.name)
-			self.itemUsageList.SetCellValue(self.currentUsageRow, 2, str(weapon.quantity))
-			self.currentUsageRow += 1
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), weapon.name, self.test)
+			self.itemUsageList.SetItem(index, 1, f"{weapon.quantity}")
 
 
 	def initItemObtaining(self):
-		self.itemObtainingLabel = wx.StaticText(self.itemDetailPanel, label="Obtaining", style=wx.ALIGN_LEFT)
-		self.itemObtainingLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
-		self.itemDetailSizer.Add(self.itemObtainingLabel, 1, wx.EXPAND)
-
-		self.itemObtainingList = cgr.HeaderBitmapGrid(self.itemDetailPanel)
-		self.itemDetailSizer.Add(self.itemObtainingList, 8, wx.EXPAND)
-
-		self.itemObtainingList.CreateGrid(1, 3)
-		self.itemObtainingList.SetDefaultRowSize(36, resizeExistingRows=True)
-		self.itemObtainingList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.itemObtainingList.SetDefaultCellFont(wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.itemObtainingList.SetColLabelSize(2)
-		self.itemObtainingList.SetRowLabelSize(1)
+		self.itemObtainingList = wx.ListCtrl(self.itemDetailPanel, style=wx.LC_REPORT
+																	| wx.LC_VRULES
+																	| wx.LC_HRULES
+																	)
+		self.itemObtainingList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.itemDetailSizer.Add(self.itemObtainingList, 12, wx.EXPAND)
 
 
 	def loadItemObtaining(self):
-		try:
-			self.itemObtainingList.DeleteRows(0, self.itemList.GetNumberRows())
-		except:
-			pass
+		self.itemObtainingList.ClearAll()
 
-		self.currentObtainingRow = 0
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Obtaining"
+		self.itemObtainingList.InsertColumn(0, info)
+		self.itemObtainingList.SetColumnWidth(0, 480)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.itemObtainingList.InsertColumn(1, info)
+		self.itemObtainingList.SetColumnWidth(1, 190)
 
 		self.loadObtainingCombination()
 		self.loadObtainingLocations()
@@ -499,16 +521,15 @@ class ItemsTab:
 		for row in data:
 			if row[2] == self.currentItemName:
 				combinations.append(combo.CombinationObtaining(row))
-		self.itemObtainingList.AppendRows(len(combinations))
 
 		for com in combinations:
-			self.itemObtainingList.SetCellRenderer(self.currentObtainingRow, 0,cgr.ImageCellRenderer(self.testIcon36))
 			if com.secondName != None:
-				self.itemObtainingList.SetCellValue(self.currentObtainingRow, 1, f"{com.resultName} = {com.firstName} + {com.secondName}")
+				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
+					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
 			else:
-				self.itemObtainingList.SetCellValue(self.currentObtainingRow, 1, f"{com.resultName} = {com.firstName}")
-			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 2, f"x {com.quantity}")
-			self.currentObtainingRow += 1
+				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
+					f"{com.resultName} = {com.firstName}", self.test)
+			self.itemObtainingList.SetItem(index, 1, f"x {com.quantity}")
 
 
 	def loadObtainingLocations(self):
@@ -529,13 +550,11 @@ class ItemsTab:
 		locations = []
 		for row in data:
 			locations.append(l.LocationObtaining(row))
-		self.itemObtainingList.AppendRows(len(locations))
 
 		for local in locations:
-			self.itemObtainingList.SetCellRenderer(self.currentObtainingRow, 0,cgr.ImageCellRenderer(self.testIcon36))
-			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 1, f"{local.name} - Area {local.area}")
-			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 2, f"{local.stack} x {local.percentage}%")
-			self.currentObtainingRow += 1
+			index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
+				f"{local.name} - Area {local.area}", self.test)
+			self.itemObtainingList.SetItem(index, 1, f"{local.stack} x {local.percentage}%")
 
 
 	def loadObtainingRewards(self):
@@ -562,13 +581,11 @@ class ItemsTab:
 		rewards = []
 		for row in data:
 			rewards.append(r.RewardObtaining(row))
-		self.itemObtainingList.AppendRows(len(rewards))
 
 		for reward in rewards:
-			self.itemObtainingList.SetCellRenderer(self.currentObtainingRow, 0,cgr.ImageCellRenderer(self.testIcon36))
-			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 1, f"{reward.monsterName} - {reward.rank} {reward.rewardName}")
-			self.itemObtainingList.SetCellValue(self.currentObtainingRow, 2, f"{reward.stack} x {reward.percentage}%")
-			self.currentObtainingRow += 1
+			index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
+				f"{reward.monsterName} - {reward.rank} {reward.rewardName}", self.test)
+			self.itemObtainingList.SetItem(index, 1, f"{reward.stack} x {reward.percentage}%")
 
 
 	def onItemTypeSelection(self, event):
@@ -578,9 +595,11 @@ class ItemsTab:
 
 		if event.GetEventObject().GetName() != "crafting":
 			self.currentItemCategory = event.GetEventObject().GetName()
+			self.itemList.ClearAll()
 			self.loadItemList()
 		else:
 			self.currentItemCategory = event.GetEventObject().GetName()
+			self.itemList.ClearAll()
 			self.loadCraftingList()
 
 
@@ -588,13 +607,13 @@ class ItemsTab:
 		"""
 		When a specific item is selected in the list, the detail view gets populated with the information from the database.
 		"""
-		if self.itemList.GetCellValue(event.GetRow(), 3) != "":
-			self.currentlySelectedItemID = self.itemList.GetCellValue(event.GetRow(), 3)
+		self.currentlySelectedItemID = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		if self.currentlySelectedItemID != "":
 			if self.currentItemCategory == "crafting":
-				name = self.itemList.GetCellValue(event.GetRow(), 1)
+				name = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
 				self.currentItemName = name[:name.find(" =")]
 			else:
-				self.currentItemName = self.itemList.GetCellValue(event.GetRow(), 1)
+				self.currentItemName = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
 			"""iconFile = self.itemList.GetCellValue(event.GetRow(), 2)
 			self.itemImage = wx.Bitmap(f"images/items/{category}/{iconFile}", wx.BITMAP_TYPE_ANY)
 			self.itemImageLabel.SetBitmap(self.itemImage)"""
@@ -608,9 +627,9 @@ class ItemsTab:
 		When the application window is resized some columns's width gets readjusted.
 		"""
 		try:
-			self.itemList.SetColSize(1, self.itemPanel.GetSize()[0] * 0.50 - 70)
+			self.itemList.SetColumnWidth(0, self.itemPanel.GetSize()[0] * 0.50 - 70)
 		except:
-			self.itemList.SetColSize(1, 623)
+			self.itemList.SetColumnWidth(0, 680)
 		try:
 			colWidth = self.itemDetailPanel.GetSize()[0] / 6 + 40
 			self.itemDetailList.SetColSize(0, colWidth)

@@ -156,9 +156,9 @@ class KinsectsTab:
 
 	def initKinsectDetailTab(self):
 		self.kinsectDetailList = wx.ListCtrl(self.kinsectDetailPanel, style=wx.LC_REPORT
-																	| wx.LC_VRULES
-																	| wx.LC_HRULES
-																	)
+																		| wx.LC_VRULES
+																		| wx.LC_HRULES
+																		)
 		self.kinsectDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.kinsectDetailSizer.Add(self.kinsectDetailList, 1, wx.EXPAND)
 
