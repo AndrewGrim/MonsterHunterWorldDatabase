@@ -100,7 +100,7 @@ class ArmorTab:
 		self.armorDetailedSizer.Add(self.armorImageLabel, 1, wx.ALIGN_CENTER)
 		self.armorDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
 
-		self.armorSizer.Add(self.armorTreeSizer, 2, wx.EXPAND)
+		self.armorSizer.Add(self.armorTreeSizer, 1, wx.EXPAND)
 		self.armorSizer.Add(self.armorDetailedSizer, 1, wx.EXPAND)
 
 		self.armorPanel.SetSizer(self.armorSizer)
@@ -163,16 +163,18 @@ class ArmorTab:
 		self.armorTree.AddColumn("Ice") # 10
 		self.armorTree.AddColumn("Thunder") # 11
 		self.armorTree.AddColumn("Dragon") # 12
-		self.armorTree.AddColumn("id") # 13
-		self.armorTree.AddColumn("armorSetID") # 14
+		self.armorTree.AddColumn("M") # 13 # IMAGES icon
+		self.armorTree.AddColumn("F") # 14 # IMAGES icon
+		self.armorTree.AddColumn("id") # 15
+		self.armorTree.AddColumn("armorSetID") # 16
 
-		for num in range(1, 13):
+		for num in range(1, 15):
 			self.armorTree.SetColumnWidth(num, 29)
 			self.armorTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-		self.armorTree.SetColumnWidth(0, 200)
+		self.armorTree.SetColumnWidth(0, 299)
 		self.armorTree.SetColumnWidth(1, 0)
-		#self.armorTree.SetColumnWidth(13, 0)
-		#self.armorTree.SetColumnWidth(14, 0)
+		self.armorTree.SetColumnWidth(15, 0)
+		self.armorTree.SetColumnWidth(16, 0)
 
 		for num in range(2, 5):
 			self.armorTree.SetColumnImage(num, self.il.slots)
@@ -235,9 +237,13 @@ class ArmorTab:
 			self.armorTree.SetItemText(armorPiece, str(a.ice), 10)
 			self.armorTree.SetItemText(armorPiece, str(a.thunder), 11)
 			self.armorTree.SetItemText(armorPiece, str(a.dragon), 12)
+			if a.male == 1:
+				self.armorTree.SetItemText(armorPiece, "✓", 13)
+			if a.female == 1:
+				self.armorTree.SetItemText(armorPiece, "✓", 14)
 
-			self.armorTree.SetItemText(armorPiece, str(a.id), 13)
-			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 14)
+			self.armorTree.SetItemText(armorPiece, str(a.id), 15)
+			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 16)
 
 			self.armorTree.SetItemImage(armorPiece, self.il.armorIcons[a.armorType][a.rarity], which=wx.TreeItemIcon_Normal)
 			if a.slot1 != 0:
@@ -254,6 +260,7 @@ class ArmorTab:
 	def initArmorDetailTab(self):
 		self.armorDetailList = cgr.HeaderBitmapGrid(self.armorDetailPanel)
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
+		self.armorDetailList.EnableEditing(False)
 		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
 
 		self.armorDetailList.CreateGrid(12, 2)
@@ -761,8 +768,8 @@ class ArmorTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 13)
-		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 14)
+		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 15)
+		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 16)
 
 		if self.currentlySelectedArmorID != "":
 			self.armorImageLabel.SetBitmap(self.armorImage)
