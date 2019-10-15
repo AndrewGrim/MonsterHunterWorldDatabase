@@ -22,31 +22,27 @@ class MonstersTab:
 		self.root = root
 		self.mainNotebook = mainNotebook
 		
-		self.currentMonsterID = 17 # nergigante
-		self.currentMonsterMaterialID = 212 # nergigante : immortal dragon scale
+		self.currentMonsterID = 17
+		self.currentMonsterName = "Great Jagras"
+		self.currentMonsterMaterialID = 212
+		self.currentMonsterSize = "Large"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.initMonstersTab()
-		self.loadData()
+		self.initMonsterSizeButtons()
+		self.initMonsterList()
+		self.loadMonsterList()
 		self.initMonsterSummary() # TODO sort weaknesses from highest to low/none
 		self.initMonsterDamage()
 		self.initMonsterMaterials()
 
-		# for loading monster's data in detailed view
-		self.monstersTable.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onMonsterSelect)
 		# for scaling the columns
-		self.monstersTable.Bind(wx.EVT_SIZE, self.onSize)
+		#self.monstersTable.Bind(wx.EVT_SIZE, self.onSize)
 
 		# TEST defaults to materials tab
 		# PREFERENCES make this customizable
 		self.monsterDetailsNotebook.SetSelection(0)
 
-		self.physicalDamagePane.Expand()
-		self.elementDamagePane.Expand()
-		self.breakDamagePane.Expand()
-
-		self.damagePanel.SetVirtualSize(600, 1800)
-		self.damagePanel.SetScrollRate(20,20)
 
 	def initMonstersTab(self):
 		# TODO sort columns on header click
@@ -60,14 +56,14 @@ class MonstersTab:
 
 		# left side
 		# sizer containing the monsters table
-		self.monstersTableSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.monsterSelectionSizer = wx.BoxSizer(wx.VERTICAL)
+		self.monsterListSizer = wx.BoxSizer(wx.VERTICAL)
+		self.monsterSizeButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.monsterSelectionSizer.Add(self.monsterListSizer)
+		self.monsterSelectionSizer.Add(self.monsterSizeButtonsSizer)
 		# create monsters table and add bindings on selection and on size change of the main window
-		self.monstersTable = wx.grid.Grid(self.monstersPanel)
-		self.monstersTable.CreateGrid(56, 5) # TODO make the grid based of the monsters data
 		# add left side sizer to the main sizer of the monsters tab
-		self.monstersSizer.Add(self.monstersTableSizer, 0, wx.EXPAND)
-		# add table to sizer
-		self.monstersTableSizer.Add(self.monstersTable, 1, wx.EXPAND)
+		self.monstersSizer.Add(self.monsterSelectionSizer, 1, wx.EXPAND)
 
 		# right side
 		# sizer containing the monsters details
@@ -77,14 +73,14 @@ class MonstersTab:
 		data = conn.execute("SELECT name FROM monsters WHERE id = ?", (self.currentMonsterID, ))
 		monsterIcon = data.fetchone()[0]
 		self.monsterImage = wx.Bitmap("images/monsters/256/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
-		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage)
+		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage, size=(160, 160))
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
 		self.summaryPanel = wx.Panel(self.monsterDetailsNotebook)
 		self.damagePanel = wx.ScrolledWindow(self.monsterDetailsNotebook)
 		self.materialsPanel = wx.Panel(self.monsterDetailsNotebook)
 		#
-		self.monsterSummarySizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.monsterSummarySizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.summaryPanel, "Summary")
 		# 
 		self.monsterDamageSizer = wx.BoxSizer(wx.VERTICAL)
@@ -93,36 +89,89 @@ class MonstersTab:
 		self.monsterMaterialsSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.monsterDetailsNotebook.AddPage(self.materialsPanel, "Materials")
 		# add the right side detailed view to the main size of the monsters notebook tab
-		self.monstersSizer.Add(self.monstersDetailedSizer, 1, wx.EXPAND)
+		self.monstersSizer.Add(self.monstersDetailedSizer, 2, wx.EXPAND)
 		# add widgets within to their parent sizer
-		self.monstersDetailedSizer.Add(self.monsterImageLabel, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.ADJUST_MINSIZE, 10)
-		self.monstersDetailedSizer.Add(self.monsterDetailsNotebook, 3, wx.EXPAND)
+		self.monstersDetailedSizer.Add(self.monsterImageLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
+		self.monstersDetailedSizer.Add(self.monsterDetailsNotebook, 5, wx.EXPAND)
 
 		# set sizer for the monsters notebook tab
 		self.monstersPanel.SetSizer(self.monstersSizer)
 
+		self.damagePanel.SetScrollRate(20, 20)
+
+
+	def initMonsterSizeButtons(self):
+		self.smallMonstersButton = wx.Button(self.monstersPanel, name="Small")
+		self.largeMonstersButton = wx.Button(self.monstersPanel, name="Large")
+		self.smallMonstersButton.SetBitmap(self.testIcon)
+		self.largeMonstersButton.SetBitmap(self.testIcon)
+		self.monsterSizeButtonsSizer.Add(self.smallMonstersButton)
+		self.monsterSizeButtonsSizer.Add(self.largeMonstersButton)
+
+		self.smallMonstersButton.Bind(wx.EVT_BUTTON, self.onMonsterSizeSelect)
+		self.largeMonstersButton.Bind(wx.EVT_BUTTON, self.onMonsterSizeSelect)
+
+
+	def initMonsterList(self):
+		self.monsterList = wx.ListCtrl(self.monstersPanel, style=wx.LC_REPORT
+																| wx.LC_VRULES
+																| wx.LC_HRULES
+																| wx.LC_NO_HEADER
+																)
+		self.monsterList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onMonsterSelected)
+
+		isz = (24,24)
+		self.il = wx.ImageList(isz[0], isz[1])
+		self.monsterList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.test = self.il.Add(self.testIcon)
+
+		self.monsterSelectionSizer.Add(self.monsterList, 1, wx.EXPAND)
+
+
+	def loadMonsterList(self):
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = ""
+		self.monsterList.InsertColumn(0, info)
+		self.monsterList.SetColumnWidth(0, 443)
+		self.monsterList.InsertColumn(1, info)
+		self.monsterList.SetColumnWidth(1, 0)
+
+		conn = sqlite3.connect("MonsterHunter.db")
+		data = conn.execute("SELECT * FROM monsters WHERE size = :size", (self.currentMonsterSize, ))
+		data = data.fetchall()
+
+		for row in data:
+			index = self.monsterList.InsertItem(self.monsterList.GetItemCount(), row[1], self.test)
+			self.monsterList.SetItem(index, 1, f"{row[0]}")
+
 
 	def initMonsterSummary(self):
-		self.summaryTree = wx.lib.agw.hypertreelist.HyperTreeList(self.summaryPanel, -1, style=0, agwStyle=
-												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_TWIST_BUTTONS
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												| gizmos.TR_NO_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												)
+		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Name:\nDescription")
+		self.monsterSummarySizer.Add(self.monsterSummaryNameLabel, 1, wx.EXPAND)
+		
+		self.summaryTree = wx.lib.agw.hypertreelist.HyperTreeList(self.summaryPanel, -1, style=0, 
+																	agwStyle=
+																	gizmos.TR_DEFAULT_STYLE
+																	| gizmos.TR_TWIST_BUTTONS
+																	| gizmos.TR_ROW_LINES
+																	| gizmos.TR_COLUMN_LINES
+																	| gizmos.TR_NO_LINES
+																	| gizmos.TR_FULL_ROW_HIGHLIGHT
+																	| gizmos.TR_HIDE_ROOT
+																	)
+												
+		self.monsterSummarySizer.Add(self.summaryTree, 12, wx.EXPAND)
 
 		self.summaryTree.AddColumn("")
 		self.summaryTree.AddColumn("")
 		self.summaryTree.SetMainColumn(0)
-		self.summaryTree.SetColumnWidth(0, (self.root.GetSize().width * 0.45) * 0.34)
-		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.45) * 0.27)
+		self.summaryTree.SetColumnWidth(0, (self.root.GetSize().width * 0.80) * 0.47)
+		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.80) * 0.45)
 
-		isz = (24,24)
-		self.il = wx.ImageList(isz[0], isz[1])
-
-		self.testidx = self.il.Add(self.testIcon)
+		self.summaryTree.SetImageList(self.il)
 
 		self.ancientForest = self.il.Add(wx.Bitmap("images/locations-24/Ancient Forest.png"))
 		self.wildspireWaste = self.il.Add(wx.Bitmap("images/locations-24/Wildspire Waste.png"))
@@ -163,28 +212,6 @@ class MonstersTab:
 			"Stun": self.stun,
 		}
 
-		self.summaryTree.SetImageList(self.il)
-
-		self.monsterSummaryImageLabel = wx.StaticBitmap(self.summaryPanel, bitmap=wx.Bitmap("images/monsters/256/Nergigante.png"))
-		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Nergigante", style=wx.ALIGN_LEFT)
-		self.monsterSummaryNameLabel.SetFont(wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False))
-		self.monsterSummaryTypeLabel = wx.StaticText(self.summaryPanel, label="Elder Dragon", style=wx.ALIGN_LEFT)
-		self.monsterSummaryTypeLabel.SetFont(wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT, False))
-		self.monsterSummaryDescription = wx.StaticText(self.summaryPanel, label="testing\ntesting\ntesting", style=wx.ALIGN_LEFT)
-		self.monsterSummaryDescription.SetFont(wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-
-		self.monsterSummaryLeftSizer = wx.BoxSizer(wx.VERTICAL)
-		self.monsterSummaryRightSizer = wx.BoxSizer(wx.VERTICAL)
-
-		self.monsterSummaryLeftSizer.Add(self.summaryTree, 1, wx.EXPAND)
-
-		self.monsterSummaryRightSizer.Add(self.monsterSummaryImageLabel, 1, wx.ALIGN_CENTER)
-		self.monsterSummaryRightSizer.Add(self.monsterSummaryNameLabel, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 10))
-		self.monsterSummaryRightSizer.Add(self.monsterSummaryTypeLabel, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 20))
-		self.monsterSummaryRightSizer.Add(self.monsterSummaryDescription, wx.SizerFlags().Proportion(18).Border(wx.LEFT, 30))
-
-		self.monsterSummarySizer.Add(self.monsterSummaryLeftSizer, 1, wx.EXPAND)
-		self.monsterSummarySizer.Add(self.monsterSummaryRightSizer, 1, wx.EXPAND)
 		self.summaryPanel.SetSizer(self.monsterSummarySizer)
 
 		self.loadMonsterSummary(self.currentMonsterID)
@@ -227,11 +254,9 @@ class MonstersTab:
 		name = getName.execute("SELECT name FROM monsters WHERE id = :monsterID", (self.currentMonsterID, ))
 		name = name.fetchone()
 		monsterName = name[0]
-		self.monsterSummaryImageLabel.SetBitmap(wx.Bitmap("images/monsters/256/" + str(monsterName) + ".png"))
-		self.monsterSummaryNameLabel.SetLabelText(str(monsterName)) 
-		self.monsterSummaryTypeLabel.SetLabelText(str(data[39]))
-		self.monsterSummaryDescription.SetLabelText(str(data[40]))
-		self.monsterSummaryDescription.Wrap(300)
+		
+		self.monsterSummaryNameLabel.SetLabelText(f"\n{monsterName}:\n{data[40]}") 
+		self.monsterSummaryNameLabel.Wrap(700)
 
 		weaknessElements = {
 			"Fire": [6, 16],
@@ -315,7 +340,7 @@ class MonstersTab:
 						self.summaryTree.SetItemText(genericSummaryNode, "", 1)
 					else:
 						self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.summaryTree.Expand(self.monsterAilmentsNode)
 
 		habitats = """
@@ -349,35 +374,26 @@ class MonstersTab:
 	
 	def initMonsterDamage(self):
 		# physical damage grid
-		self.physicalDamagePane = wx.CollapsiblePane(self.damagePanel, label="Physical")
-		self.physicalDamagePaneSizer = wx.BoxSizer(wx.VERTICAL)
-		self.physicalDamageTable = cgr.HeaderBitmapGrid(self.physicalDamagePane.GetPane())
-		self.physicalDamageTable.CreateGrid(25, 5)
-		self.physicalDamagePaneSizer.Add(self.physicalDamageTable, 0, wx.RIGHT|wx.LEFT|wx.EXPAND, 25)
-		self.physicalDamagePane.GetPane().SetSizer(self.physicalDamagePaneSizer)
-		self.physicalDamagePane.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.onPaneStateChanged)
+		self.physicalDamageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.physicalDamageTable.CreateGrid(0, 5)
+		self.physicalDamageTable.EnableEditing(False)
+		self.physicalDamageTable.EnableDragRowSize(False)
 
 		# element damage grid
-		self.elementDamagePane = wx.CollapsiblePane(self.damagePanel, label="Element")
-		self.elementDamagePaneSizer = wx.BoxSizer(wx.VERTICAL)
-		self.elementDamageTable = cgr.HeaderBitmapGrid(self.elementDamagePane.GetPane())
-		self.elementDamageTable.CreateGrid(25, 6)
-		self.elementDamagePaneSizer.Add(self.elementDamageTable, 0, wx.RIGHT|wx.LEFT|wx.EXPAND, 25)
-		self.elementDamagePane.GetPane().SetSizer(self.elementDamagePaneSizer)
-		self.elementDamagePane.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.onPaneStateChanged)
+		self.elementDamageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.elementDamageTable.CreateGrid(0, 6)
+		self.elementDamageTable.EnableEditing(False)
+		self.elementDamageTable.EnableDragRowSize(False)
 
 		# break damage grid
-		self.breakDamagePane = wx.CollapsiblePane(self.damagePanel, label="Break")
-		self.breakDamagePaneSizer = wx.BoxSizer(wx.VERTICAL)
-		self.breakDamageTable = cgr.HeaderBitmapGrid(self.breakDamagePane.GetPane())
-		self.breakDamageTable.CreateGrid(15, 5)
-		self.breakDamagePaneSizer.Add(self.breakDamageTable, 0, wx.RIGHT|wx.LEFT|wx.EXPAND, 25)
-		self.breakDamagePane.GetPane().SetSizer(self.breakDamagePaneSizer)
-		self.breakDamagePane.Bind(wx.EVT_COLLAPSIBLEPANE_CHANGED, self.onPaneStateChanged)
+		self.breakDamageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.breakDamageTable.CreateGrid(0, 5)
+		self.breakDamageTable.EnableEditing(False)
+		self.breakDamageTable.EnableDragRowSize(False)
 		
-		self.monsterDamageSizer.Add(self.physicalDamagePane, 0, wx.EXPAND)
-		self.monsterDamageSizer.Add(self.elementDamagePane, 0, wx.EXPAND)
-		self.monsterDamageSizer.Add(self.breakDamagePane, 0, wx.EXPAND)
+		self.monsterDamageSizer.Add(self.physicalDamageTable, 1, wx.EXPAND)
+		self.monsterDamageSizer.Add(self.elementDamageTable, 1, wx.EXPAND|wx.TOP, 5)
+		self.monsterDamageSizer.Add(self.breakDamageTable, 1, wx.EXPAND|wx.TOP, 5)
 		self.damagePanel.SetSizer(self.monsterDamageSizer)
 
 		self.physicalDamageTable.SetColLabelValue(0, "Body Part")
@@ -440,8 +456,10 @@ class MonstersTab:
 		# 11 - body part name
 		
 		weaknessData = conn.execute(sql, ("en", monsterID))
+		weaknessData = weaknessData.fetchall()
 
 		for index, row in enumerate(weaknessData):
+			self.physicalDamageTable.AppendRows(1)
 			self.physicalDamageTable.SetCellValue(index, 0, str(row[11]))
 			self.physicalDamageTable.SetCellValue(index, 1, str(row[2]))
 			self.physicalDamageTable.SetCellValue(index, 2, str(row[3]))
@@ -449,6 +467,7 @@ class MonstersTab:
 			if str(row[10]) != str(0):
 				self.physicalDamageTable.SetCellValue(index, 4, str(row[10]))
 
+			self.elementDamageTable.AppendRows(1)
 			self.elementDamageTable.SetCellValue(index, 0, str(row[11]))
 			self.elementDamageTable.SetCellValue(index, 1, str(row[5]))
 			self.elementDamageTable.SetCellValue(index, 2, str(row[6]))
@@ -472,8 +491,10 @@ class MonstersTab:
 		# 4 - body part name
 
 		breakData = conn.execute(sql, (monsterID, "en"))
+		breakData = breakData.fetchall()
 
 		for index, row in enumerate(breakData):
+			self.breakDamageTable.AppendRows(1)
 			self.breakDamageTable.SetCellValue(index, 0, str(row[4]))
 			if row[0] != None:
 				self.breakDamageTable.SetCellValue(index, 1, str(row[0]))
@@ -482,6 +503,9 @@ class MonstersTab:
 			if row[2] != None:
 				self.breakDamageTable.SetCellValue(index, 3, str(row[2]))
 			self.breakDamageTable.SetCellValue(index, 4, str(row[3]))
+
+		self.root.SetSize(1419, 900)
+		self.root.SetSize(1420, 900)
 
 	
 	def initMonsterMaterials(self):
@@ -592,7 +616,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -600,7 +624,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, lowRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 
@@ -612,7 +636,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -620,7 +644,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, highRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 
@@ -632,7 +656,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
@@ -640,7 +664,7 @@ class MonstersTab:
 					self.materialsTree.SetItemText(monsterMaterial, str(row[2]), 1)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[3]), 2)
 					self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 3)
-					self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 					self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
 					self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
 
@@ -663,14 +687,14 @@ class MonstersTab:
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[2]), 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[3]), 2)
-				self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+				self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 				self.materialsTree.SetItemBackgroundColour(monsterMaterial, rankColor)
 			else:
 				rewardCondition = self.materialsTree.AppendItem(rankNodes[dataRow[0]], str(dataRow[1]))
 				monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(dataRow[5]))
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[2]), 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(dataRow[3]), 2)
-				self.materialsTree.SetItemImage(monsterMaterial, self.testidx, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+				self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
 				self.materialsTree.SetItemBackgroundColour(rewardCondition, rankColor)
 				self.materialsTree.SetItemBackgroundColour(monsterMaterial, rankColor)
 				self.materialsTree.Expand(rewardCondition)
@@ -702,33 +726,6 @@ class MonstersTab:
 		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
 		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)
 		self.materialsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
-		
-	
-	# TODO when notebook is changed to monsters tab then call the contents of onSize
-	
-
-	def loadData(self):
-		conn = sqlite3.connect("MonsterHunter.db")
-		data = conn.execute("SELECT * FROM monsters ORDER by size DESC, name ASC ")
-		i = 0
-
-		for row in data:
-			self.monstersTable.SetCellValue(i, 0, str(row[0]))
-			self.monstersTable.SetCellValue(i, 1, row[1])
-			self.monstersTable.SetCellValue(i, 2, row[2])
-			self.monstersTable.SetCellValue(i, 3, row[3])
-			self.monstersTable.SetCellValue(i, 4, row[4])
-			i += 1
-
-		self.monstersTable.SetRowLabelSize(30)
-		self.monstersTable.SetColLabelSize(30)
-		self.monstersTable.SetColLabelValue(0, "ID")
-		self.monstersTable.SetColLabelValue(1, "Name")
-		self.monstersTable.SetColLabelValue(2, "Species")
-		self.monstersTable.SetColLabelValue(3, "Generation")
-		self.monstersTable.SetColLabelValue(4, "Size")
-		self.monstersTable.SetColLabelSize(30)
-		self.monstersTable.HideCol(0)
 
 
 	def onMaterialSelection(self, event):
@@ -955,26 +952,42 @@ class MonstersTab:
 		self.obtainingMaterialPage.SetSplitterLeft()
 
 
-	def onPaneStateChanged(self, event):
-		if self.physicalDamagePane.IsCollapsed() and self.elementDamagePane.IsCollapsed() and self.breakDamagePane.IsCollapsed():
-			self.damagePanel.SetVirtualSize(self.damagePanel.GetSize()[0], self.damagePanel.GetSize()[1])
-		else:
-			self.damagePanel.SetVirtualSize(self.damagePanel.GetSize()[0], self.damagePanel.GetSize()[1] + 1000)
-		self.damagePanel.Layout()
-
-
-	def onMonsterSelect(self, event):
-		if str(self.monstersTable.GetCellValue(event.GetRow(), 1)) != "":
-			self.monsterImage.LoadFile("images/monsters/256/" + str(self.monstersTable.GetCellValue(event.GetRow(), 1)) + ".png")
+	def onMonsterSelected(self, event):
+		self.currentMonsterID = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
+		self.currentMonsterName = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 0))
+		if self.currentMonsterID != "":
+			self.monsterImage.LoadFile(f"images/monsters/256/{self.currentMonsterName}.png")
 		else:
 			self.monsterImage.LoadFile("images/monsters/256/Unknown.png")
 		self.monsterImageLabel.SetBitmap(self.monsterImage)
+		self.monsterImageLabel.SetSize((160, 160))
+
 		self.physicalDamageTable.ClearGrid()
+		try:
+			self.physicalDamageTable.DeleteRows(0, self.physicalDamageTable.GetNumberRows())
+		except:
+			pass
+
 		self.elementDamageTable.ClearGrid()
+		try:
+			self.elementDamageTable.DeleteRows(0, self.elementDamageTable.GetNumberRows())
+		except:
+			pass
+
 		self.breakDamageTable.ClearGrid()
+		try:
+			self.breakDamageTable.DeleteRows(0, self.breakDamageTable.GetNumberRows())
+		except:
+			pass
+		
 		self.materialsTree.DeleteAllItems()
 		self.summaryTree.DeleteAllItems()
-		self.currentMonsterID = self.monstersTable.GetCellValue(event.GetRow(), 0)
 		self.loadMonsterSummary(self.currentMonsterID)
 		self.loadMonsterDamage(self.currentMonsterID)
 		self.loadMonsterMaterials(self.currentMonsterID)
+
+	
+	def onMonsterSizeSelect(self, event):
+		self.currentMonsterSize = event.GetEventObject().GetName()
+		self.monsterList.ClearAll()
+		self.loadMonsterList()

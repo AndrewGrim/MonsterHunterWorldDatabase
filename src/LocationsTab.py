@@ -115,15 +115,15 @@ class LocationsTab:
 																| wx.LC_VRULES
 																| wx.LC_HRULES
 																)
-		self.locationDetailSizer.Add(self.baseCampList, 1, wx.EXPAND)
 		self.baseCampList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.locationDetailSizer.Add(self.baseCampList, 1, wx.EXPAND)
 
 		self.materialList = wx.ListCtrl(self.locationDetailPanel, style=wx.LC_REPORT
 																| wx.LC_VRULES
 																| wx.LC_HRULES
 																)
-		self.locationDetailSizer.Add(self.materialList, 7, wx.EXPAND)
 		self.materialList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.locationDetailSizer.Add(self.materialList, 7, wx.EXPAND)
 
 
 	def loadLocationDetail(self):
@@ -136,8 +136,8 @@ class LocationsTab:
 		info.Text = "Base Camps"
 		self.baseCampList.InsertColumn(0, info)
 		self.baseCampList.SetColumnWidth(0, 580)
-		info = wx.ListItem()
 
+		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
 		info.Align = wx.LIST_FORMAT_LEFT

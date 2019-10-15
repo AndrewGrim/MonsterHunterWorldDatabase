@@ -261,6 +261,7 @@ class ArmorTab:
 		self.armorDetailList = cgr.HeaderBitmapGrid(self.armorDetailPanel)
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
 		self.armorDetailList.EnableEditing(False)
+		self.armorDetailList.EnableDragRowSize(False)
 		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
 
 		self.armorDetailList.CreateGrid(12, 2)

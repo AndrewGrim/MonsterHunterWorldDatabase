@@ -534,6 +534,7 @@ class WeaponsTab:
 		self.weaponDetailList = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
 		self.weaponDetailList.EnableEditing(False)
+		self.weaponDetailList.EnableDragRowSize(False)
 		self.weaponDetailSizer.Add(self.weaponDetailList, 1, wx.EXPAND)
 
 		self.weaponDetailList.CreateGrid(17, 2)
@@ -547,6 +548,7 @@ class WeaponsTab:
 		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
 		self.weaponSharpnessTable.CreateGrid(6, 7)
 		self.weaponSharpnessTable.EnableEditing(False)
+		self.weaponSharpnessTable.EnableDragRowSize(False)
 		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 1, wx.EXPAND)
 
 		self.materialsRequiredList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
@@ -558,6 +560,7 @@ class WeaponsTab:
 
 		self.weaponSongsList = cgr.HeaderBitmapGrid(self.weaponSongsPanel)
 		self.weaponSongsList.EnableEditing(False)
+		self.weaponSongsList.EnableDragRowSize(False)
 		self.weaponSongsList.CreateGrid(15, 6)
 
 		self.weaponSongsList.SetColLabelSize(0)
