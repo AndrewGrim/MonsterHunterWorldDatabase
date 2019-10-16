@@ -1,8 +1,5 @@
 import wx
 import wx.grid
-import wx.lib.gizmos as gizmos
-import wx.propgrid as wxpg
-import sqlite3
 import time
 import sys
 
@@ -45,7 +42,10 @@ class Application(wx.Frame):
 		#s.SkillsTab(root, self.mainNotebook)
 		#c.CharmsTab(root, self.mainNotebook)
 		#l.LocationsTab(root, self.mainNotebook)
-		k.KinsectsTab(root, self.mainNotebook)
+		#k.KinsectsTab(root, self.mainNotebook)
+
+		#pros = []
+			
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
@@ -57,7 +57,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(1) # decoration tab
+		self.mainNotebook.SetSelection(0)
 
 		self.Show()
 

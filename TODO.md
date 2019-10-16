@@ -49,6 +49,7 @@
   - [ ] resize some 325px monster images to have a border around them
 - [x] probably rework damage tab, so that each section is divided into their own collapsible panes: physical, element, break
 - [ ] get missing data ie dlc monsters
+  - [ ] kulve materials and icons
   - [ ] habitat data
   - [ ] nerg definitely has tremor :( and you can definitely break diablos's head! twice even
   - [ ] descriptions for small monsters that i added
@@ -64,4 +65,3 @@
 - [ ] organize src files into separate folders
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
-- [ ] load all the tabs in parallel by utlizing threading
