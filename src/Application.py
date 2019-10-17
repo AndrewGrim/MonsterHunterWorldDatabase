@@ -87,7 +87,7 @@ class Application(wx.Frame):
 
 
 	def followLink(self):
-		"""if self.link.event == True:
+		if self.link.event == True:
 			if self.link.eventType == "item":
 				self.items.itemList.ClearAll()
 				self.items.currentItemCategory = self.link.item.category
@@ -97,7 +97,7 @@ class Application(wx.Frame):
 				self.items.loadItemUsage()
 				self.items.loadItemObtaining()
 				self.mainNotebook.SetSelection(1) # TEST needs to be changed if more tabs are loaded
-				# prob make a dict for all the tabs with their respective indexes"""
+				# prob make a dict for all the tabs with their respective indexes
 
 
 	# TODO make a preferences page
