@@ -13,6 +13,7 @@ import SkillsTab as s
 import CharmsTab as c
 import LocationsTab as l
 import KinsectsTab as k
+import Utilities as util
 
 class Application(wx.Frame):
 
@@ -33,11 +34,13 @@ class Application(wx.Frame):
 		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
 
+		self.link = util.Link()
+
 		self.initMainNotebook()
-		monsters = m.MonstersTab(root, self.mainNotebook)
+		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
 		#w.WeaponsTab(root, self.mainNotebook)
 		#a.ArmorTab(root, self.mainNotebook)
-		#i.ItemsTab(root, self.mainNotebook)
+		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		#d.DecorationsTab(root, self.mainNotebook)
 		#s.SkillsTab(root, self.mainNotebook)
 		#c.CharmsTab(root, self.mainNotebook)
@@ -61,10 +64,6 @@ class Application(wx.Frame):
 
 		self.Show()
 
-		monsters.summaryMaterialPage.SetSplitterLeft()
-		monsters.usageMaterialPage.SetSplitterLeft()
-		monsters.obtainingMaterialPage.SetSplitterLeft() 
-
 
 	def initMainNotebook(self):
 		# the outermost panel holding in all the widgets
@@ -85,6 +84,19 @@ class Application(wx.Frame):
 		if event.GetEventObject() == self.mainNotebook:
 			self.SetSize(self.windowWidth + 3, self.windowHeight)
 			self.SetSize(self.windowWidth, self.windowHeight)
+
+
+	def followLink(self):
+		if self.link.event == True:
+			if self.link.eventType == "item":
+				self.items.itemList.ClearAll()
+				self.items.currentItemCategory = self.link.item.category
+				self.items.loadItemList()
+				self.items.currentlySelectedItemID = self.link.item.id
+				self.items.loadItemDetail()
+				self.items.loadItemUsage()
+				self.items.loadItemObtaining()
+				self.mainNotebook.SetSelection(1)
 
 
 	# TODO make a preferences page

@@ -11,6 +11,7 @@ from typing import Tuple
 from typing import Dict
 from typing import NewType
 import Utilities as util
+import MonsterMaterialLink as mml
 
 wxColour = NewType("wxColour", None)
 sqlite3Connection = NewType("sqlite3Connection", None)
@@ -18,9 +19,10 @@ sqlite3Connection = NewType("sqlite3Connection", None)
 
 class MonstersTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
 		
 		self.currentMonsterID = 17
 		self.currentMonsterName = "Great Jagras"
@@ -546,8 +548,7 @@ class MonstersTab:
 												| gizmos.TR_FULL_ROW_HIGHLIGHT
 												| gizmos.TR_HIDE_ROOT
 												)
-
-		self.materialsTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onMaterialSelection)
+		self.materialsTree.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onMaterialSelection)
 
 		self.materialsTree.AddColumn("")
 		self.materialsTree.AddColumn("")
@@ -560,37 +561,21 @@ class MonstersTab:
 
 		self.materialsTree.SetImageList(self.ilMats)
 
-		self.initMaterialDetail()
-
-		self.monsterMaterialsSizer.Add(self.materialsTree, 2, wx.EXPAND)
-		self.monsterMaterialsSizer.Add(self.materialDetailPanel, 1, wx.EXPAND)
+		self.monsterMaterialsSizer.Add(self.materialsTree, 1, wx.EXPAND)
 		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
 
 		self.loadMonsterMaterials(self.currentMonsterID)
-
-	def initMaterialDetail(self):
-		self.materialDetailPanel = wx.Panel(self.materialsPanel)
-		self.materialDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.materialImage = wx.Bitmap("util/VectorDrawable2Svg-master/png/ic_items_scale_base128.png", wx.BITMAP_TYPE_ANY)
-		self.materialImageLabel = wx.StaticBitmap(self.materialDetailPanel, bitmap=self.materialImage)
-
-		self.materialDetailsPropertyGrid = wxpg.PropertyGridManager(self.materialDetailPanel, style=wxpg.PG_TOOLBAR)
-
-		self.initMaterialData(self.currentMonsterMaterialID)
-
-		self.materialDetailSizer.Add(self.materialImageLabel, 1, wx.EXPAND)
-		self.materialDetailSizer.Add(self.materialDetailsPropertyGrid, 3, wx.EXPAND)
-
-		self.materialDetailPanel.SetSizer(self.materialDetailSizer)
 	
 
 	def loadMonsterMaterials(self, monsterID: int) -> None:
 		root = self.materialsTree.AddRoot("Materials")
+		
+		# TODO only make the node if the monster exists in that rank
 
 		# master rank
-		self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
-		masterRankColour = util.hexToRGB("#FFEB3B")
-		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
+		#self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
+		#masterRankColour = util.hexToRGB("#FFEB3B")
+		#self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
 		
 		# high rank
 		self.highRankNode = self.materialsTree.AppendItem(root, "High Rank")
@@ -629,16 +614,15 @@ class MonstersTab:
 		rankNodes = {
 			"LR": self.lowRankNode,
 			"HR": self.highRankNode,
-			"MR": self.masterRankNode,
+			#"MR": self.masterRankNode,
 			}
 
 		self.ilMats.RemoveAll()
 		test = self.ilMats.Add(self.testIcon)
-		noLog = wx.LogNull()
+		#noLog = wx.LogNull()
 	
 		# TODO refactor into function
 		for index, row in enumerate(data):
-			#print(row)
 			if index == 0:
 				self.currentMonsterMaterialID = row[4]
 			currentCategory = str(row[1])
@@ -648,10 +632,8 @@ class MonstersTab:
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
 					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
-					#self.materialsTree.SetItemBackgroundColour(rewardCondition, lowRankColour)
-				#self.materialsTree.SetItemBackgroundColour(monsterMaterial, lowRankColour)
 				self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 2)
+				self.materialsTree.SetItemText(monsterMaterial, str(row), 2)
 				try:
 					img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{row[6]}{row[8]}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
@@ -660,17 +642,13 @@ class MonstersTab:
 				categoriesLR.append(currentCategory)
 
 			elif row[0] == "HR":
-				#if row[1] == "Kulve Taroth":
-				print(row)
 				if currentCategory in categoriesHR:
 					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
 				else:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
 					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
-					#self.materialsTree.SetItemBackgroundColour(rewardCondition, highRankColour)
-				#self.materialsTree.SetItemBackgroundColour(monsterMaterial, highRankColour)
 				self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 2)
+				self.materialsTree.SetItemText(monsterMaterial, str(row), 2)
 				try:
 					img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{row[6]}{row[8]}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
@@ -692,12 +670,12 @@ class MonstersTab:
 			#		
 			#	categoriesMR.append(currentCategory)
 
-		self.materialsTree.ExpandAllChildren(self.highRankNode) 
+		self.materialsTree.ExpandAll() 
 
-		del noLog
+		#del noLog
 
 		# TODO maybe make this an option to auto expand a particular option or all of them
-		#self.materialsTree.ExpandAll()
+		#self.materialsTree.ExpandAllChildren()
 		#self.materialsTree.Expand(self.masterRankNode)
 		#
 		#self.materialsTree.Expand(self.lowRankNode)
@@ -735,227 +713,16 @@ class MonstersTab:
 
 
 	def onMaterialSelection(self, event):
-		itemID = self.materialsTree.GetItemText(event.GetItem(), 2 )
-		conn = sqlite3.connect("mhw.db")
-
-		itemInfo = self.loadMonsterMaterialsummaryPage(itemID, conn)
-		itemObtaining = self.loadMaterialObtainingPage(itemID, conn)
-		itemUsage = self.loadMaterialUsagePage(itemID, conn)
-		# PREFERENCES remember the last selected page and select it
-		self.materialDetailsPropertyGrid.Clear()
-		self.loadMaterialPropertyGrid(itemInfo, itemObtaining, itemUsage)
-
-	def initMaterialData(self, itemID: int) -> None:
-		itemID = str(itemID)
-		conn = sqlite3.connect("mhw.db")
-
-		itemInfo = self.loadMonsterMaterialsummaryPage(itemID, conn)
-		itemObtaining = self.loadMaterialObtainingPage(itemID, conn)
-		itemUsage = self.loadMaterialUsagePage(itemID, conn)
-		self.loadMaterialPropertyGrid(itemInfo, itemObtaining, itemUsage)
-
-	def loadMonsterMaterialsummaryPage(self, itemID: int, conn: sqlite3Connection) -> List[str]:
-		itemDetails = """
-			SELECT i.*, it.name, it.description
-			FROM item i
-			JOIN item_text it
-				ON it.id = i.id
-				AND it.lang_id = :langId
-			WHERE i.id = :itemId
-			"""
-		
-		data = conn.execute(itemDetails, ("en", itemID))
-		data = data.fetchone()
-		itemInfo = []
-		for item in data:
-			itemInfo.append(item)
-
-		# 0 - item id
-		# 1 - item type ie material
-		# 2 - subcategory ie trade, supply, account
-		# 3 - rarity
-		# 4 - buy price
-		# 5 - sell price
-		# 6 - carry limit
-		# 7 - points
-		# 8 - icon type ie scale
-		# 9 - icon color ie Gray
-		# 10 - item name ie immortal dragon scale
-		# 11- item desc ei Rare Nergigante material. Mostly obtained...
-		
-		return itemInfo
-
-	
-	def loadMaterialUsagePage(self, itemID: int, conn: sqlite3Connection) -> List[List[str]]:
-		# more specifically this: List[List[str], List[str], List[str]]
-
-		charmUsage = """
-			SELECT c.id, c.rarity, c.previous_id, ctext.name, cr.quantity
-			FROM charm_recipe cr
-				JOIN charm c
-					ON c.id = cr.charm_id
-				JOIN charm_text ctext
-					ON ctext.id = c.id
-			WHERE cr.item_id = :itemId
-			AND ctext.lang_id = :langId
-			"""
-
-		armorUsage = """
-			SELECT armor_id id, name, armor_type, rarity, slot_1, slot_2, slot_3, ar.quantity
-			FROM armor_recipe ar
-				JOIN armor a
-					ON ar.armor_id = a.id
-				JOIN armor_text atext
-					ON a.id = atext.id
-			WHERE ar.item_id = :itemId
-				AND atext.lang_id = :langId
-			"""
-
-		weaponUsage = """
-			SELECT w.id, w.rarity, w.weapon_type, w.category, wt.*, wr.quantity
-			FROM weapon w
-				JOIN weapon_text wt USING (id)
-				JOIN weapon_recipe wr ON w.id = wr.weapon_id
-			WHERE wt.lang_id = :langId
-				AND wr.item_id = :itemId
-			"""
-		
-		data = conn.execute(charmUsage, (itemID, "en"))
-		data = data.fetchall()
-		charmUsage = []
-
-		for row in data:
-			charmUsage.append(row)
-
-		# 0 - charm id
-		# 1 - rarity
-		# 2 - previous charm level id
-		# 3 - charm name
-		# 4 - required quantity
-
-		data = conn.execute(armorUsage, (itemID, "en"))
-		data = data.fetchall()
-		armorUsage = []
-
-		for row in data:
-			armorUsage.append(row)
-
-		# 0 - armor id
-		# 1 - armor name
-		# 2 - armor type
-		# 3 - rarity
-		# 4 - slot 1
-		# 5 - slot 2
-		# 6 - slot 3
-		# 7 - required quantity
-
-		data = conn.execute(weaponUsage, ("en", itemID))
-		data = data.fetchall()
-		weaponUsage = []
-
-		for row in data:
-			weaponUsage.append(row)
-
-		# 0 - weapon id
-		# 1 - rarity
-		# 2 - weapon type
-		# 3 - weapon category??
-		# 4 - weapon id duplicate
-		# 5 - lang id
-		# 6 - weapon name
-		# 7 - required quantity
-		
-		return [charmUsage, armorUsage, weaponUsage]
-
-
-	# TODO missing return type!
-	def loadMaterialObtainingPage(self, itemID: int, conn: sqlite3Connection):
-		itemRewards = """
-			SELECT r.monster_id, mtext.name monster_name, m.size monster_size,
-				rtext.name condition_name, r.rank, r.stack, r.percentage
-			FROM monster_reward r
-				JOIN monster_reward_condition_text rtext
-					ON rtext.id = r.condition_id
-				JOIN monster m
-					ON m.id = r.monster_id
-				JOIN monster_text mtext
-					ON mtext.id = m.id
-					AND mtext.lang_id = rtext.lang_id
-			WHERE r.item_id = :itemId
-				AND rtext.lang_id = :langId
-				ORDER BY m.id ASC, r.percentage DESC
-			"""
-
-		data = conn.execute(itemRewards, (itemID, "en"))
-		data = data.fetchall()
-		itemObtaining = []
-
-		for row in data:
-			itemObtaining.append(row)
-
-		# 0 - monster id
-		# 1 - monster name
-		# 2 - monster size
-		# 3 - reward condition
-		# 4 - rank
-		# 5 - stack
-		# 6 - percentage
-		
-		return itemObtaining
-
-	
-	def loadMaterialPropertyGrid(self, itemInfo, itemObtaining, itemUsage):
-		for index, item in enumerate(itemInfo):
-			if str(item) == "None" or str(item) == "0":
-				itemInfo[index] = "-"
-			else:
-				itemInfo[index] = str(item)
-				
-		# IMAGES replace icon with item icon probably base scale
-		self.summaryMaterialPage = self.materialDetailsPropertyGrid.AddPage("Summary", self.testIcon)
-		self.summaryMaterialPage.Append(wxpg.PropertyCategory("Summary"))
-		self.summaryMaterialPage.Append(wxpg.StringProperty("Name",value=itemInfo[10]))
-		self.summaryMaterialPage.Append(wxpg.LongStringProperty("Description",value=itemInfo[11]))
-		self.summaryMaterialPage.Append(wxpg.StringProperty("Rarity",value=itemInfo[3]))
-		self.summaryMaterialPage.Append(wxpg.StringProperty("Buy",value=itemInfo[4]))
-		if itemInfo[5] == "-":	
-			# IMAGES points icon
-			self.summaryMaterialPage.Append(wxpg.StringProperty("Sell",value=itemInfo[7]))
-		else:
-			# IMAGES zenny icon
-			self.summaryMaterialPage.Append(wxpg.StringProperty("Sell",value=itemInfo[5]))
-		self.summaryMaterialPage.Append(wxpg.StringProperty("Carry",value=itemInfo[6]))
-
-		self.summaryMaterialPage.SetSplitterLeft()
-
-		# IMAGES replace icon with armor icon probably base chest or head
-		self.usageMaterialPage = self.materialDetailsPropertyGrid.AddPage("Usage", self.testIcon)
-		self.usageMaterialPage.Append(wxpg.PropertyCategory("Usage"))
-		if itemUsage[0]:
-			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Charms"))
-			for item in itemUsage[0]:
-				self.usageMaterialPage.Append(wxpg.StringProperty(str(item[3]),value=str(item[4])))
-		if itemUsage[1]:
-			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Armor"))
-			for item in itemUsage[1]:
-				self.usageMaterialPage.Append(wxpg.StringProperty(str(item[1]),value=str(item[7])))
-		if itemUsage[2]:
-			self.usageMaterialPage.AppendIn(wxpg.PGPropArgCls("Usage"), wxpg.PropertyCategory("Weapons"))
-			for item in itemUsage[2]:
-				self.usageMaterialPage.Append(wxpg.StringProperty(str(item[6]),value=str(item[7])))
-		self.usageMaterialPage.SetSplitterLeft()
-
-		# IMAGES replace icon with unknow monster icon
-		self.obtainingMaterialPage = self.materialDetailsPropertyGrid.AddPage("Obtaining", self.testIcon)
-		self.obtainingMaterialPage.Append(wxpg.PropertyCategory("Obtaining"))
-		for item in itemObtaining:
-			self.obtainingMaterialPage.AppendIn(wxpg.PGPropArgCls("Obtaining"), wxpg.PropertyCategory(str(item[1])))
-			try:
-				self.obtainingMaterialPage.Append(wxpg.StringProperty(str(item[4]) + " " + str(item[3]),value=str(item[5]) + " x " + str(item[6]) + "%"))
-			except:
-				pass
-
-		self.obtainingMaterialPage.SetSplitterLeft()
+		materialInfo = self.materialsTree.GetItemText(event.GetItem(), 2)
+		materialInfo = materialInfo.replace("(", "").replace(")", "").replace("'", "").split(",")
+		for i, item in enumerate(materialInfo):
+			if item[0] == " ":
+				materialInfo[i] = item[1:]
+		self.link.event = True
+		self.link.eventType = "item"
+		self.link.item =  mml.MonsterMaterialLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onMonsterSelected(self, event):

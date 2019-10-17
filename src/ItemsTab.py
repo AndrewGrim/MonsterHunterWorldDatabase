@@ -23,9 +23,10 @@ import RewardObtaining as r
 
 class ItemsTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
 
 		self.currentlySelectedItemID = 1
 		self.currentItemName = "Potion"
