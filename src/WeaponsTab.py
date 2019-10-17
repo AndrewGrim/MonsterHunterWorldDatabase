@@ -566,7 +566,8 @@ class WeaponsTab:
 																			| wx.LC_VRULES
 																			| wx.LC_HRULES
 																			)
-		self.materialsRequiredList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.ilMats = wx.ImageList(24, 24)
+		self.materialsRequiredList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.weaponDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND)
 
 		self.weaponSongsList = cgr.HeaderBitmapGrid(self.weaponSongsPanel)
@@ -1115,6 +1116,9 @@ class WeaponsTab:
 
 
 	def loadWeaponMaterials(self):
+		self.ilMats.RemoveAll()
+		test = self.ilMats.Add(self.testIcon)
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -1153,13 +1157,22 @@ class WeaponsTab:
 		data = data.fetchall()
 
 		for item in data:
+			img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{item[2]}{item[4]}.png"))
 			if item[6] == "Create":
-				index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
-					f"Create:    {item[1]}", self.test)
+				try:
+					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
+						f"Create:    {item[1]}", img)
+				except:
+					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
+						f"Create:    {item[1]}", test)
 				self.materialsRequiredList.SetItem(index, 1, f"{item[5]}")
 			else:
-				index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
-					f"Upgrade:    {item[1]}", self.test)
+				try:
+					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
+						f"Upgrade:    {item[1]}", img)
+				except:
+					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
+						f"Upgrade:    {item[1]}", test)
 				self.materialsRequiredList.SetItem(index, 1, f"{item[5]}")
 
 
