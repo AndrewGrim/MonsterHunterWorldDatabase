@@ -278,6 +278,7 @@ class WeaponsTab:
 
 		self.specialAmmo = self.il.Add(wx.Bitmap("images/weapon-detail-24/specialammo.png", wx.BITMAP_TYPE_ANY))
 		self.deviation = self.il.Add(wx.Bitmap("images/weapon-detail-24/deviation.png"))
+		self.ammo = self.il.Add(wx.Bitmap("util/ammo-24/AmmoWhite.png"))
 
 		self.closeCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
 		self.powerCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
@@ -601,7 +602,8 @@ class WeaponsTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-		self.weaponAmmoList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.ilAmmo = wx.ImageList(24, 24)
+		self.weaponAmmoList.SetImageList(self.ilAmmo, wx.IMAGE_LIST_SMALL)
 		self.weaponAmmoSizer.Add(self.weaponAmmoList, 1, wx.EXPAND)
 
 		self.loadWeaponDetails()
@@ -859,7 +861,7 @@ class WeaponsTab:
 			self.weaponDetailList.SetCellValue(row + 1, 1, str(additionalDetails[self.currentWeaponTree][4]))
 
 			self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
-			self.weaponDetailsNotebook.SetPageImage(1, self.deviation)
+			self.weaponDetailsNotebook.SetPageImage(1, self.ammo)
 			self.loadBowgunAmmo()
 
 		elif self.currentWeaponTree == "bow":
@@ -940,6 +942,8 @@ class WeaponsTab:
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
 	def loadBowgunAmmo(self):
+		self.ilAmmo.RemoveAll()
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -1021,25 +1025,64 @@ class WeaponsTab:
 					"Tranq",
 					]
 
+		ammoIcons = {
+			"Normal 1": "AmmoWhite.png",
+			"Normal 2": "AmmoWhite.png",
+			"Normal 3": "AmmoWhite.png",
+			"Pierce 1": "AmmoBlue.png",
+			"Pierce 2": "AmmoBlue.png",
+			"Pierce 3": "AmmoBlue.png",
+			"Spread 1": "AmmoDarkGreen.png",
+			"Spread 2": "AmmoDarkGreen.png",
+			"Spread 3": "AmmoDarkGreen.png",
+			"Sticky 1": "AmmoBeige.png",
+			"Sticky 2": "AmmoBeige.png",
+			"Sticky 3": "AmmoBeige.png",
+			"Cluster 1": "AmmoDarkRed.png",
+			"Cluster 2": "AmmoDarkRed.png",
+			"Cluster 3": "AmmoDarkRed.png",
+			"Recover 1": "AmmoGreen.png",
+			"Recover 2": "AmmoGreen.png",
+			"Poison 1": "AmmoViolet.png",
+			"Poison 2": "AmmoViolet.png",
+			"Paralysis 1": "AmmoGold.png",
+			"Paralysis 2": "AmmoGold.png",
+			"Sleep 1": "AmmoCyan.png",
+			"Sleep 2": "AmmoCyan.png",
+			"Exhaust 1": "AmmoDarkPurple.png",
+			"Exhaust 2": "AmmoDarkPurple.png",
+			"Flaming": "AmmoOrange.png",
+			"Water": "AmmoDarkBlue.png",
+			"Freeze": "AmmoWhite.png",
+			"Thunder": "AmmoYellow.png",
+			"Dragon": "AmmoDarkRed.png",
+			"Slicing": "AmmoWhite.png",
+			"Wyvern": "AmmoLightBeige.png",
+			"Demon": "AmmoRed.png",
+			"Armor": "AmmoDarkBeige.png",
+			"Tranq": "AmmoPink.png",
+		}
+
 		col = 3
 		# different checks are used avoid going out of bounds since not all ammo types have the same amount of columns
 		for item in ammoTypes:
+			img = self.ilAmmo.Add(wx.Bitmap(f"util/ammo-24/{ammoIcons[item]}"))
 			if col == 127:
 				if data[col] != 0 and data[col] != None:
-					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, self.test)
+					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, img)
 					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
 					if self.currentWeaponTree == "heavy-bowgun":
 						self.weaponAmmoList.SetItem(index, 2, "Rapid")
 					self.weaponAmmoList.SetItem(index, 3, str(data[col + 1]).capitalize())
 			elif col > 127:
 				if data[col] != 0 and data[col] != None:
-					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, self.test)
+					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, img)
 					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
 					self.weaponAmmoList.SetItem(index, 2, "Normal+" + str(data[col + 1]))
 					self.weaponAmmoList.SetItem(index, 3, str(data[col + 2]).capitalize())
 			else:
 				if data[col] != 0 and data[col] != None:
-					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, self.test)
+					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, img)
 					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
 					if data[col + 1] == 1:
 						self.weaponAmmoList.SetItem(index, 2, "Rapid+" + str(data[col + 2]))

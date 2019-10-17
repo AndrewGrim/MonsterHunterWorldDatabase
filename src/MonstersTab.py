@@ -44,7 +44,7 @@ class MonstersTab:
 
 		# TEST defaults to materials tab
 		# PREFERENCES make this customizable
-		self.monsterDetailsNotebook.SetSelection(2)
+		self.monsterDetailsNotebook.SetSelection(0)
 
 
 	def initMonstersTab(self):
@@ -174,8 +174,9 @@ class MonstersTab:
 		self.summaryTree.AddColumn("")
 		self.summaryTree.AddColumn("")
 		self.summaryTree.SetMainColumn(0)
-		self.summaryTree.SetColumnWidth(0, (self.root.GetSize().width * 0.80) * 0.47)
-		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.80) * 0.45)
+		self.summaryTree.SetColumnWidth(0, (self.root.GetSize().width * 0.80) * 0.37)
+		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.80) * 0.20)
+		self.summaryTree.SetColumnAlignment(1, wx.ALIGN_CENTER)
 
 		self.summaryTree.SetImageList(self.il)
 
