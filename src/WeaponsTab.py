@@ -108,6 +108,17 @@ class WeaponsTab:
 			"purple": "cc99ff",
 		}
 
+		self.noteColors = {
+			"W": "White",
+			"R": "Red",
+			"C": "Cyan",
+			"B": "Blue",
+			"G": "Green",
+			"O": "Orange",
+			"Y": "Yellow",
+			"P": "Purple",
+		}
+
 		self.initWeaponsTab()
 
 
@@ -561,22 +572,24 @@ class WeaponsTab:
 		self.weaponSongsList = cgr.HeaderBitmapGrid(self.weaponSongsPanel)
 		self.weaponSongsList.EnableEditing(False)
 		self.weaponSongsList.EnableDragRowSize(False)
-		self.weaponSongsList.CreateGrid(15, 6)
+		self.weaponSongsList.CreateGrid(15, 7)
 
 		self.weaponSongsList.SetColLabelSize(0)
 		self.weaponSongsList.SetRowLabelSize(0)
 		self.weaponSongsList.SetColLabelValue(0, "")
 		self.weaponSongsList.SetColLabelValue(1, "")
 		self.weaponSongsList.SetColLabelValue(2, "")
-		self.weaponSongsList.SetColLabelValue(3, "Duration")
-		self.weaponSongsList.SetColLabelValue(4, "Extension")
-		self.weaponSongsList.SetColLabelValue(5, "Effects")
+		self.weaponSongsList.SetColLabelValue(3, "")
+		self.weaponSongsList.SetColLabelValue(4, "Duration")
+		self.weaponSongsList.SetColLabelValue(5, "Extension")
+		self.weaponSongsList.SetColLabelValue(6, "Effects")
 
-		self.weaponSongsList.SetColSize(0, 29)
-		self.weaponSongsList.SetColSize(1, 29)
-		self.weaponSongsList.SetColSize(2, 29)
-		self.weaponSongsList.SetColSize(3, 60)
-		self.weaponSongsList.SetColSize(4, 65)
+		self.weaponSongsList.SetColSize(0, 26)
+		self.weaponSongsList.SetColSize(1, 26)
+		self.weaponSongsList.SetColSize(2, 26)
+		self.weaponSongsList.SetColSize(3, 26)
+		self.weaponSongsList.SetColSize(4, 55)
+		self.weaponSongsList.SetColSize(5, 60)
 
 		self.weaponSongsList.SetDefaultRowSize(32, resizeExistingRows=True)
 		self.weaponSongsList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
@@ -821,26 +834,26 @@ class WeaponsTab:
 		row = len(weaponDetail.items())
 		if self.currentWeaponTree in ["charge-blade", "switch-axe", "gunlance", "insect-glaive"]:
 			if self.currentWeaponTree in ["charge-blade", "switch-axe"] :
-				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/weapon-detail-24/phials.png") \
+				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							"images/weapon-detail-24/phials.png") 
 							, additionalDetails[self.currentWeaponTree][0]))
 			elif self.currentWeaponTree == "gunlance":
-				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/weapon-detail-24/shelling.png") \
+				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							"images/weapon-detail-24/shelling.png") 
 							, additionalDetails[self.currentWeaponTree][0]))
 			elif self.currentWeaponTree == "insect-glaive":
-				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/damage-types-24/kinsect.png") \
+				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							"images/damage-types-24/kinsect.png") 
 							, additionalDetails[self.currentWeaponTree][0]))
 			self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][1]))
 		elif self.currentWeaponTree in ["light-bowgun", "heavy-bowgun"]:
-			self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/weapon-detail-24/specialammo.png") \
+			self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							"images/weapon-detail-24/specialammo.png") 
 							, additionalDetails[self.currentWeaponTree][0]))
 			self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][1]))
 
-			self.weaponDetailList.SetCellRenderer(row + 1, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/weapon-detail-24/deviation.png") \
+			self.weaponDetailList.SetCellRenderer(row + 1, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							"images/weapon-detail-24/deviation.png") 
 							, additionalDetails[self.currentWeaponTree][3]))
 			self.weaponDetailList.SetCellValue(row + 1, 1, str(additionalDetails[self.currentWeaponTree][4]))
 
@@ -850,18 +863,24 @@ class WeaponsTab:
 
 		elif self.currentWeaponTree == "bow":
 			for num in range(0, 17, 3):
-				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/weapon-detail-24/coating.png") \
+				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							"images/weapon-detail-24/coating.png") 
 							, additionalDetails[self.currentWeaponTree][num]))
 				self.weaponDetailList.SetCellValue(row, 0, additionalDetails[self.currentWeaponTree][num])
 				self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][num + 1]))
 				row += 1
 		elif self.currentWeaponTree == "hunting-horn":
+			noteNum = 1
 			for num in range(0, 9, 3):
-				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-							"images/weapon-detail-24/notes.png") \
+				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap(
+							"images/weapon-detail-24/notes.png")
 							, additionalDetails[self.currentWeaponTree][num + 2]))
-				self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][num + 3]))
+				noteColor = self.noteColors[additionalDetails[self.currentWeaponTree][num + 3]]
+				self.weaponDetailList.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(wx.Bitmap( 
+							f"util/notes-24/Note{noteNum}{noteColor}.png")
+							, f"{noteColor}",
+							imageOffset=40))
+				noteNum += 1
 				row += 1
 
 			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
@@ -1037,8 +1056,13 @@ class WeaponsTab:
 
 
 	def loadHuntingHornSongs(self, notes: List[str]):
-		size = self.weaponSongsPanel.GetSize()[0] - 3 * 29 - 60 - 65 - 6 - 20
-		self.weaponSongsList.SetColSize(5, size)
+		size = self.weaponSongsPanel.GetSize()[0] - 4 * 29 - 60 - 65 - 6 - 20 + 27
+		self.weaponSongsList.SetColSize(6, size)
+		noteNumbers = {
+			notes[0]: "Note1",
+			notes[1]: "Note2",
+			notes[2]: "Note3",
+		}
 
 		sql = """
 			SELECT wm.id, wm.notes, wmt.effect1, wmt.effect2, wm.duration, wm.extension
@@ -1073,12 +1097,18 @@ class WeaponsTab:
 		if self.weaponSongsList.GetNumberRows() < len(songList):
 			self.weaponSongsList.AppendRows(len(songList) - self.weaponSongsList.GetNumberRows())
 		for row, song in enumerate(songList):
-			self.weaponSongsList.SetCellRenderer(row, 0, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note1.png")))
-			self.weaponSongsList.SetCellRenderer(row, 1, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note2.png")))
-			self.weaponSongsList.SetCellRenderer(row, 2, cgr.ImageCellRenderer(wx.Bitmap("images/weapon-detail-24/note3.png")))
-			self.weaponSongsList.SetCellValue(row, 3, str(song[4]))
-			self.weaponSongsList.SetCellValue(row, 4, str(song[5]))
-			self.weaponSongsList.SetCellValue(row, 5, str(song[2]) + "\n" + str(song[3]))
+			for i in range(len(song[1])):
+				self.weaponSongsList.SetCellRenderer(row, i, cgr.ImageCellRenderer(
+					wx.Bitmap(f"util/notes-24/{noteNumbers[song[1][i]]}{self.noteColors[song[1][i]]}.png")))
+			self.weaponSongsList.SetCellFont(row, 4, 
+				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+			self.weaponSongsList.SetCellValue(row, 4, str(song[4]))
+			self.weaponSongsList.SetCellFont(row, 5, 
+				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+			self.weaponSongsList.SetCellValue(row, 5, str(song[5]))
+			self.weaponSongsList.SetCellFont(row, 6, 
+				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+			self.weaponSongsList.SetCellValue(row, 6, str(song[2]) + "\n" + str(song[3]))
 			
 	def splitNotes(self, notes: str) -> List[str]:
 		return [note for note in notes]
