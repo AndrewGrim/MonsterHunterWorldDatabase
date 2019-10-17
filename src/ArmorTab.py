@@ -239,8 +239,12 @@ class ArmorTab:
 			self.armorTree.SetItemText(armorPiece, str(a.dragon), 12)
 			if a.male == 1:
 				self.armorTree.SetItemText(armorPiece, "✓", 13)
+			else:
+				self.armorTree.SetItemText(armorPiece, "✗", 13)
 			if a.female == 1:
 				self.armorTree.SetItemText(armorPiece, "✓", 14)
+			else:
+				self.armorTree.SetItemText(armorPiece, "✗", 14)
 
 			self.armorTree.SetItemText(armorPiece, str(a.id), 15)
 			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 16)

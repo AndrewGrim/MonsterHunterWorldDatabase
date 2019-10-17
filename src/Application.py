@@ -38,8 +38,8 @@ class Application(wx.Frame):
 
 		self.initMainNotebook()
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
-		w.WeaponsTab(root, self.mainNotebook)
-		#a.ArmorTab(root, self.mainNotebook)
+		#w.WeaponsTab(root, self.mainNotebook)
+		a.ArmorTab(root, self.mainNotebook)
 		#self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		#d.DecorationsTab(root, self.mainNotebook)
 		#s.SkillsTab(root, self.mainNotebook)
