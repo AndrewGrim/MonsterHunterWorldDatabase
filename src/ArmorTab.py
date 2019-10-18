@@ -71,6 +71,59 @@ class ArmorTab:
 			11: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
+		# TODO these will need to be check when i have access to iceborne
+		self.setBonusColors = {
+			"Anjanath Power": "SetBonusPink.png",
+			"Anjanath Will": "SetBonusPink.png",
+			"Anjanath Dominance": "SetBonusPink.png",
+			"Astera Blessing": "SetBonusWhite.png",
+			"Bazelgeuse Protection": "SetBonusWhite.png",
+			"Bazelgeuse Ambition": "SetBonusWhite.png",
+			"Commission Guidance": "SetBonusGreen.png",
+			"Diablos Mastery": "SetBonusBeige.png",
+			"Diablos Power": "SetBonusBeige.png",
+			"Diablos Ambition": "SetBonusBeige.png",
+			"Guild Guidance": "SetBonusGold.png",
+			"Kirin Blessing": "SetBonusWhite.png",
+			"Kirin Favor": "SetBonusWhite.png",
+			"Kirin Favor": "SetBonusWhite.png",
+			"Kushala Daora Flight": "SetBonusGray.png",
+			"Legiana Blessing": "SetBonusBlue.png",
+			"Legiana Favor": "SetBonusBlue.png",
+			"Legiana Ambition": "SetBonusBlue.png",
+			"Lunastra Favor": "SetBonusBlue.png",
+			"Nergigante Hunger": "SetBonusGray.png",
+			"Odogaron Mastery": "SetBonusDarkRed.png",
+			"Odogaron Power": "SetBonusDarkRed.png",
+			"Pink Rathian Mastery": "SetBonusPink.png",
+			"Rathalos Mastery": "SetBonusRed.png",
+			"Rathalos Power": "SetBonusRed.png",
+			"Rathalos Essence": "SetBonusRed.png",
+			"Rathian Essence": "SetBonusGreen.png",
+			"Soul of the Dragoon": "SetBonusViolet.png",
+			"Teostra Technique": "SetBonusRed.png",
+			"Uragaan Protection": "SetBonusGold.png",
+			"Uragaan Ambition": "SetBonusGold.png",
+			"Vaal Hazak Vitality": "SetBonusWhite.png",
+			"Vaal Soulvein": "SetBonusWhite.png",
+			"Xeno'jiiva Divinity": "SetBonusWhite.png",
+			"Zorah Magdaros Mastery": "SetBonusGray.png",
+			"Zorah Magdaros Essence": "SetBonusGray.png",
+			"Ancient Divinity": "SetBonusBeige.png",
+			"Commission Alchemy": "SetBonusBeige.png",
+			"Barioth Hidden Art": "SetBonusWhite.png",
+			"Nargacuga Essence": "SetBonusGray.png",
+			"Glavenus Essence": "SetBonusRed.png",
+			"Brachydios Essence": "SetBonusBlue.png",
+			"Tigrex Essence": "SetBonusBeige.png",
+			"Instructor's Guidance": "SetBonusLightBeige.png",
+			"Deviljho Essence": "SetBonusRed.png",
+			"Velkhana Divinity": "SetBonusWhite.png",
+			"Namielle Divinity": "SetBonusBlue.png",
+			"Shara Ishvalda Divinity": "SetBonusBeige.png",
+			"Zinogre Essence": "SetBonusCyan.png",
+		}
+
 		self.initArmorTab()
 
 
@@ -280,14 +333,16 @@ class ArmorTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-		self.armorSkillList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.ilSkills = wx.ImageList(24, 24)
+		self.armorSkillList.SetImageList(self.ilSkills, wx.IMAGE_LIST_SMALL)
 		self.armorDetailSizer.Add(self.armorSkillList, 1, wx.EXPAND)
 
 		self.armorMaterialsList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-		self.armorMaterialsList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.ilMats = wx.ImageList(24, 24)
+		self.armorMaterialsList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.armorDetailSizer.Add(self.armorMaterialsList, 1, wx.EXPAND)
 
 		self.loadArmorDetails()
@@ -367,6 +422,8 @@ class ArmorTab:
 
 	def loadArmorSkills(self):
 		if int(self.currentlySelectedArmorID) > 0:
+			self.ilSkills.RemoveAll()
+
 			sql = """
 				SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level, s.icon_color skill_icon_color,
 					askill.level level
@@ -411,12 +468,16 @@ class ArmorTab:
 				for skill in armorSkills:
 					lvl = skill.skillLevel * "◈"
 					maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
-					index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, self.il.test)
-					self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+					if skill.iconColor is not None:
+						img = self.ilSkills.Add(wx.Bitmap(f"util/skills-24/Skill{skill.iconColor}.png"))
+						index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, img)
+						self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 
 	def loadArmorMaterials(self):
 		if int(self.currentlySelectedArmorID) > 0:
+			self.ilMats.RemoveAll()
+			
 			sql = """
 				SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
 					i.category item_category, i.icon_color item_icon_color, a.quantity
@@ -458,7 +519,11 @@ class ArmorTab:
 				self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
 
 				for material in armorMaterials:
-					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, self.il.test)
+					try:
+						img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{material.iconName}{material.iconColor}.png"))
+					except:
+						img = self.ilMats.Add(wx.Bitmap(f"images/unknown.png"))
+					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
 					self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
 
 
@@ -478,14 +543,14 @@ class ArmorTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-		self.armorSetSkillList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.armorSetSkillList.SetImageList(self.ilSkills, wx.IMAGE_LIST_SMALL)
 		self.armorSetSizer.Add(self.armorSetSkillList, 1, wx.EXPAND)
 
 		self.armorSetMaterialList = wx.ListCtrl(self.armorSetPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-		self.armorSetMaterialList.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
+		self.armorSetMaterialList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.armorSetSizer.Add(self.armorSetMaterialList, 1, wx.EXPAND)
 
 		self.loadArmorSetDetails()
@@ -523,7 +588,9 @@ class ArmorTab:
 		dragon = 0
 
 		armorSetSkills = {}
+		skillIcons = {}
 		armorSetMaterials = {}
+		materialIcons = {}
 		armorSetBonus = False
 		armorSetBonusID = 0
 
@@ -590,6 +657,8 @@ class ArmorTab:
 
 				for skill in armorSkills:
 					armorPieceSkills[skill.name] = [0, skill.skillMaxLevel]
+					if skill.iconColor is not None:
+						skillIcons[skill.name] = f"util/skills-24/Skill{skill.iconColor}.png"
 
 				for skill in armorSkills:
 					armorPieceSkills[skill.name][0] += skill.skillLevel
@@ -626,6 +695,7 @@ class ArmorTab:
 
 				for mat in armorMaterials:
 					armorPieceMaterials[mat.name] = 0
+					materialIcons[mat.name] = f"util/materials-24/{mat.iconName}{mat.iconColor}.png"
 
 				for mat in armorMaterials:
 					armorPieceMaterials[mat.name] += mat.quantity
@@ -703,7 +773,8 @@ class ArmorTab:
 			for k, v in armorSetSkills.items():
 				lvl = v[0] * "◈"
 				maxLvl = (v[1] - v[0]) * "◇"
-				index = self.armorSetSkillList.InsertItem(self.armorSetSkillList.GetItemCount(), k, self.il.test)
+				img = self.ilSkills.Add(wx.Bitmap(skillIcons[k]))
+				index = self.armorSetSkillList.InsertItem(self.armorSetSkillList.GetItemCount(), k, img)
 				self.armorSetSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 			if armorSetBonus:
 				sql = """
@@ -731,9 +802,10 @@ class ArmorTab:
 					for row in data:
 						setBonuses.append(a.ArmorSetBonus(row))
 					for b in setBonuses:
+						img = self.ilSkills.Add(wx.Bitmap(f"util/skills-24/{self.setBonusColors[b.setBonusName]}"))
 						index = self.armorSetSkillList.InsertItem(
 							self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
-							self.il.test)
+							img)
 						self.armorSetSkillList.SetItem(index, 1, "Req. " + str(b.setBonusAmtRequired))
 
 			info = wx.ListItem()
@@ -754,7 +826,11 @@ class ArmorTab:
 			self.armorSetMaterialList.SetColumnWidth(1, 155 - 22)
 
 			for k, v in armorSetMaterials.items():
-				index = self.armorSetMaterialList.InsertItem(self.armorSetMaterialList.GetItemCount(), k, self.il.test)
+				try:
+					img = self.ilMats.Add(wx.Bitmap(materialIcons[k]))
+				except:
+					img = self.ilMats.Add(wx.Bitmap("images/unknown.png"))
+				index = self.armorSetMaterialList.InsertItem(self.armorSetMaterialList.GetItemCount(), k, img)
 				self.armorSetMaterialList.SetItem(index, 1, str(v))
 
 
