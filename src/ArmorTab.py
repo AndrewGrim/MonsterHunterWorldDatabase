@@ -488,7 +488,7 @@ class ArmorTab:
 					lvl = skill.skillLevel * "◈"
 					maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
 					if skill.iconColor is not None:
-						img = self.ilSkills.Add(wx.Bitmap(f"util/skills-24/Skill{skill.iconColor}.png"))
+						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
 						index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, img)
 						self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
@@ -539,7 +539,7 @@ class ArmorTab:
 
 				for material in armorMaterials:
 					try:
-						img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{material.iconName}{material.iconColor}.png"))
+						img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{material.iconName}{material.iconColor}.png"))
 					except:
 						img = self.ilMats.Add(wx.Bitmap(f"images/unknown.png"))
 					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
@@ -677,7 +677,7 @@ class ArmorTab:
 				for skill in armorSkills:
 					armorPieceSkills[skill.name] = [0, skill.skillMaxLevel]
 					if skill.iconColor is not None:
-						skillIcons[skill.name] = f"util/skills-24/Skill{skill.iconColor}.png"
+						skillIcons[skill.name] = f"images/skills-24/Skill{skill.iconColor}.png"
 
 				for skill in armorSkills:
 					armorPieceSkills[skill.name][0] += skill.skillLevel
@@ -714,7 +714,7 @@ class ArmorTab:
 
 				for mat in armorMaterials:
 					armorPieceMaterials[mat.name] = 0
-					materialIcons[mat.name] = f"util/materials-24/{mat.iconName}{mat.iconColor}.png"
+					materialIcons[mat.name] = f"images/materials-24/{mat.iconName}{mat.iconColor}.png"
 
 				for mat in armorMaterials:
 					armorPieceMaterials[mat.name] += mat.quantity
@@ -821,7 +821,7 @@ class ArmorTab:
 					for row in data:
 						setBonuses.append(a.ArmorSetBonus(row))
 					for b in setBonuses:
-						img = self.ilSkills.Add(wx.Bitmap(f"util/skills-24/{self.setBonusColors[b.setBonusName]}"))
+						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{self.setBonusColors[b.setBonusName]}"))
 						index = self.armorSetSkillList.InsertItem(
 							self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
 							img)

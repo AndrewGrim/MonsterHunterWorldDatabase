@@ -267,7 +267,7 @@ class WeaponsTab:
 
 		self.specialAmmo = self.il.Add(wx.Bitmap("images/weapon-detail-24/specialammo.png", wx.BITMAP_TYPE_ANY))
 		self.deviation = self.il.Add(wx.Bitmap("images/weapon-detail-24/deviation.png"))
-		self.ammo = self.il.Add(wx.Bitmap("util/ammo-24/AmmoWhite.png"))
+		self.ammo = self.il.Add(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
 
 		self.closeCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
 		self.powerCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
@@ -869,7 +869,7 @@ class WeaponsTab:
 							, additionalDetails[self.currentWeaponTree][num + 2]))
 				noteColor = self.noteColors[additionalDetails[self.currentWeaponTree][num + 3]]
 				self.weaponDetailList.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(wx.Bitmap( 
-							f"util/notes-24/Note{noteNum}{noteColor}.png")
+							f"images/notes-24/Note{noteNum}{noteColor}.png")
 							, f"{noteColor}",
 							imageOffset=40))
 				noteNum += 1
@@ -1055,7 +1055,7 @@ class WeaponsTab:
 		col = 3
 		# different checks are used avoid going out of bounds since not all ammo types have the same amount of columns
 		for item in ammoTypes:
-			img = self.ilAmmo.Add(wx.Bitmap(f"util/ammo-24/{ammoIcons[item]}"))
+			img = self.ilAmmo.Add(wx.Bitmap(f"images/ammo-24/{ammoIcons[item]}"))
 			if col == 127:
 				if data[col] != 0 and data[col] != None:
 					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, img)
@@ -1132,7 +1132,7 @@ class WeaponsTab:
 		for row, song in enumerate(songList):
 			for i in range(len(song[1])):
 				self.weaponSongsList.SetCellRenderer(row, i, cgr.ImageCellRenderer(
-					wx.Bitmap(f"util/notes-24/{noteNumbers[song[1][i]]}{self.noteColors[song[1][i]]}.png")))
+					wx.Bitmap(f"images/notes-24/{noteNumbers[song[1][i]]}{self.noteColors[song[1][i]]}.png")))
 			self.weaponSongsList.SetCellFont(row, 4, 
 				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
 			self.weaponSongsList.SetCellValue(row, 4, str(song[4]))
@@ -1189,7 +1189,7 @@ class WeaponsTab:
 		data = data.fetchall()
 
 		for item in data:
-			img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{item[2]}{item[4]}.png"))
+			img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{item[2]}{item[4]}.png"))
 			if item[6] == "Create":
 				try:
 					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),

@@ -636,7 +636,7 @@ class MonstersTab:
 				self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(row), 2)
 				try:
-					img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{row[6]}{row[8]}.png"))
+					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{row[6]}{row[8]}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
 				except:
 					self.materialsTree.SetItemImage(monsterMaterial, test, which=wx.TreeItemIcon_Normal)
@@ -651,7 +651,7 @@ class MonstersTab:
 				self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
 				self.materialsTree.SetItemText(monsterMaterial, str(row), 2)
 				try:
-					img = self.ilMats.Add(wx.Bitmap(f"util/materials-24/{row[6]}{row[8]}.png"))
+					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{row[6]}{row[8]}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
 				except:
 					self.materialsTree.SetItemImage(monsterMaterial, test, which=wx.TreeItemIcon_Normal)
