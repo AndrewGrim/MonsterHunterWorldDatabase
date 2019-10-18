@@ -135,8 +135,9 @@ class ArmorTab:
 		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.armorImage = wx.Bitmap("images/armor/male/Leather Headgear.png", wx.BITMAP_TYPE_ANY)
-		self.armorImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=self.armorImage, size=(160, 160))
+		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.png", wx.BITMAP_TYPE_ANY)
+		self.armorMaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(160, 160))
+		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(160, 160))
 
 		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
 		self.armorDetailPanel = wx.Panel(self.armorDetailsNotebook)
@@ -150,7 +151,11 @@ class ArmorTab:
 		self.armorDetailsNotebook.AddPage(self.armorSetPanel, "Armor Set Detail")
 		self.armorSetPanel.SetSizer(self.armorSetSizer)
 		
-		self.armorDetailedSizer.Add(self.armorImageLabel, 1, wx.ALIGN_CENTER)
+		self.armorDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.armorDetailedImagesSizer.Add(self.armorMaleImageLabel, 1, wx.ALIGN_CENTER)
+		self.armorDetailedImagesSizer.Add(self.armorFemaleImageLabel, 1, wx.ALIGN_CENTER)
+
+		self.armorDetailedSizer.Add(self.armorDetailedImagesSizer, 1, wx.EXPAND)
 		self.armorDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
 
 		self.armorSizer.Add(self.armorTreeSizer, 1, wx.EXPAND)
@@ -216,18 +221,16 @@ class ArmorTab:
 		self.armorTree.AddColumn("Ice") # 10
 		self.armorTree.AddColumn("Thunder") # 11
 		self.armorTree.AddColumn("Dragon") # 12
-		self.armorTree.AddColumn("M") # 13 # IMAGES icon
-		self.armorTree.AddColumn("F") # 14 # IMAGES icon
-		self.armorTree.AddColumn("id") # 15
-		self.armorTree.AddColumn("armorSetID") # 16
+		self.armorTree.AddColumn("id") # 13
+		self.armorTree.AddColumn("armorSetID") # 14
 
-		for num in range(1, 15):
+		for num in range(1, 13):
 			self.armorTree.SetColumnWidth(num, 29)
 			self.armorTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-		self.armorTree.SetColumnWidth(0, 299)
+		self.armorTree.SetColumnWidth(0, 299 + 2 * 29)
 		self.armorTree.SetColumnWidth(1, 0)
-		self.armorTree.SetColumnWidth(15, 0)
-		self.armorTree.SetColumnWidth(16, 0)
+		self.armorTree.SetColumnWidth(13, 0)
+		self.armorTree.SetColumnWidth(14, 0)
 
 		for num in range(2, 5):
 			self.armorTree.SetColumnImage(num, self.il.slots)
@@ -271,15 +274,27 @@ class ArmorTab:
 		armorList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
 		"""
 		root = self.armorTree.AddRoot("Armor")
-		armorSets = []
+		armorSets = [] 
 		for a in armorList:
 			currentArmorSet = a.armorSetName
 			if currentArmorSet in armorSets:
-				armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
+				if a.name[0:11] == "King Beetle":
+					name = a.name.replace("King", "King / Queen")
+					armorPiece = self.armorTree.AppendItem(armorSetNode,  name)
+				else:
+					armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
 			else:
-				armorSetNode = self.armorTree.AppendItem(root,  a.armorSetName)
+				if a.armorSetName[0:11] == "King Beetle":
+					name = a.name.replace("King", "King / Queen")
+					armorSetNode = self.armorTree.AppendItem(root, name)
+				else:
+					armorSetNode = self.armorTree.AppendItem(root,  a.armorSetName)
 				self.armorTree.SetItemImage(armorSetNode, self.il.armorIcons["armorset"][a.rarity], which=wx.TreeItemIcon_Normal)
-				armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
+				if a.name[0:11] == "King Beetle":
+					name = a.name.replace("King", "King / Queen")
+					armorPiece = self.armorTree.AppendItem(armorSetNode,  name)
+				else:
+					armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
 				armorSets.append(currentArmorSet)
 			self.armorTree.SetItemText(armorPiece, str(a.rarity), 1)
 			self.armorTree.SetItemText(armorPiece, str(a.defenseBase), 5)
@@ -290,17 +305,8 @@ class ArmorTab:
 			self.armorTree.SetItemText(armorPiece, str(a.ice), 10)
 			self.armorTree.SetItemText(armorPiece, str(a.thunder), 11)
 			self.armorTree.SetItemText(armorPiece, str(a.dragon), 12)
-			if a.male == 1:
-				self.armorTree.SetItemText(armorPiece, "✓", 13)
-			else:
-				self.armorTree.SetItemText(armorPiece, "✗", 13)
-			if a.female == 1:
-				self.armorTree.SetItemText(armorPiece, "✓", 14)
-			else:
-				self.armorTree.SetItemText(armorPiece, "✗", 14)
-
-			self.armorTree.SetItemText(armorPiece, str(a.id), 15)
-			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 16)
+			self.armorTree.SetItemText(armorPiece, str(a.id), 13)
+			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 14)
 
 			self.armorTree.SetItemImage(armorPiece, self.il.armorIcons[a.armorType][a.rarity], which=wx.TreeItemIcon_Normal)
 			if a.slot1 != 0:
@@ -372,7 +378,18 @@ class ArmorTab:
 
 			armor = a.Armor(data)
 
-			self.armorImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.png"))
+			noLog = wx.LogNull()
+			try:
+				self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.png"))
+			except:
+				self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
+			try:
+				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{armor.name}.png"))
+			except:
+				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
+			del noLog
+			self.root.SetSize(self.root.GetSize()[0] + 3, self.root.GetSize()[1])
+			self.root.SetSize(self.root.GetSize()[0] - 3, self.root.GetSize()[1])
 			
 			armorDetail = {
 				0:  str(armor.rarity),
@@ -851,11 +868,10 @@ class ArmorTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 15)
-		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 16)
+		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 13)
+		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 14)
 
 		if self.currentlySelectedArmorID != "":
-			self.armorImageLabel.SetBitmap(self.armorImage)
 			self.armorDetailList.ClearGrid()
 			self.armorSkillList.ClearAll()
 			self.armorMaterialsList.ClearAll()
