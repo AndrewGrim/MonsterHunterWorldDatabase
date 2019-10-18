@@ -27,7 +27,7 @@ class MonstersTab:
 		self.currentMonsterID = 17
 		self.currentMonsterName = "Great Jagras"
 		self.currentMonsterMaterialID = 212
-		self.currentMonsterSize = "Large"
+		self.currentMonsterSize = "large"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 		self.ilMats = wx.ImageList(24, 24)
 
@@ -72,10 +72,7 @@ class MonstersTab:
 		# sizer containing the monsters details
 		self.monstersDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		# create bitmap from image and load bitmap into a label
-		conn = sqlite3.connect("MonsterHunter.db")
-		data = conn.execute("SELECT name FROM monsters WHERE id = ?", (self.currentMonsterID, ))
-		monsterIcon = data.fetchone()[0]
-		self.monsterImage = wx.Bitmap("images/monsters/160/" + monsterIcon + ".png", wx.BITMAP_TYPE_ANY)
+		self.monsterImage = wx.Bitmap("images/monsters/160/Great Jagras.png", wx.BITMAP_TYPE_ANY)
 		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage, size=(160, 160))
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
@@ -104,8 +101,8 @@ class MonstersTab:
 
 
 	def initMonsterSizeButtons(self):
-		self.smallMonstersButton = wx.Button(self.monstersPanel, label="Small", name="Small")
-		self.largeMonstersButton = wx.Button(self.monstersPanel, label="Large", name="Large")
+		self.smallMonstersButton = wx.Button(self.monstersPanel, label="Small", name="small")
+		self.largeMonstersButton = wx.Button(self.monstersPanel, label="Large", name="large")
 		self.smallMonstersButton.SetBitmap(wx.Bitmap("images/monsters/24/Jagras.png"))
 		self.largeMonstersButton.SetBitmap(wx.Bitmap("images/monsters/24/Great Jagras.png"))
 		self.monsterSizeButtonsSizer.Add(self.smallMonstersButton)
@@ -142,16 +139,26 @@ class MonstersTab:
 		self.monsterList.InsertColumn(1, info)
 		self.monsterList.SetColumnWidth(1, 0)
 
-		conn = sqlite3.connect("MonsterHunter.db")
-		data = conn.execute("SELECT * FROM monsters WHERE size = :size", (self.currentMonsterSize, ))
+		sql = """
+			SELECT m.id, m.size, mt.name
+			FROM monster m
+			JOIN monster_text mt
+				ON m.id = mt.id
+			WHERE size = :size
+				AND mt.lang_id = :langId
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, (self.currentMonsterSize, "en"))
 		data = data.fetchall()
 
 		self.ilBig.RemoveAll()
 
 		for row in data:
-			img = self.ilBig.Add(wx.Bitmap(f"images/monsters/56/{row[1]}.png"))
-			index = self.monsterList.InsertItem(self.monsterList.GetItemCount(), row[1], img)
+			img = self.ilBig.Add(wx.Bitmap(f"images/monsters/56/{row[2]}.png"))
+			index = self.monsterList.InsertItem(self.monsterList.GetItemCount(), row[2], img)
 			self.monsterList.SetItem(index, 1, f"{row[0]}")
+
 
 
 	def initMonsterSummary(self):
@@ -230,7 +237,7 @@ class MonstersTab:
 			from monster m JOIN monster_text t USING (id)
 			WHERE t.lang_id = :langId AND m.id = :id
 			LIMIT 1
-			"""
+		"""
 
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(monster, ("en", monsterID))
@@ -256,12 +263,8 @@ class MonstersTab:
 		# 22 - wind ailment
 		# 23 - tremor ailment
 		# -> 37 ailments
-
-		getName = sqlite3.connect("MonsterHunter.db")
-		name = getName.execute("SELECT name FROM monsters WHERE id = :monsterID", (self.currentMonsterID, ))
-		name = name.fetchone()
-		monsterName = name[0]
 		
+		monsterName = data[38]
 		self.monsterSummaryNameLabel.SetLabelText(f"\n{monsterName}:\n{data[40]}") 
 		self.monsterSummaryNameLabel.Wrap(700)
 
