@@ -135,7 +135,7 @@ class ArmorTab:
 		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.armorImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.armorImage = wx.Bitmap("images/armor/male/Leather Headgear.png", wx.BITMAP_TYPE_ANY)
 		self.armorImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=self.armorImage, size=(160, 160))
 
 		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
@@ -371,6 +371,8 @@ class ArmorTab:
 			data = data.fetchone()
 
 			armor = a.Armor(data)
+
+			self.armorImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.png"))
 			
 			armorDetail = {
 				0:  str(armor.rarity),
@@ -477,7 +479,7 @@ class ArmorTab:
 	def loadArmorMaterials(self):
 		if int(self.currentlySelectedArmorID) > 0:
 			self.ilMats.RemoveAll()
-			
+
 			sql = """
 				SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
 					i.category item_category, i.icon_color item_icon_color, a.quantity
