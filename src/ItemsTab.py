@@ -34,8 +34,6 @@ class ItemsTab:
 		self.currentUsageRow = 0
 		self.currentObtainingRow = 0
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
-		self.testIcon36 = wx.Bitmap("images/unknown36.png", wx.BITMAP_TYPE_ANY)
-		self.testIcon48 = wx.Bitmap("images/unknown48.png", wx.BITMAP_TYPE_ANY)
 
 		self.initItemTab()
 
@@ -85,15 +83,15 @@ class ItemsTab:
 
 	def initItemButtons(self):
 		self.itemsButton = wx.Button(self.itemPanel, label="Items", name="item")
-		self.itemsButton.SetBitmap(wx.Bitmap("images/unknown.png"))
+		self.itemsButton.SetBitmap(wx.Bitmap("images/materials-24/LiquidGreen.png"))
 		self.materialsButton = wx.Button(self.itemPanel, label="Materials", name="material")
-		self.materialsButton.SetBitmap(wx.Bitmap("images/unknown.png"))
+		self.materialsButton.SetBitmap(wx.Bitmap("images/materials-24/BoneYellow.png"))
 		self.ammoButton = wx.Button(self.itemPanel, label="Ammo", name="ammo")
-		self.ammoButton.SetBitmap(wx.Bitmap("images/unknown.png"))
+		self.ammoButton.SetBitmap(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
 		self.miscButton = wx.Button(self.itemPanel, label="Misc.", name="misc")
-		self.miscButton.SetBitmap(wx.Bitmap("images/unknown.png"))
+		self.miscButton.SetBitmap(wx.Bitmap("images/materials-24/SmokeRed.png"))
 		self.craftingButton = wx.Button(self.itemPanel, label="Crafting", name="crafting")
-		self.craftingButton.SetBitmap(wx.Bitmap("images/unknown.png"))
+		self.craftingButton.SetBitmap(wx.Bitmap("images/materials-24/CraftingLightBeige.png"))
 
 		self.itemsButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
 		self.materialsButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
@@ -114,19 +112,22 @@ class ItemsTab:
 
 	def initItemList(self):
 		self.itemList = wx.ListCtrl(self.itemPanel, style=wx.LC_REPORT
-																	| wx.LC_VRULES
-																	| wx.LC_HRULES
-																	)
+													| wx.LC_VRULES
+													| wx.LC_HRULES
+													)
 		self.itemList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onItemSelection)
 		self.itemListSizer.Add(self.itemList, 1, wx.EXPAND)
 
 		isz = (24, 24)
 		self.il = wx.ImageList(isz[0], isz[1])
-		self.test = self.il.Add(self.testIcon)
+		
 		self.itemList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
 
 	def loadItemList(self):
+		self.il.RemoveAll()
+		self.test = self.il.Add(self.testIcon)
+		
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -136,8 +137,6 @@ class ItemsTab:
 		self.itemList.SetColumnWidth(0, 680)
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
-		self.itemList.InsertColumn(2, info)
-		self.itemList.SetColumnWidth(2, 0)
 		
 		sql = """
 			SELECT i.*, it.name, it.description
@@ -158,9 +157,17 @@ class ItemsTab:
 			items.append(i.Item(row))
 
 		for item in items:
-			index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{item.name}", self.test)
-			self.itemList.SetItem(index, 1, f"{item.iconName}{item.iconColor}.png")
-			self.itemList.SetItem(index, 2, f"{item.id}")
+			if item.category in ["item", "material", "misc"]:
+				img = self.il.Add(wx.Bitmap(f"images/materials-24/{item.iconName}{item.iconColor}.png"))
+			elif item.category == "ammo":
+				if item.iconName == "Ammo":
+					img = self.il.Add(wx.Bitmap(f"images/ammo-24/{item.iconName}{item.iconColor}.png"))
+				elif item.iconName == "Bottle":
+					img = self.il.Add(wx.Bitmap(f"images/coatings-24/{item.iconName}{item.iconColor}.png"))	
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+			index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{item.name}", img)
+			self.itemList.SetItem(index, 1, f"{item.id}")
 
 
 	def loadCraftingList(self):
@@ -173,8 +180,6 @@ class ItemsTab:
 		self.itemList.SetColumnWidth(0, 680)
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
-		self.itemList.InsertColumn(2, info)
-		self.itemList.SetColumnWidth(2, 0)
 
 		sql = """
 			SELECT c.id,
@@ -215,13 +220,28 @@ class ItemsTab:
 
 		for com in combinations:
 			if com.secondName != None:
-				index = self.itemList.InsertItem(self.itemList.GetItemCount(),
-					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
+				if com.resultCategory in ["item", "material", "misc"]:
+					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
+				elif com.resultCategory == "ammo":
+					if com.resultIconName == "Ammo":
+						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
+					elif com.resultIconName == "Bottle":
+						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
+				else:
+					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{com.resultName} = {com.firstName} + {com.secondName}", img)
 			else:
-				index = self.itemList.InsertItem(self.itemList.GetItemCount(),
-					f"{com.resultName} = {com.firstName}", self.test)
-			self.itemList.SetItem(index, 1, f"{com.resultIconName}{com.resultIconColor}.png")
-			self.itemList.SetItem(index, 2, f"{com.resultID}")
+				if com.resultCategory in ["item", "material", "misc"]:
+					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
+				elif com.resultCategory == "ammo":
+					if com.resultIconName == "Ammo":
+						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
+					elif com.resultIconName == "Bottle":
+						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
+				else:
+					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
+			self.itemList.SetItem(index, 1, f"{com.resultID}")
 
 
 	def initItemDetail(self):
@@ -277,19 +297,32 @@ class ItemsTab:
 		self.itemDescriptionLabel.SetLabelText(item.description)
 		self.itemDescriptionLabel.Wrap(650)
 
-		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Rarity", self.test)
+		img = self.il.Add(wx.Bitmap(f"images/item-rarity-24/{item.rarity}.png"))
+		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Rarity", img)
 		self.itemDetailList.SetItem(index, 1, f"{item.rarity}")
-		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Buy", self.test)
-		if item.buyPrice != 0:
-			self.itemDetailList.SetItem(index, 1, f"{item.buyPrice}")
-		else:
+		if item.subcategory == "account":
+			img = self.il.Add(wx.Bitmap("images/points.png"))
+			index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Buy", img)
 			self.itemDetailList.SetItem(index, 1, "-")
-		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Sell", self.test)
-		if item.sellPrice != 0:
-			self.itemDetailList.SetItem(index, 1, f"{item.sellPrice}")
+			index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Sell", img)
+			self.itemDetailList.SetItem(index, 1, f"{item.points}")
 		else:
-			self.itemDetailList.SetItem(index, 1, "-")
-		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Carry", self.test)
+			img = self.il.Add(wx.Bitmap("images/zenny.png"))
+			index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Buy", img)
+			if item.buyPrice != 0:
+				self.itemDetailList.SetItem(index, 1, f"{item.buyPrice}")
+			else:
+				self.itemDetailList.SetItem(index, 1, "-")
+			if item.points > 0:
+				index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Sell", img)
+			else:
+				index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Sell", img)
+			if item.sellPrice != 0:
+				self.itemDetailList.SetItem(index, 1, f"{item.sellPrice}")
+			else:
+				self.itemDetailList.SetItem(index, 1, "-")
+		img = self.il.Add(wx.Bitmap("images/itemBox.png"))
+		index = self.itemDetailList.InsertItem(self.itemDetailList.GetItemCount(), "Carry", img)
 		if item.carryLimit != 0:
 			self.itemDetailList.SetItem(index, 1, f"{item.carryLimit}")
 		else:
@@ -608,7 +641,7 @@ class ItemsTab:
 		"""
 		When a specific item is selected in the list, the detail view gets populated with the information from the database.
 		"""
-		self.currentlySelectedItemID = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		self.currentlySelectedItemID = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if self.currentlySelectedItemID != "":
 			if self.currentItemCategory == "crafting":
 				name = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)

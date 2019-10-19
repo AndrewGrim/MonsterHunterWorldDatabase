@@ -329,8 +329,8 @@ class ArmorTab:
 			except:
 				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 			del noLog
-			self.root.SetSize(self.root.GetSize()[0] + 3, self.root.GetSize()[1])
-			self.root.SetSize(self.root.GetSize()[0] - 3, self.root.GetSize()[1])
+			self.root.SetSize(self.root.windowWidth + 3, self.root.windowHeight)
+			self.root.SetSize(self.root.windowWidth, self.root.windowHeight)
 			
 			armorDetail = {
 				0:  str(armor.rarity),
