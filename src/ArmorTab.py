@@ -234,10 +234,10 @@ class ArmorTab:
 			if a.name[0:11] == "King Beetle":
 				name = a.name.replace("King", "King / Queen")
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"                {name}", hAlign=wx.ALIGN_LEFT, imageOffset=125))
+					img, f"┗ ━━━           {name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
 			else:
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"                {a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=125))
+					img, f"┗ ━━━           {a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
 			self.armorTree.SetCellValue(row, 4, str(a.defenseBase))
 			self.armorTree.SetCellValue(row, 5, str(a.defenseMax))
 			self.armorTree.SetCellValue(row, 6, str(a.defenseAugmentedMax))
