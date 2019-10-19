@@ -46,16 +46,12 @@ class Application(wx.Frame):
 		#c.CharmsTab(root, self.mainNotebook)
 		#l.LocationsTab(root, self.mainNotebook)
 		#k.KinsectsTab(root, self.mainNotebook)
-
-		#pros = []
 			
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
 		self.SetStatusText("Welcome to wxPython!")
 
-		# to trigger onSize event so the table looks as it should
-		# TODO could probably replace this by calling layout or refresh or something
 		self.SetSize(self.windowWidth, self.windowHeight)
 		self.Center()
 

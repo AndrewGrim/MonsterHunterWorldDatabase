@@ -15,6 +15,7 @@ from typing import Dict
 from typing import NewType
 import Armor as a
 import ArmorImageList as ail
+import Utilities as util
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 Armor = NewType('Armor', None)
@@ -25,9 +26,9 @@ class ArmorTab:
 		self.root = root
 		self.mainNotebook = mainNotebook
 
-		self.currentArmorTree = "LR"
-		self.currentlySelectedArmorID = 1
-		self.currentlySelectedArmorSetID = 1
+		self.currentArmorTree = "HR"
+		self.currentlySelectedArmorID = 159
+		self.currentlySelectedArmorSetID = 39
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 
 		self.rarityColors = {
@@ -69,59 +70,6 @@ class ArmorTab:
 			9: ["images/damage-types-24/ice.png", "Ice"],
 			10: [ "images/damage-types-24/thunder.png", "Thunder"],
 			11: [ "images/damage-types-24/dragon.png", "Dragon"],
-		}
-
-		# TODO these will need to be check when i have access to iceborne
-		self.setBonusColors = {
-			"Anjanath Power": "SetBonusPink.png",
-			"Anjanath Will": "SetBonusPink.png",
-			"Anjanath Dominance": "SetBonusPink.png",
-			"Astera Blessing": "SetBonusWhite.png",
-			"Bazelgeuse Protection": "SetBonusWhite.png",
-			"Bazelgeuse Ambition": "SetBonusWhite.png",
-			"Commission Guidance": "SetBonusGreen.png",
-			"Diablos Mastery": "SetBonusBeige.png",
-			"Diablos Power": "SetBonusBeige.png",
-			"Diablos Ambition": "SetBonusBeige.png",
-			"Guild Guidance": "SetBonusGold.png",
-			"Kirin Blessing": "SetBonusWhite.png",
-			"Kirin Favor": "SetBonusWhite.png",
-			"Kirin Favor": "SetBonusWhite.png",
-			"Kushala Daora Flight": "SetBonusGray.png",
-			"Legiana Blessing": "SetBonusBlue.png",
-			"Legiana Favor": "SetBonusBlue.png",
-			"Legiana Ambition": "SetBonusBlue.png",
-			"Lunastra Favor": "SetBonusBlue.png",
-			"Nergigante Hunger": "SetBonusGray.png",
-			"Odogaron Mastery": "SetBonusDarkRed.png",
-			"Odogaron Power": "SetBonusDarkRed.png",
-			"Pink Rathian Mastery": "SetBonusPink.png",
-			"Rathalos Mastery": "SetBonusRed.png",
-			"Rathalos Power": "SetBonusRed.png",
-			"Rathalos Essence": "SetBonusRed.png",
-			"Rathian Essence": "SetBonusGreen.png",
-			"Soul of the Dragoon": "SetBonusViolet.png",
-			"Teostra Technique": "SetBonusRed.png",
-			"Uragaan Protection": "SetBonusGold.png",
-			"Uragaan Ambition": "SetBonusGold.png",
-			"Vaal Hazak Vitality": "SetBonusWhite.png",
-			"Vaal Soulvein": "SetBonusWhite.png",
-			"Xeno'jiiva Divinity": "SetBonusWhite.png",
-			"Zorah Magdaros Mastery": "SetBonusGray.png",
-			"Zorah Magdaros Essence": "SetBonusGray.png",
-			"Ancient Divinity": "SetBonusBeige.png",
-			"Commission Alchemy": "SetBonusBeige.png",
-			"Barioth Hidden Art": "SetBonusWhite.png",
-			"Nargacuga Essence": "SetBonusGray.png",
-			"Glavenus Essence": "SetBonusRed.png",
-			"Brachydios Essence": "SetBonusBlue.png",
-			"Tigrex Essence": "SetBonusBeige.png",
-			"Instructor's Guidance": "SetBonusLightBeige.png",
-			"Deviljho Essence": "SetBonusRed.png",
-			"Velkhana Divinity": "SetBonusWhite.png",
-			"Namielle Divinity": "SetBonusBlue.png",
-			"Shara Ishvalda Divinity": "SetBonusBeige.png",
-			"Zinogre Essence": "SetBonusCyan.png",
 		}
 
 		self.initArmorTab()
@@ -821,7 +769,7 @@ class ArmorTab:
 					for row in data:
 						setBonuses.append(a.ArmorSetBonus(row))
 					for b in setBonuses:
-						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{self.setBonusColors[b.setBonusName]}"))
+						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{util.setBonusColors[b.setBonusName]}"))
 						index = self.armorSetSkillList.InsertItem(
 							self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
 							img)
