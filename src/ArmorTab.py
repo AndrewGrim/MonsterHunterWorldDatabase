@@ -140,60 +140,48 @@ class ArmorTab:
 
 
 	def initArmorTree(self):
-		self.armorTree = wx.lib.agw.hypertreelist.HyperTreeList(self.armorPanel, -1, style=0,
-												agwStyle=
-												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												#| gizmos.TR_ELLIPSIZE_LONG_ITEMS
-												)
-		self.armorTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onArmorSelection)
+		self.armorTree = wx.ListCtrl(self.armorPanel, style=wx.LC_REPORT
+														| wx.LC_VRULES
+														| wx.LC_HRULES
+														)
+		self.armorTree.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onArmorSelection)
 		self.armorTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
 
 		self.il = ail.ArmorImageList()
-		self.armorTree.SetImageList(self.il.il)
-
-		self.armorTree.AddColumn("Name") # 0
-		
-		self.armorTree.AddColumn("Rarity") # 1
-		self.armorTree.AddColumn("Slot I") # 2
-		self.armorTree.AddColumn("Slot II") # 3
-		self.armorTree.AddColumn("Slot III") # 4
-		self.armorTree.AddColumn("Defense") # 5
-		self.armorTree.AddColumn("Defense Max") # 6
-		self.armorTree.AddColumn("Defense Augmented Max") # 7
-		self.armorTree.AddColumn("Fire") # 8
-		self.armorTree.AddColumn("Water") # 9
-		self.armorTree.AddColumn("Ice") # 10
-		self.armorTree.AddColumn("Thunder") # 11
-		self.armorTree.AddColumn("Dragon") # 12
-		self.armorTree.AddColumn("id") # 13
-		self.armorTree.AddColumn("armorSetID") # 14
-
-		for num in range(1, 13):
-			self.armorTree.SetColumnWidth(num, 29)
-			self.armorTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-		self.armorTree.SetColumnWidth(0, 299 + 2 * 29)
-		self.armorTree.SetColumnWidth(1, 0)
-		self.armorTree.SetColumnWidth(13, 0)
-		self.armorTree.SetColumnWidth(14, 0)
-
-		for num in range(2, 5):
-			self.armorTree.SetColumnImage(num, self.il.slots)
-
-		for num in range(5, 8):
-			self.armorTree.SetColumnImage(num, self.il.defense)
-
-		self.armorTree.SetColumnImage(8, self.il.fire)
-		self.armorTree.SetColumnImage(9, self.il.water)
-		self.armorTree.SetColumnImage(10, self.il.ice)
-		self.armorTree.SetColumnImage(11, self.il.thunder)
-		self.armorTree.SetColumnImage(12, self.il.dragon)
-
+		self.armorTree.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
 
 	def loadArmorTree(self):
+		try:
+			self.armorTree.ClearAll()
+		except:
+			pass
+
+		armorTreeColumns = {
+			"Name": [357, -1],
+			"Slot I": [29, self.il.slots],
+			"Slot II": [29, self.il.slots],
+			"Slot III": [29, self.il.slots],
+			"Defense": [29, self.il.defense],
+			"Defense Max": [29, self.il.defense],
+			"Defense Augmented Max": [29, self.il.defense],
+			"Fire": [29, self.il.fire],
+			"Water": [29, self.il.water],
+			"Ice": [29, self.il.ice],
+			"Thunder": [29, self.il.thunder],
+			"Dragon": [29, self.il.dragon],
+			"id": [0, -1],
+			"armorSetID": [0, -1],
+		}
+
+		for col, (k, v) in enumerate(armorTreeColumns.items()):
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = v[1]
+			info.Align = wx.LIST_FORMAT_CENTER
+			info.Text = k
+			self.armorTree.InsertColumn(col, info)
+			self.armorTree.SetColumnWidth(col, v[0])
+
 		sql = """
 			SELECT a.*, at.name, ast.name armorset_name
 			FROM armor a
@@ -214,58 +202,46 @@ class ArmorTab:
 			armorList.append(a.Armor(row))
 		self.populateArmorTree(armorList)
 
-		self.armorTree.ExpandAll()
-
 
 	def populateArmorTree(self, armorList: List[Armor]) -> None:
 		"""
 		armorList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
 		"""
-		root = self.armorTree.AddRoot("Armor")
-		armorSets = [] 
+
+		armorSet = "" 
 		for a in armorList:
-			currentArmorSet = a.armorSetName
-			if currentArmorSet in armorSets:
-				if a.name[0:11] == "King Beetle":
-					name = a.name.replace("King", "King / Queen")
-					armorPiece = self.armorTree.AppendItem(armorSetNode,  name)
-				else:
-					armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
-			else:
+			if a.armorSetName != armorSet:
+				img = self.il.armorIcons["armorset"][a.rarity]
 				if a.armorSetName[0:11] == "King Beetle":
 					name = a.name.replace("King", "King / Queen")
-					armorSetNode = self.armorTree.AppendItem(root, name)
+					armorSetNode = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"{name} ▼", img)
 				else:
-					armorSetNode = self.armorTree.AppendItem(root,  a.armorSetName)
-				self.armorTree.SetItemImage(armorSetNode, self.il.armorIcons["armorset"][a.rarity], which=wx.TreeItemIcon_Normal)
-				if a.name[0:11] == "King Beetle":
-					name = a.name.replace("King", "King / Queen")
-					armorPiece = self.armorTree.AppendItem(armorSetNode,  name)
-				else:
-					armorPiece = self.armorTree.AppendItem(armorSetNode,  a.name)
-				armorSets.append(currentArmorSet)
-			self.armorTree.SetItemText(armorPiece, str(a.rarity), 1)
-			self.armorTree.SetItemText(armorPiece, str(a.defenseBase), 5)
-			self.armorTree.SetItemText(armorPiece, str(a.defenseMax), 6)
-			self.armorTree.SetItemText(armorPiece, str(a.defenseAugmentedMax), 7)
-			self.armorTree.SetItemText(armorPiece, str(a.fire), 8)
-			self.armorTree.SetItemText(armorPiece, str(a.water), 9)
-			self.armorTree.SetItemText(armorPiece, str(a.ice), 10)
-			self.armorTree.SetItemText(armorPiece, str(a.thunder), 11)
-			self.armorTree.SetItemText(armorPiece, str(a.dragon), 12)
-			self.armorTree.SetItemText(armorPiece, str(a.id), 13)
-			self.armorTree.SetItemText(armorPiece, str(a.armorSetID), 14)
+					armorSetNode = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"{a.armorSetName} ▼", img)
+			armorSet = a.armorSetName
+			img = self.il.armorIcons[a.armorType][a.rarity]
+			if a.name[0:11] == "King Beetle":
+				name = a.name.replace("King", "King / Queen")
+				armorPiece = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"{name}", img) # TODO might need to have an empty image
+			else:
+				armorPiece = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"        {a.name}", img)
+			#self.armorTree.SetItem(armorPiece, 1, str(a.rarity))
+			self.armorTree.SetItem(armorPiece, 4, str(a.defenseBase))
+			self.armorTree.SetItem(armorPiece, 5, str(a.defenseMax))
+			self.armorTree.SetItem(armorPiece, 6, str(a.defenseAugmentedMax))
+			self.armorTree.SetItem(armorPiece, 7, str(a.fire))
+			self.armorTree.SetItem(armorPiece, 8, str(a.water))
+			self.armorTree.SetItem(armorPiece, 9, str(a.ice))
+			self.armorTree.SetItem(armorPiece, 10, str(a.thunder))
+			self.armorTree.SetItem(armorPiece, 11, str(a.dragon))
+			self.armorTree.SetItem(armorPiece, 12, str(a.id))
+			self.armorTree.SetItem(armorPiece, 13, str(a.armorSetID))
 
-			self.armorTree.SetItemImage(armorPiece, self.il.armorIcons[a.armorType][a.rarity], which=wx.TreeItemIcon_Normal)
 			if a.slot1 != 0:
-				self.armorTree.SetItemText(armorPiece, str(a.slot1), 2) 
-				armorPiece.SetImage(2, self.il.slotIcons[a.slot1], wx.TreeItemIcon_Normal)
+				self.armorTree.SetItem(armorPiece, 1, str(a.slot1), self.il.slotIcons[a.slot1]) 
 			if a.slot2 != 0:
-				self.armorTree.SetItemText(armorPiece, str(a.slot2), 3)
-				armorPiece.SetImage(3, self.il.slotIcons[a.slot2], wx.TreeItemIcon_Normal)
+				self.armorTree.SetItem(armorPiece, 2, str(a.slot2), self.il.slotIcons[a.slot2]) 
 			if a.slot3 != 0:
-				self.armorTree.SetItemText(armorPiece, str(a.slot3), 4)
-				armorPiece.SetImage(4, self.il.slotIcons[a.slot3], wx.TreeItemIcon_Normal)
+				self.armorTree.SetItem(armorPiece, 3, str(a.slot3), self.il.slotIcons[a.slot3]) 
 
 
 	def initArmorDetailTab(self):
@@ -807,7 +783,6 @@ class ArmorTab:
 		"""
 
 		self.currentArmorTree = event.GetEventObject().GetName()
-		self.armorTree.DeleteAllItems()
 		self.loadArmorTree()
 
 
@@ -816,8 +791,8 @@ class ArmorTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetItem(), 13)
-		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetItem(), 14)
+		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetEventObject().GetFirstSelected(), 12)
+		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetEventObject().GetFirstSelected(), 13)
 
 		if self.currentlySelectedArmorID != "":
 			self.armorDetailList.ClearGrid()
