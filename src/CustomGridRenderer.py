@@ -15,7 +15,8 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 	colour = (r,g,b)
 	selectedColour = (r,g,b)
 	"""
-	def __init__(self, img = wx.NullBitmap, label = "", colour = wx.WHITE, selectedColour = (0, 120, 215), autoImageOffset = False, imageOffset = 50):
+	def __init__(self, img = wx.NullBitmap, label = "", colour = wx.WHITE, selectedColour = (0, 120, 215),
+		autoImageOffset = False, imageOffset = 50, hAlign = wx.ALIGN_CENTER):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
 		self.colour = colour
@@ -23,6 +24,7 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 		self.label = label
 		self.autoImageOffset = autoImageOffset
 		self.imageOffset = imageOffset
+		self.hAlign = hAlign
 
 
 	def Draw(self, grid, attr, dc, rect, row, col, isSelected):
@@ -49,7 +51,7 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 			dc.DrawBitmap(self.img, x - self.imageOffset[0], y, True)
 		else:
 			dc.DrawBitmap(self.img, x - self.imageOffset, y, True)
-		self.DrawText(grid, dc, rect, self.label, wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.DrawText(grid, dc, rect, self.label, self.hAlign, wx.ALIGN_CENTER)
 
 
 	def DrawText(self, grid, dc, rect, text, hAlign, vAlign):
@@ -58,7 +60,11 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 		dc.SetFont(grid.GetDefaultCellFont())
 		rect = wx.Rect(*rect)
 		rect.Deflate(2,2)
-		grid.DrawTextRectangle(dc, text, rect, wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		grid.DrawTextRectangle(dc, text, rect, hAlign, wx.ALIGN_CENTER)
+
+
+	def GetLabel(self):
+		return self.label
 
 
 class ImageCellRenderer(wx.grid.GridCellRenderer):
@@ -112,21 +118,21 @@ class HeaderBitmapRowLabelRenderer(glr.GridLabelRenderer):
 class HeaderBitmapColLabelRenderer(glr.GridLabelRenderer):
 
 	def __init__(self, image, label = "default", imageAlignment = wx.ALIGN_CENTER):
-		self._bmp = wx.Bitmap(image, wx.BITMAP_TYPE_ANY)
+		self.img = image
 		self.imgAlign = imageAlignment
 		self.label = label
 
 
 	def Draw(self, grid, dc, rect, col):
-		x = rect.left + (rect.width - self._bmp.GetWidth()) / 2
-		y = rect.top + (rect.height - self._bmp.GetHeight()) / 2
+		x = rect.left + (rect.width - self.img.GetWidth()) / 2
+		y = rect.top + (rect.height - self.img.GetHeight()) / 2
 		self.DrawBorder(grid, dc, rect)
 		if self.imgAlign == wx.ALIGN_LEFT:
-			dc.DrawBitmap(self._bmp, x - 40, y, True)
+			dc.DrawBitmap(self.img, x - 40, y, True)
 		elif self.imgAlign == wx.ALIGN_RIGHT:
-			dc.DrawBitmap(self._bmp, x + 40, y, True)
+			dc.DrawBitmap(self.img, x + 40, y, True)
 		else:
-			dc.DrawBitmap(self._bmp, x, y, True)
+			dc.DrawBitmap(self.img, x, y, True)
 		hAlign, vAlign = grid.GetColLabelAlignment()
 		if self.label == "default":
 			self.DrawText(grid, dc, rect, grid.GetColLabelValue(col), hAlign, vAlign)
@@ -137,11 +143,11 @@ class HeaderBitmapColLabelRenderer(glr.GridLabelRenderer):
 class HeaderBitmapCornerLabelRenderer(glr.GridLabelRenderer):
 
 	def __init__(self, image):
-		self._bmp = wx.Bitmap(image, wx.BITMAP_TYPE_ANY)
+		self.img = image
 
 
 	def Draw(self, grid, dc, rect, rc):
-		x = rect.left + (rect.width - self._bmp.GetWidth()) / 2
-		y = rect.top + (rect.height - self._bmp.GetHeight()) / 2
+		x = rect.left + (rect.width - self.img.GetWidth()) / 2
+		y = rect.top + (rect.height - self.img.GetHeight()) / 2
 		self.DrawBorder(grid, dc, rect)
-		dc.DrawBitmap(self._bmp, x, y, True)
+		dc.DrawBitmap(self.img, x, y, True)

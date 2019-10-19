@@ -74,6 +74,8 @@ class ArmorTab:
 
 		self.initArmorTab()
 
+		self.init = True
+
 
 	def initArmorTab(self):
 		self.armorPanel = wx.Panel(self.mainNotebook)
@@ -140,47 +142,51 @@ class ArmorTab:
 
 
 	def initArmorTree(self):
-		self.armorTree = wx.ListCtrl(self.armorPanel, style=wx.LC_REPORT
-														| wx.LC_VRULES
-														| wx.LC_HRULES
-														)
-		self.armorTree.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onArmorSelection)
+		self.armorTree = cgr.HeaderBitmapGrid(self.armorPanel)
+		self.armorTree.EnableEditing(False)
+		self.armorTree.EnableDragRowSize(False)
+		self.armorTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onArmorSelection)
 		self.armorTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
+		self.init = False
+
+		armorTreeColumns = {
+			"Name": [324, wx.Bitmap("images/noImage24.png")],
+			"Slot I": [32, wx.Bitmap("images/weapon-detail-24/slots.png")],
+			"Slot II": [32, wx.Bitmap("images/weapon-detail-24/slots.png")],
+			"Slot III": [32, wx.Bitmap("images/weapon-detail-24/slots.png")],
+			"Defense": [32, wx.Bitmap("images/weapon-detail-24/defense.png")],
+			"Defense Max": [32, wx.Bitmap("images/weapon-detail-24/defense.png")],
+			"Defense Augmented Max": [32, wx.Bitmap("images/weapon-detail-24/defense.png")],
+			"Fire": [32, wx.Bitmap("images/damage-types-24/fire.png")],
+			"Water": [32, wx.Bitmap("images/damage-types-24/water.png")],
+			"Ice": [32, wx.Bitmap("images/damage-types-24/ice.png")],
+			"Thunder": [32, wx.Bitmap("images/damage-types-24/thunder.png")],
+			"Dragon": [32, wx.Bitmap("images/damage-types-24/dragon.png")],
+			"id": [0,  wx.Bitmap("images/noImage24.png")],
+			"armorSetID": [0, wx.Bitmap("images/noImage24.png")],
+		}
+
+		self.armorTree.CreateGrid(1, 14)
+		self.armorTree.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.armorTree.HideRowLabels()
+		self.armorTree.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		
+
+		for col, (k, v) in enumerate(armorTreeColumns.items()):
+			if col == 0:
+				self.armorTree.SetColLabelRenderer(col, cgr.HeaderBitmapColLabelRenderer(v[1], k))
+			else:
+				self.armorTree.SetColLabelRenderer(col, cgr.HeaderBitmapColLabelRenderer(v[1], ""))
+			self.armorTree.SetColSize(col, v[0])
 
 		self.il = ail.ArmorImageList()
-		self.armorTree.SetImageList(self.il.il, wx.IMAGE_LIST_SMALL)
 
 	def loadArmorTree(self):
 		try:
-			self.armorTree.ClearAll()
+			pass
+			self.armorTree.DeleteRows(0, self.armorTree.GetNumberRows())
 		except:
 			pass
-
-		armorTreeColumns = {
-			"Name": [357, -1],
-			"Slot I": [29, self.il.slots],
-			"Slot II": [29, self.il.slots],
-			"Slot III": [29, self.il.slots],
-			"Defense": [29, self.il.defense],
-			"Defense Max": [29, self.il.defense],
-			"Defense Augmented Max": [29, self.il.defense],
-			"Fire": [29, self.il.fire],
-			"Water": [29, self.il.water],
-			"Ice": [29, self.il.ice],
-			"Thunder": [29, self.il.thunder],
-			"Dragon": [29, self.il.dragon],
-			"id": [0, -1],
-			"armorSetID": [0, -1],
-		}
-
-		for col, (k, v) in enumerate(armorTreeColumns.items()):
-			info = wx.ListItem()
-			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-			info.Image = v[1]
-			info.Align = wx.LIST_FORMAT_CENTER
-			info.Text = k
-			self.armorTree.InsertColumn(col, info)
-			self.armorTree.SetColumnWidth(col, v[0])
 
 		sql = """
 			SELECT a.*, at.name, ast.name armorset_name
@@ -209,39 +215,50 @@ class ArmorTab:
 		"""
 
 		armorSet = "" 
+		row = 0
 		for a in armorList:
+			self.armorTree.AppendRows()
 			if a.armorSetName != armorSet:
-				img = self.il.armorIcons["armorset"][a.rarity]
+				img = wx.Bitmap(f"images/armor/armorset/rarity-24/{a.rarity}.png")
 				if a.armorSetName[0:11] == "King Beetle":
 					name = a.name.replace("King", "King / Queen")
-					armorSetNode = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"{name} ▼", img)
+					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+						img, f"        {name} ▼", hAlign=wx.ALIGN_LEFT, imageOffset=150))
 				else:
-					armorSetNode = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"{a.armorSetName} ▼", img)
+					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+						img, f"        {a.armorSetName} ▼", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+				self.armorTree.AppendRows()
+				row += 1
 			armorSet = a.armorSetName
-			img = self.il.armorIcons[a.armorType][a.rarity]
+			img = wx.Bitmap(f"images/armor/{a.armorType}/rarity-24/{a.rarity}.png")
 			if a.name[0:11] == "King Beetle":
 				name = a.name.replace("King", "King / Queen")
-				armorPiece = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"{name}", img) # TODO might need to have an empty image
+				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+					img, f"                {name}", hAlign=wx.ALIGN_LEFT, imageOffset=125))
 			else:
-				armorPiece = self.armorTree.InsertItem(self.armorTree.GetItemCount(), f"        {a.name}", img)
-			#self.armorTree.SetItem(armorPiece, 1, str(a.rarity))
-			self.armorTree.SetItem(armorPiece, 4, str(a.defenseBase))
-			self.armorTree.SetItem(armorPiece, 5, str(a.defenseMax))
-			self.armorTree.SetItem(armorPiece, 6, str(a.defenseAugmentedMax))
-			self.armorTree.SetItem(armorPiece, 7, str(a.fire))
-			self.armorTree.SetItem(armorPiece, 8, str(a.water))
-			self.armorTree.SetItem(armorPiece, 9, str(a.ice))
-			self.armorTree.SetItem(armorPiece, 10, str(a.thunder))
-			self.armorTree.SetItem(armorPiece, 11, str(a.dragon))
-			self.armorTree.SetItem(armorPiece, 12, str(a.id))
-			self.armorTree.SetItem(armorPiece, 13, str(a.armorSetID))
+				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+					img, f"                {a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=125))
+			self.armorTree.SetCellValue(row, 4, str(a.defenseBase))
+			self.armorTree.SetCellValue(row, 5, str(a.defenseMax))
+			self.armorTree.SetCellValue(row, 6, str(a.defenseAugmentedMax))
+			self.armorTree.SetCellValue(row, 7, str(a.fire))
+			self.armorTree.SetCellValue(row, 8, str(a.water))
+			self.armorTree.SetCellValue(row, 9, str(a.ice))
+			self.armorTree.SetCellValue(row, 10, str(a.thunder))
+			self.armorTree.SetCellValue(row, 11, str(a.dragon))
+			self.armorTree.SetCellValue(row, 12, str(a.id))
+			self.armorTree.SetCellValue(row, 13, str(a.armorSetID))
 
 			if a.slot1 != 0:
-				self.armorTree.SetItem(armorPiece, 1, str(a.slot1), self.il.slotIcons[a.slot1]) 
+				self.armorTree.SetCellRenderer(row, 1,  cgr.ImageCellRenderer(
+					wx.Bitmap("images/decoration-slots-24/1.png")))
 			if a.slot2 != 0:
-				self.armorTree.SetItem(armorPiece, 2, str(a.slot2), self.il.slotIcons[a.slot2]) 
+				self.armorTree.SetCellRenderer(row, 2, cgr.ImageCellRenderer(
+					wx.Bitmap("images/decoration-slots-24/2.png")))
 			if a.slot3 != 0:
-				self.armorTree.SetItem(armorPiece, 3, str(a.slot3), self.il.slotIcons[a.slot3]) 
+				self.armorTree.SetCellRenderer(row, 3,  cgr.ImageCellRenderer(
+					wx.Bitmap("images/decoration-slots-24/3.png")))
+			row += 1
 
 
 	def initArmorDetailTab(self):
@@ -791,27 +808,28 @@ class ArmorTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		self.currentlySelectedArmorID = self.armorTree.GetItemText(event.GetEventObject().GetFirstSelected(), 12)
-		self.currentlySelectedArmorSetID = self.armorTree.GetItemText(event.GetEventObject().GetFirstSelected(), 13)
+		if self.init:
+			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 12)
+			self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
 
-		if self.currentlySelectedArmorID != "":
-			self.armorDetailList.ClearGrid()
-			self.armorSkillList.ClearAll()
-			self.armorMaterialsList.ClearAll()
-			self.armorSetDetailList.ClearGrid()
-			self.armorSetSkillList.ClearAll()
-			self.armorSetMaterialList.ClearAll()
-		
-			self.loadArmorDetails()
-			self.loadArmorSkills()
-			self.loadArmorMaterials()
-			self.loadArmorSetDetails()
-			width, height = self.armorDetailPanel.GetSize()
-			self.armorDetailPanel.SetSize(width + 1, height + 1)
-			self.armorDetailPanel.SetSize(width, height)
-			width, height = self.armorSetPanel.GetSize()
-			self.armorSetPanel.SetSize(width + 1, height + 1)
-			self.armorSetPanel.SetSize(width, height)
+			if self.currentlySelectedArmorID != "":
+				self.armorDetailList.ClearGrid()
+				self.armorSkillList.ClearAll()
+				self.armorMaterialsList.ClearAll()
+				self.armorSetDetailList.ClearGrid()
+				self.armorSetSkillList.ClearAll()
+				self.armorSetMaterialList.ClearAll()
+			
+				self.loadArmorDetails()
+				self.loadArmorSkills()
+				self.loadArmorMaterials()
+				self.loadArmorSetDetails()
+				width, height = self.armorDetailPanel.GetSize()
+				self.armorDetailPanel.SetSize(width + 1, height + 1)
+				self.armorDetailPanel.SetSize(width, height)
+				width, height = self.armorSetPanel.GetSize()
+				self.armorSetPanel.SetSize(width + 1, height + 1)
+				self.armorSetPanel.SetSize(width, height)
 
 
 	def onSize(self, event):
