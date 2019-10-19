@@ -347,11 +347,13 @@ class MonstersTab:
 				else:
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, ailment)
 					if ailment not in textAilments:
-						self.summaryTree.SetItemText(genericSummaryNode, "", 1)
+						pass
 					else:
 						self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
 					self.summaryTree.SetItemImage(genericSummaryNode, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
-					self.summaryTree.Expand(self.monsterAilmentsNode)
+			if self.summaryTree.GetChildrenCount(self.monsterAilmentsNode) == 0:
+				genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, "None")
+			self.summaryTree.ExpandAll()
 
 		habitats = """
 			SELECT h.start_area, h.move_area, h.rest_area,
