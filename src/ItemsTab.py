@@ -171,6 +171,9 @@ class ItemsTab:
 
 
 	def loadCraftingList(self):
+		self.il.RemoveAll()
+		self.test = self.il.Add(self.testIcon)
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -403,12 +406,36 @@ class ItemsTab:
 
 		for com in combinations:
 			if com.secondName != None:
+				if com.resultCategory in ["item", "material", "misc"]:
+					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
+				elif com.resultCategory == "ammo":
+					if com.resultIconName == "Ammo":
+						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
+					elif com.resultIconName == "Bottle":
+						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
+				else:
+					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName} + {com.secondName}", img)
+			else:
+				if com.resultCategory in ["item", "material", "misc"]:
+					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
+				elif com.resultCategory == "ammo":
+					if com.resultIconName == "Ammo":
+						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
+					elif com.resultIconName == "Bottle":
+						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
+				else:
+					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
+			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
+
+			"""if com.secondName != None:
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(),
 					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
 			else:
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(),
-					f"{com.resultName} = {com.firstName}", self.test)
-			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
+					f"{com.resultName} = {com.firstName}", self.test)"""
+			
 
 		
 	def loadUsageCharms(self):
