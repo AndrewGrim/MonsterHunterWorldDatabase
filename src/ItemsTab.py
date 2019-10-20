@@ -429,15 +429,7 @@ class ItemsTab:
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
 
-			"""if com.secondName != None:
-				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(),
-					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
-			else:
-				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(),
-					f"{com.resultName} = {com.firstName}", self.test)"""
-			
 
-		
 	def loadUsageCharms(self):
 		sql = """
 			SELECT c.id, c.rarity, ctext.name, cr.quantity
@@ -459,7 +451,8 @@ class ItemsTab:
 			charms.append(c.CharmUsage(row))
 
 		for charm in charms:
-			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), charm.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), charm.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{charm.quantity}")
 
 
@@ -484,7 +477,8 @@ class ItemsTab:
 			armor.append(a.ArmorUsage(row))
 
 		for arm in armor:
-			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), arm.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.rarity}.png"))
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), arm.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{arm.quantity}")
 
 
@@ -507,7 +501,8 @@ class ItemsTab:
 			weapons.append(w.WeaponUsage(row))
 
 		for weapon in weapons:
-			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), weapon.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/weapons/{weapon.weaponType}/rarity-24/{weapon.rarity}.png"))
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), weapon.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{weapon.quantity}")
 
 
@@ -585,11 +580,27 @@ class ItemsTab:
 
 		for com in combinations:
 			if com.secondName != None:
-				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
-					f"{com.resultName} = {com.firstName} + {com.secondName}", self.test)
+				if com.resultCategory in ["item", "material", "misc"]:
+					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
+				elif com.resultCategory == "ammo":
+					if com.resultIconName == "Ammo":
+						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
+					elif com.resultIconName == "Bottle":
+						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
+				else:
+					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(), f"{com.resultName} = {com.firstName} + {com.secondName}", img)
 			else:
-				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
-					f"{com.resultName} = {com.firstName}", self.test)
+				if com.resultCategory in ["item", "material", "misc"]:
+					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
+				elif com.resultCategory == "ammo":
+					if com.resultIconName == "Ammo":
+						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
+					elif com.resultIconName == "Bottle":
+						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
+				else:
+					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemObtainingList.SetItem(index, 1, f"x {com.quantity}")
 
 
@@ -613,8 +624,9 @@ class ItemsTab:
 			locations.append(l.LocationObtaining(row))
 
 		for local in locations:
+			img = self.il.Add(wx.Bitmap(f"images/locations-24/{local.name}.png"))
 			index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
-				f"{local.name} - Area {local.area}", self.test)
+				f"{local.name} - Area {local.area}", img)
 			self.itemObtainingList.SetItem(index, 1, f"{local.stack} x {local.percentage}%")
 
 
@@ -644,8 +656,9 @@ class ItemsTab:
 			rewards.append(r.RewardObtaining(row))
 
 		for reward in rewards:
+			img = self.il.Add(wx.Bitmap(f"images/monsters/24/{reward.monsterName}.png"))
 			index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
-				f"{reward.monsterName} - {reward.rank} {reward.rewardName}", self.test)
+				f"{reward.monsterName} - {reward.rank} {reward.rewardName}", img)
 			self.itemObtainingList.SetItem(index, 1, f"{reward.stack} x {reward.percentage}%")
 
 
