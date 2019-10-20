@@ -46,7 +46,7 @@ class ItemsTab:
 		self.itemListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.itemDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.itemImage = wx.Bitmap("images/materials-160/LiquidGreen.png", wx.BITMAP_TYPE_ANY)
 		self.itemImageLabel = wx.StaticBitmap(self.itemPanel, bitmap=self.itemImage, size=(160, 160))
 
 		self.itemDetailsNotebook = wx.Notebook(self.itemPanel)
@@ -295,6 +295,13 @@ class ItemsTab:
 		data = data.fetchone()
 
 		item = i.Item(data)
+
+		if item.category in ["item", "material", "misc"]:
+			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/materials-160/{item.iconName}{item.iconColor}.png"))
+		elif item.iconName == "Ammo":
+			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/ammo-160/{item.iconName}{item.iconColor}.png"))
+		elif item.iconName == "Bottle":
+			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/coatings-160/{item.iconName}{item.iconColor}.png"))
 		
 		self.itemNameLabel.SetLabelText(f"\n{item.name}:")
 		self.itemDescriptionLabel.SetLabelText(item.description)
@@ -688,9 +695,6 @@ class ItemsTab:
 				self.currentItemName = name[:name.find(" =")]
 			else:
 				self.currentItemName = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
-			"""iconFile = self.itemList.GetCellValue(event.GetRow(), 2)
-			self.itemImage = wx.Bitmap(f"images/items/{category}/{iconFile}", wx.BITMAP_TYPE_ANY)
-			self.itemImageLabel.SetBitmap(self.itemImage)"""
 			self.loadItemDetail()
 			self.loadItemUsage()
 			self.loadItemObtaining()
