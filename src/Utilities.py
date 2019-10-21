@@ -197,3 +197,13 @@ class Link:
 
 	def __repr__(self):
 		return f"{self.__dict__!r}"
+
+
+class RedirectText():
+
+	def __init__(self, wxTextCtrl):
+		self.out = wxTextCtrl
+
+
+	def write(self, string):
+		self.out.WriteText(string)

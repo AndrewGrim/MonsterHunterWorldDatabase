@@ -2,6 +2,7 @@ import wx
 import wx.grid
 import time
 import sys
+import platform
 
 import CustomGridRenderer as cgr
 import MonstersTab as m
@@ -38,14 +39,14 @@ class Application(wx.Frame):
 
 		self.initMainNotebook()
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
-		#w.WeaponsTab(root, self.mainNotebook)
-		#a.ArmorTab(root, self.mainNotebook)
+		w.WeaponsTab(root, self.mainNotebook)
+		a.ArmorTab(root, self.mainNotebook)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
-		#d.DecorationsTab(root, self.mainNotebook)
-		#s.SkillsTab(root, self.mainNotebook)
-		#c.CharmsTab(root, self.mainNotebook)
-		#l.LocationsTab(root, self.mainNotebook)
-		#k.KinsectsTab(root, self.mainNotebook)
+		d.DecorationsTab(root, self.mainNotebook)
+		s.SkillsTab(root, self.mainNotebook)
+		c.CharmsTab(root, self.mainNotebook)
+		l.LocationsTab(root, self.mainNotebook)
+		k.KinsectsTab(root, self.mainNotebook)
 			
 		self.makeMenuBar()
 		self.CreateStatusBar()
@@ -59,6 +60,8 @@ class Application(wx.Frame):
 		self.mainNotebook.SetSelection(1)
 
 		self.Show()
+		if "-debug" in cmdArgs:
+			self.debugWindow(None)
 
 
 	def initMainNotebook(self):
@@ -109,15 +112,38 @@ class Application(wx.Frame):
 		helpMenu = wx.Menu()
 		aboutItem = helpMenu.Append(wx.ID_ABOUT)
 
+		optionsMenu = wx.Menu()
+		debugItem = optionsMenu.Append(-1, "Debug")
+
 		menuBar = wx.MenuBar()
 		menuBar.Append(fileMenu, "&File")
 		menuBar.Append(helpMenu, "&Help")
+		menuBar.Append(optionsMenu, "&Options")
 
 		self.SetMenuBar(menuBar)
 
 		self.Bind(wx.EVT_MENU, self.OnHello, helloItem)
 		self.Bind(wx.EVT_MENU, self.OnExit,  exitItem)
 		self.Bind(wx.EVT_MENU, self.OnAbout, aboutItem)
+		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
+
+
+	def debugWindow(self, event):
+		self.log = wx.LogWindow(self, "Debug", show=True)
+		frame = self.log.GetFrame()
+		frame.SetSize(400, self.windowHeight)
+		frame.SetPosition((self.GetPosition()[0] - 385, self.GetPosition()[1]))
+		text = self.log.GetFrame().GetChildren()[0]
+
+		assert type(text) == wx.TextCtrl, "Redirect target is not wxTextCtrl!"
+
+		wx.Log.SetActiveTarget(self.log)
+
+		redir=util.RedirectText(text)
+		sys.stdout=redir
+		sys.stderr=redir
+
+		self.SetFocus()
 
 
 	def OnExit(self, event):
@@ -139,7 +165,7 @@ if __name__ == '__main__':
 	app = wx.App()
 	frm = Application(None, title="Database")
 	end = time.time()
-	print("application load time: " + str(end - start))
+	print(f"Application load time: {round(end - start, 2)}s")
 	if "-speedTest" in sys.argv:
 		speedTest = True
 	else:
