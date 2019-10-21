@@ -37,15 +37,16 @@ class Application(wx.Frame):
 		self.link = util.Link()
 
 		self.initMainNotebook()
+
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
 		w.WeaponsTab(root, self.mainNotebook)
 		a.ArmorTab(root, self.mainNotebook)
-		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
+		c.CharmsTab(root, self.mainNotebook)
 		d.DecorationsTab(root, self.mainNotebook)
 		s.SkillsTab(root, self.mainNotebook)
-		c.CharmsTab(root, self.mainNotebook)
+		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		l.LocationsTab(root, self.mainNotebook)
-		k.KinsectsTab(root, self.mainNotebook)
+		#k.KinsectsTab(root, self.mainNotebook)
 			
 		self.makeMenuBar()
 		self.CreateStatusBar()
@@ -56,7 +57,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(1)
+		self.mainNotebook.SetSelection(0)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -94,8 +95,13 @@ class Application(wx.Frame):
 				self.items.loadItemDetail()
 				self.items.loadItemUsage()
 				self.items.loadItemObtaining()
-				self.mainNotebook.SetSelection(1) # TEST needs to be changed if more tabs are loaded
-				# prob make a dict for all the tabs with their respective indexes
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Items":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index) 
 
 
 	# TODO make a preferences page
