@@ -15,11 +15,15 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 	colour = (r,g,b)
 	selectedColour = (r,g,b)
 	"""
-	def __init__(self, img = wx.NullBitmap, label = "", colour = wx.WHITE, selectedColour = (0, 120, 215),
+	def __init__(self, img = wx.NullBitmap, label = "", colour = None, selectedColour = None,
 		autoImageOffset = False, imageOffset = 50, hAlign = wx.ALIGN_CENTER):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
+		if colour == None:
+			colour = wx.SystemSettings().GetColour(wx.SYS_COLOUR_WINDOW)
 		self.colour = colour
+		if selectedColour == None:
+			selectedColour = wx.SystemSettings().GetColour(wx.SYS_COLOUR_HIGHLIGHT)
 		self.selectedColour = selectedColour
 		self.label = label
 		self.autoImageOffset = autoImageOffset
@@ -73,10 +77,14 @@ class ImageCellRenderer(wx.grid.GridCellRenderer):
 	colour = (r,g,b)
 	selectedColour = (r,g,b)
 	"""
-	def __init__(self, img, colour = wx.WHITE, selectedColour = (0, 120, 215)):
+	def __init__(self, img, colour = None, selectedColour = None):
 		wx.grid.GridCellRenderer.__init__(self)
 		self.img = img
+		if colour == None:
+			colour = wx.SystemSettings().GetColour(wx.SYS_COLOUR_WINDOW)
 		self.colour = colour
+		if selectedColour == None:
+			selectedColour = wx.SystemSettings().GetColour(wx.SYS_COLOUR_HIGHLIGHT)
 		self.selectedColour = selectedColour
 
 
