@@ -36,7 +36,7 @@ class CharmsTab:
 		self.charmListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.charmDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.charmImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.charmImage = wx.Bitmap("images/charms/Artillery Charm I.png", wx.BITMAP_TYPE_ANY)
 		self.charmImageLabel = wx.StaticBitmap(self.charmPanel, bitmap=self.charmImage, size=(160, 160))
 
 		self.charmDetailsNotebook = wx.Notebook(self.charmPanel)
@@ -69,8 +69,7 @@ class CharmsTab:
 		self.charmListSizer.Add(self.charmList, 1, wx.EXPAND)
 		self.charmList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSkillSelected)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		self.il = wx.ImageList(24, 24)
 		self.test = self.il.Add(self.testIcon)
 		self.charmList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -105,7 +104,8 @@ class CharmsTab:
 			charms.append(c.Charm(row))
 
 		for charm in charms:
-			index = self.charmList.InsertItem(self.charmList.GetItemCount(), charm.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
+			index = self.charmList.InsertItem(self.charmList.GetItemCount(), charm.name, img)
 			self.charmList.SetItem(index, 1, f"{charm.id}")
 
 
@@ -169,7 +169,8 @@ class CharmsTab:
 		for skill in skills:
 			lvl = skill.level * "◈"
 			maxLvl = (skill.maxLevel - skill.level) * "◇"
-			index = self.charmSkillList.InsertItem(self.charmSkillList.GetItemCount(), skill.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
+			index = self.charmSkillList.InsertItem(self.charmSkillList.GetItemCount(), skill.name, img)
 			self.charmSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 		info = wx.ListItem()
@@ -208,7 +209,8 @@ class CharmsTab:
 		for row in data:
 			materials.append(cm.CharmMaterial(row))
 		for mat in materials:
-			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/materials-24/{mat.iconName}{mat.iconColor}.png"))
+			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, img)
 			self.materialList.SetItem(index, 1, f"{mat.quantity}")
 
 

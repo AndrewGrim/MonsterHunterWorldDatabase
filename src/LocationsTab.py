@@ -36,7 +36,7 @@ class LocationsTab:
 		self.locationListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.locationDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.locationImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.locationImage = wx.Bitmap("images/locations-160/Ancient Forest.png", wx.BITMAP_TYPE_ANY)
 		self.locationImageLabel = wx.StaticBitmap(self.locationPanel, bitmap=self.locationImage, size=(160, 160))
 
 		self.locationDetailsNotebook = wx.Notebook(self.locationPanel)
@@ -69,8 +69,7 @@ class LocationsTab:
 		self.locationListSizer.Add(self.locationList, 1, wx.EXPAND)
 		self.locationList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onLocationSelected)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		self.il = wx.ImageList(24, 24)
 		self.test = self.il.Add(self.testIcon)
 		self.locationList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -103,7 +102,8 @@ class LocationsTab:
 			locations.append(l.Location(row))
 
 		for location in locations:
-			index = self.locationList.InsertItem(self.locationList.GetItemCount(), location.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/locations-24/{location.name}.png"))
+			index = self.locationList.InsertItem(self.locationList.GetItemCount(), location.name, img)
 			self.locationList.SetItem(index, 1, f"{location.id}")
 
 
@@ -128,6 +128,7 @@ class LocationsTab:
 
 	def loadLocationDetail(self):
 		self.locationNameLabel.SetLabelText(f"\n{self.currentLocationName}")
+		self.locationImageLabel.SetBitmap(wx.Bitmap(f"images/locations-160/{self.currentLocationName}.png"))
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -160,8 +161,9 @@ class LocationsTab:
 		camps = []
 		for row in data:
 			camps.append(lbc.LocationBaseCamp(row))
+		img = self.il.Add(wx.Bitmap(f"images/locations-24/camp.png"))
 		for camp in camps:
-			index = self.baseCampList.InsertItem(self.baseCampList.GetItemCount(), camp.name, self.test)
+			index = self.baseCampList.InsertItem(self.baseCampList.GetItemCount(), camp.name, img)
 			self.baseCampList.SetItem(index, 1, f"Area {camp.area}")
 
 		info = wx.ListItem()
@@ -209,7 +211,8 @@ class LocationsTab:
 		for row in data:
 			materials.append(lm.LocationMaterial(row))
 		for mat in materials:
-			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/materials-24/{mat.iconName}{mat.iconColor}.png"))
+			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, img)
 			self.materialList.SetItem(index, 1, f"{mat.stack} x {mat.percentage}%")
 			self.materialList.SetItem(index, 2, f"Area {mat.area}")
 

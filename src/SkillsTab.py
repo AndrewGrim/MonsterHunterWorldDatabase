@@ -19,6 +19,7 @@ import SkillDecoration as sdeco
 import SkillCharm as sch
 import SkillArmor as aarm
 import SkillArmorSetBonus as aarmsb
+import Utilities as util
 
 class SkillsTab:
 
@@ -38,7 +39,7 @@ class SkillsTab:
 		self.skillListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.skillDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.skillImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.skillImage = wx.Bitmap("images/skills-160/SkillViolet.png", wx.BITMAP_TYPE_ANY)
 		self.skillImageLabel = wx.StaticBitmap(self.skillPanel, bitmap=self.skillImage, size=(160, 160))
 
 		self.skillDetailsNotebook = wx.Notebook(self.skillPanel)
@@ -71,8 +72,7 @@ class SkillsTab:
 		self.skillListSizer.Add(self.skillList, 1, wx.EXPAND)
 		self.skillList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSkillSelected)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		self.il = wx.ImageList(24, 24)
 		self.test = self.il.Add(self.testIcon)
 		self.skillList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -105,7 +105,11 @@ class SkillsTab:
 			skills.append(s.Skill(row))
 
 		for skill in skills:
-			index = self.skillList.InsertItem(self.skillList.GetItemCount(), skill.name, self.test)
+			if skill.iconColor != None:
+				img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+			index = self.skillList.InsertItem(self.skillList.GetItemCount(), skill.name, img)
 			self.skillList.SetItem(index, 1, f"{skill.id}")
 
 
@@ -170,8 +174,10 @@ class SkillsTab:
 		for skill in skills:
 			lvl = skill.skillLevel * "◈"
 			maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
-			index = self.skillDetailList.InsertItem(self.skillDetailList.GetItemCount(), f"{lvl}{maxLvl}", self.test)
+			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
+			index = self.skillDetailList.InsertItem(self.skillDetailList.GetItemCount(), f"{lvl}{maxLvl}", img)
 			self.skillDetailList.SetItem(index, 1, skill.skillLevelDescription)
+		self.skillImageLabel.SetBitmap(wx.Bitmap(f"images/skills-160/Skill{skill.iconColor}.png"))
 		if skills[0].skillMaxLevel == 1:
 			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].name}:\n{skills[0].skillLevelDescription}")
 		else:
@@ -192,7 +198,7 @@ class SkillsTab:
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
-		info.Align = wx.LIST_FORMAT_LEFT
+		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.foundList.InsertColumn(1, info)
 		self.foundList.SetColumnWidth(1, 100)
@@ -232,7 +238,8 @@ class SkillsTab:
 		for deco in decorations:
 			lvl = deco.skillLevel * "◈"
 			maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
-			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.decorationIconColor}.png"))
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 		
@@ -263,7 +270,8 @@ class SkillsTab:
 		for charm in charms:
 			lvl = charm.skillLevel * "◈"
 			maxLvl = (charm.skillMaxLevel - charm.skillLevel) * "◇"
-			index = self.foundList.InsertItem(self.foundList.GetItemCount(), charm.name, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), charm.name, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 
@@ -295,7 +303,8 @@ class SkillsTab:
 		for arm in armor:
 			lvl = arm.skillLevel * "◈"
 			maxLvl = (arm.skillMaxLevel - arm.skillLevel) * "◇"
-			index = self.foundList.InsertItem(self.foundList.GetItemCount(), arm.armorName, self.test)
+			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.armorRarity}.png"))
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), arm.armorName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 
@@ -323,7 +332,8 @@ class SkillsTab:
 			setBonuses.append(aarmsb.SkillArmorSetBonus(row))
 	
 		for bonus in setBonuses:
-			index = self.foundList.InsertItem(self.foundList.GetItemCount(), f"{bonus.name} / {bonus.setBonusName}", self.test)
+			img = self.il.Add(wx.Bitmap(f"images/skills-24/SetBonus{util.setBonusColors[bonus.setBonusName]}.png"))
+			index = self.foundList.InsertItem(self.foundList.GetItemCount(), f"{bonus.name} / {bonus.setBonusName}", img)
 			self.foundList.SetItem(index, 1, f"Req. {bonus.setBonusRequired}")
 
 

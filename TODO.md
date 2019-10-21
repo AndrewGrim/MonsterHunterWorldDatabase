@@ -25,28 +25,25 @@
   - [x] probably change to listctrl since grid can be painful to work with sometimes
   - [x] images
   - [x] layout
-- [ ] decorations tab
-  - [ ] images
+- [x] decorations tab
+  - [x] images
   - [x] layout
-- [ ] skills tab
-  - [ ] images
+- [x] skills tab
+  - [x] images
   - [x] layout
 - [ ] charms tab
   - [ ] images
-  - [ ] layout
-- [ ] locations tab
-  - [ ] images
+  - [x] layout
+- [x] locations tab
+  - [x] images
   - [x] layout
 - [ ] kinsect tab
   - [x] layout
   - [ ] images
 - [ ] prep all images
-  - [ ] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
-  - [ ] make different sizes for taskbar and window icons
-  - [ ] make all the variations of images ie different colors/sizes
+  - [x] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
+  - [x] make all the variations of images ie different colors/sizes
   - [x] make better transparent icons - right now it only works if its on a white background!!!
-  - [x] make 325px monster images
-  - [ ] resize some 325px monster images to have a border around them
 - [x] probably rework damage tab, so that each section is divided into their own collapsible panes: physical, element, break
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
@@ -58,8 +55,8 @@
 - [ ] update with iceborne info - prob make a separate version
 - [ ] wishlist support
 - [ ] write documentation - which might force me to change sql strings??
-- [ ] support for different resolution by changing the font and pixel sizes accordingly - wx.Window ToDIP()
 - [ ] on double click show the weapon/armor etc. basically link stuff
+  - [x] monster materials to items link
 - [ ] change all the awful strings to fstrings
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
 - [ ] organize src files into separate folders

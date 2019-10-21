@@ -34,7 +34,7 @@ class DecorationsTab:
 		self.decorationListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.decorationDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.decorationImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.decorationImage = wx.Bitmap("images/materials-160/FeystoneViolet.png", wx.BITMAP_TYPE_ANY)
 		self.decorationImageLabel = wx.StaticBitmap(self.decorationPanel, bitmap=self.decorationImage, size=(160, 160))
 
 		self.decorationDetailsNotebook = wx.Notebook(self.decorationPanel)
@@ -67,8 +67,7 @@ class DecorationsTab:
 		self.decorationListSizer.Add(self.decorationList, 1, wx.EXPAND)
 		self.decorationList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onDecorationSelected)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		self.il = wx.ImageList(24, 24)
 		self.test = self.il.Add(self.testIcon)
 		self.decorationList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -83,7 +82,6 @@ class DecorationsTab:
 		self.decorationList.SetColumnWidth(0, 680)
 		self.decorationList.InsertColumn(1, info)
 		self.decorationList.SetColumnWidth(1, 0)
-
 
 		sql = """
 			SELECT d.id, dt.name, d.slot, d.icon_color
@@ -103,7 +101,11 @@ class DecorationsTab:
 			decorations.append(d.Decoration(row))
 
 		for deco in decorations:
-			index = self.decorationList.InsertItem(self.decorationList.GetItemCount(), deco.name, self.test)
+			if deco.iconColor != None:
+				img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.iconColor}.png"))
+			else:
+				img = self.test
+			index = self.decorationList.InsertItem(self.decorationList.GetItemCount(), deco.name, img)
 			self.decorationList.SetItem(index, 1, f"{deco.id}")
 
 
@@ -140,7 +142,6 @@ class DecorationsTab:
 		self.skillList.InsertColumn(1, info)
 		self.skillList.SetColumnWidth(1, 100)
 
-
 		sql = """
 			SELECT d.*, dtext.name,
 				s.id skill_id, stext.name skill_name, s.max_level skill_max_level, s.icon_color skill_icon_color,
@@ -166,7 +167,12 @@ class DecorationsTab:
 		deco = dd.DecorationDetail(data)
 		lvl = deco.skillLevel * "◈"
 		maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
-		index = self.skillList.InsertItem(self.skillList.GetItemCount(), deco.skillName, self.test)
+		self.decorationImageLabel.SetBitmap(wx.Bitmap(f"images/materials-160/Feystone{deco.iconColor}.png"))
+		if deco.iconColor != None:
+			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{deco.skillIconColor}.png"))
+		else:
+			img = self.test
+		index = self.skillList.InsertItem(self.skillList.GetItemCount(), deco.skillName, img)
 		self.skillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
 		self.loadDecorationDrop(deco)
@@ -191,13 +197,18 @@ class DecorationsTab:
 		self.dropList.InsertColumn(1, info)
 		self.dropList.SetColumnWidth(1, 100)
 
-		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Mysterious Feystone", self.test)
+		
+		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneGray.png"))
+		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Mysterious Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.mysteriousFeystonePercent}%")
-		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Glowing Feystone", self.test)
+		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneBlue.png"))
+		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Glowing Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.glowingFeystonePercent}%")
-		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Worn Feystone", self.test)
+		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneBeige.png"))
+		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Worn Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.wornFeystonePercent}%")
-		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Warped Feystone", self.test)
+		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneRed.png"))
+		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Warped Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.warpedFeystonePercent}%")
 
 
