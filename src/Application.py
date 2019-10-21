@@ -30,8 +30,7 @@ class Application(wx.Frame):
 			self.windowHeight = int(cmdArgs[index + 2])
 
 		root = self
-		icon = wx.Icon("images/OfflineDatabase.ico") # TODO possibly change to nerg for base game and velkhana for iceborne, same with pyinstaller icon
-		self.SetIcon(icon)
+		self.SetIcon(wx.Icon("images/Nergigante.png"))
 		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
 
@@ -131,6 +130,7 @@ class Application(wx.Frame):
 	def debugWindow(self, event):
 		self.log = wx.LogWindow(self, "Debug", show=True)
 		frame = self.log.GetFrame()
+		frame.SetIcon(wx.Icon("images/Nergigante.png"))
 		frame.SetSize(400, self.windowHeight)
 		frame.SetPosition((self.GetPosition()[0] - 385, self.GetPosition()[1]))
 		text = self.log.GetFrame().GetChildren()[0]

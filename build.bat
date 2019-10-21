@@ -1,2 +1,1 @@
-del /f mhwdb_debug.exe & pyinstaller -F src\Application.py & ren dist\Application.exe mhwdb_debug.exe & move dist\mhwdb_debug.exe ..\MonsterHunterWorld &
-del /f mhwdb.exe & pyinstaller -w -F -i images\OfflineDatabase.ico src\Application.py & ren dist\Application.exe mhwdb.exe & move dist\mhwdb.exe ..\MonsterHunterWorld  
+del /f MHWDB.exe & pyinstaller -w -F -i images\Nergigante.ico src\Application.py & move dist\Application.exe ..\MonsterHunterWorld & ren Application.exe MHWDB.exe

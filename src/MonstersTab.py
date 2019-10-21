@@ -40,9 +40,6 @@ class MonstersTab:
 		self.initMonsterDamage()
 		self.initMonsterMaterials()
 
-		# for scaling the columns
-		#self.monstersTable.Bind(wx.EVT_SIZE, self.onSize)
-
 		# TEST defaults to materials tab
 		# PREFERENCES make this customizable
 		self.monsterDetailsNotebook.SetSelection(0)
