@@ -135,7 +135,7 @@ class Application(wx.Frame):
 		frame.SetPosition((self.GetPosition()[0] - 385, self.GetPosition()[1]))
 		text = self.log.GetFrame().GetChildren()[0]
 
-		assert type(text) == wx.TextCtrl, "Redirect target is not wxTextCtrl!"
+		assert type(text) == wx.TextCtrl, "Redirect target must be a wx.TextCtrl!"
 
 		wx.Log.SetActiveTarget(self.log)
 

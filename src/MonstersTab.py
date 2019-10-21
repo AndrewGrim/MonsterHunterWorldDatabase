@@ -30,6 +30,7 @@ class MonstersTab:
 		self.currentMonsterSize = "large"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
 		self.ilMats = wx.ImageList(24, 24)
+		self.ilMats.Add(self.testIcon) # to prevent crash on linux, gtk wants at least one image in image list before you set it
 
 		self.initMonstersTab()
 		self.initMonsterSizeButtons()

@@ -3,27 +3,27 @@
 - [x] split source into more files/classes
 - [x] monsters tab
 - [x] weapons tab
-  - [ ] weapons tree
+  - [x] weapons tree
   - [x] weapon detail
     - [x] add checks for colors
     - [ ] change all instances of song/songs to melody/melodies since thats the language the game uses
-    - [ ] images for ammo and notes still need to be done
-- [ ] armor tab
+    - [x] images for ammo and notes still need to be done
+- [x] armor tab
   - [x] armor tree
-  - [ ] individual pieces / armor set images - individual easy peasy, set might be annoying or just not up to standard
-  - [ ] armor detail
+  - [x] individual pieces / armor set images - individual easy peasy, set might be annoying or just not up to standard
+  - [x] armor detail
     - [x] detail
     - [x] skills
     - [x] req. mats
-    - [ ] icons for mats and skills
-  - [ ] armor set detail
+    - [x] icons for mats and skills
+  - [x] armor set detail
     - [x] detail
     - [x] skills
     - [x] req. mats
-    - [ ] icons for mats and skills
-- [ ] item tab
-  - [ ] probably change to listctrl since grid can be painful to work with sometimes
-  - [ ] images
+    - [x] icons for mats and skills
+- [x] item tab
+  - [x] probably change to listctrl since grid can be painful to work with sometimes
+  - [x] images
   - [x] layout
 - [ ] decorations tab
   - [ ] images
@@ -65,3 +65,4 @@
 - [ ] organize src files into separate folders
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
+- [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow

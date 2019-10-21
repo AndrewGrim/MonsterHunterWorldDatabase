@@ -126,7 +126,6 @@ class WeaponsTab:
 		self.weaponDetailPanel = wx.Panel(self.weaponDetailsNotebook)
 		self.weaponSongsPanel = wx.Panel(self.weaponDetailsNotebook)
 		self.weaponAmmoPanel = wx.Panel(self.weaponDetailsNotebook)
-		#self.weaponFamilyPanel = wx.Panel(self.weaponDetailsNotebook) # REMOVE i dont think this is much use
 		
 		self.weaponDetailSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponDetailsNotebook.AddPage(self.weaponDetailPanel, "Detail")
@@ -140,9 +139,6 @@ class WeaponsTab:
 		self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
 		self.weaponAmmoPanel.SetSizer(self.weaponAmmoSizer)
 		
-		#self.weaponFamilySizer = wx.BoxSizer(wx.VERTICAL) # REMOVE i dont think this is much use
-		#self.weaponDetailsNotebook.AddPage(self.weaponFamilyPanel, "Family") # REMOVE i dont think this is much use
-		
 		self.weaponsDetailedSizer.Add(self.weaponImageLabel, 1, wx.ALIGN_CENTER)
 		self.weaponsDetailedSizer.Add(self.weaponDetailsNotebook, 3, wx.EXPAND)
 
@@ -154,9 +150,6 @@ class WeaponsTab:
 		self.initWeaponButtons()
 		self.initWeaponsTree()
 		self.initWeaponDetailTab()
-
-		#self.weaponDetailPanel.SetAutoLayout(1)
-		#self.weaponDetailPanel.SetupScrolling()
 
 
 	def initWeaponButtons(self):
@@ -367,11 +360,7 @@ class WeaponsTab:
 		self.weaponsTree.SetColumnWidth(6, 29)
 		self.weaponsTree.SetColumnWidth(7, 29)
 
-		# TODO either set to 8 or 14 or all or none, i'm gravitating towards none since the images will be self explanatory
-		#self.weaponsTree.SetColumnImage(14, self.weaponTreeIcons[14])
-
 		for num in range(8, 15):
-			#self.weaponsTree.SetColumnImage(num, self.weaponTreeIcons[num]) # REMOVE
 			self.weaponsTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
 			self.weaponsTree.SetColumnWidth(num, 26)
 		
@@ -497,9 +486,6 @@ class WeaponsTab:
 			weapon.SetImage(6, self.decorationSlotsIcons[row[9]], wx.TreeItemIcon_Normal)
 		if row[10] != 0:
 			weapon.SetImage(7, self.decorationSlotsIcons[row[10]], wx.TreeItemIcon_Normal)
-		#self.weaponsTree.SetItemText(weapon, str(row[8]), 5) # TODO split into 3 three cols, with an appropriate image for each
-		#self.weaponsTree.SetItemText(weapon, str(row[9]), 6) # TODO split into 3 three cols, with an appropriate image for each
-		#self.weaponsTree.SetItemText(weapon, str(row[10]), 7) # TODO split into 3 three cols, with an appropriate image for each
 		
 		# sharpness
 		try:
@@ -746,8 +732,6 @@ class WeaponsTab:
 		}
 
 		for num in range(self.weaponRowNumbers[self.currentWeaponTree]):
-			self.weaponDetailList.SetCellBackgroundColour(num, 0, util.hexToRGB("#FFFFFF"))
-			self.weaponDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#FFFFFF"))
 			self.weaponDetailList.SetCellRenderer(num, 0, wx.grid.GridCellStringRenderer())
 			self.weaponDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
 			self.weaponDetailList.SetCellValue(num, 0, "-")
@@ -1286,23 +1270,3 @@ class WeaponsTab:
 		except:
 			self.weaponDetailList.SetColSize(0, 302)
 			self.weaponDetailList.SetColSize(1, 155 - 20)
-
-		#print(self.root.GetSize())
-
-		# TODO make each sharpness column have the appropriate bg colour, i probably need to make a custom class
-		#for num in range(10):
-		#	self.weaponsTree.SetColumnColour(num, wx.Colour(255, 1, 1))
-		#self.weaponsTree.SetBackgroundColour(wx.Colour(255, 1, 1))
-		#self.weaponsTree.Refresh()
-
-		"""# TEST
-		#print(self.weaponsPanel.GetSize()[0] * 0.70 - 400 - 7 * 24 - 6 * 35 - 15)
-		self.weaponsTree.SetColumnWidth(0, self.weaponsPanel.GetSize()[0] * 0.70 * 0.43)
-		for num in range(1, 6):
-			self.weaponsTree.SetColumnWidth(num, self.weaponsPanel.GetSize()[0] * 0.70 * 0.05)
-
-		for num in range(6, 13):
-			self.weaponsTree.SetColumnWidth(num, self.weaponsPanel.GetSize()[0] * 0.70 * 0.03)
-		
-		self.weaponsTree.SetColumnWidth(5, self.weaponsPanel.GetSize()[0] * 0.70 * 0.08)
-		self.weaponsTree.SetColumnWidth(13, 0)"""
