@@ -1,0 +1,42 @@
+class Weapon:
+
+	def __init__(self, dbRow):
+		self.id = dbRow[0]
+		self.weapon_type = dbRow[1]
+		self.category = dbRow[2]
+		self.rarity = dbRow[3]
+		self.attack = dbRow[4]
+		self.attack_true = dbRow[5]
+		self.affinity = dbRow[6]
+		self.defense = dbRow[7]
+		self.slot_1 = dbRow[8]
+		self.slot_2 = dbRow[9]
+		self.slot_3 = dbRow[10]
+		self.element1 = dbRow[11]
+		self.element1_attack = dbRow[12]
+		self.element2 = dbRow[13]
+		self.element2_attack = dbRow[14]
+		self.element_hidden = dbRow[15]
+		self.sharpness = dbRow[16]
+		self.sharpness_maxed = dbRow[17]
+		self.previous_weapon_id = dbRow[18]
+		self.craftable = dbRow[19]
+		self.kinsect_bonus = dbRow[20]
+		self.elderseal = dbRow[21]
+		self.phial = dbRow[22]
+		self.phial_power = dbRow[23]
+		self.shelling = dbRow[24]
+		self.shelling_level = dbRow[25]
+		self.coating_close = dbRow[26]
+		self.coating_power = dbRow[27]
+		self.coating_poison = dbRow[28]
+		self.coating_paralysis = dbRow[29]
+		self.coating_sleep = dbRow[30]
+		self.coating_blast = dbRow[31]
+		self.notes = dbRow[32]
+		self.special_ammo = dbRow[33]
+		self.name = dbRow[34]
+
+
+	def __repr__(self):
+		return f"{self.__dict__!r}"

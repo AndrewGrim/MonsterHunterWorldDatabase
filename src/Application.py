@@ -15,6 +15,7 @@ import CharmsTab as c
 import LocationsTab as l
 import KinsectsTab as k
 import Utilities as util
+import Links as link
 
 class Application(wx.Frame):
 
@@ -34,9 +35,19 @@ class Application(wx.Frame):
 		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
 
-		self.link = util.Link()
+		self.link = link.Link()
 
 		self.initMainNotebook()
+		il = wx.ImageList(24, 24)
+		mon = il.Add(wx.Bitmap("images/Nergigante24.png"))
+		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/6.png"))
+		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
+		charm = il.Add(wx.Bitmap("images/charms-24/7.png"))
+		deco = il.Add(wx.Bitmap("images/materials-24/FeystoneGold.png"))
+		skill = il.Add(wx.Bitmap("images/skills-24/SkillBlue.png"))
+		item = il.Add(wx.Bitmap("images/materials-24/TrapGreen.png"))
+		local = il.Add(wx.Bitmap("images/locations-24/Elder's Recess.png"))
+		self.mainNotebook.AssignImageList(il)
 
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
 		w.WeaponsTab(root, self.mainNotebook)
@@ -47,7 +58,16 @@ class Application(wx.Frame):
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		l.LocationsTab(root, self.mainNotebook)
 		#k.KinsectsTab(root, self.mainNotebook)
-			
+
+		self.mainNotebook.SetPageImage(0, mon)
+		self.mainNotebook.SetPageImage(1, wep)
+		self.mainNotebook.SetPageImage(2, arm)
+		self.mainNotebook.SetPageImage(3, charm)
+		self.mainNotebook.SetPageImage(4, deco)
+		self.mainNotebook.SetPageImage(5, skill)
+		self.mainNotebook.SetPageImage(6, item)
+		self.mainNotebook.SetPageImage(7, local)	
+
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
