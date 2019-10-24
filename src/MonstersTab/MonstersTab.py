@@ -537,8 +537,9 @@ class MonstersTab:
 			self.breakDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.extractColors[row[3]]))
 			self.breakDamageTable.SetCellValue(index, 4, f"{row[3].capitalize()}")
 
-		self.root.SetSize(1419, 900)
-		self.root.SetSize(1420, 900)
+		w, h = self.root.GetSize()
+		self.root.SetSize(w - 1, h)
+		self.root.SetSize(w, h)
 
 	
 	def initMonsterMaterials(self):

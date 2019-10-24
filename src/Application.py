@@ -101,8 +101,9 @@ class Application(wx.Frame):
 
 	def onTabChanged(self, event):
 		if event.GetEventObject() == self.mainNotebook:
-			self.SetSize(self.windowWidth + 3, self.windowHeight)
-			self.SetSize(self.windowWidth, self.windowHeight)
+			w, h = self.GetSize()
+			self.SetSize(w + 3, h)
+			self.SetSize(w, h)
 
 
 	def followLink(self):
@@ -138,7 +139,7 @@ class Application(wx.Frame):
 		aboutItem = helpMenu.Append(wx.ID_ABOUT)
 
 		optionsMenu = wx.Menu()
-		debugItem = optionsMenu.Append(-1, "Debug")
+		debugItem = optionsMenu.Append(-1, "&Debug\tCtrl-D", "A debug window that redirects the wx errors and stdout/sterr to itself.")
 
 		menuBar = wx.MenuBar()
 		menuBar.Append(fileMenu, "&File")
@@ -181,8 +182,14 @@ class Application(wx.Frame):
 
 
 	def OnAbout(self, event):
-		wx.MessageBox("This is a wxPython Hello World sample",
-						"About Hello World 2",
+		# TODO make a custom messagebox with links to github profiles
+		#https://wxpython.org/Phoenix/docs/html/wx.MessageDialog.html
+		#https://wxpython.org/Phoenix/docs/html/wx.lib.agw.hyperlink.HyperLinkCtrl.html
+		wx.MessageBox("Created by github.com/AndrewGrim.\n" + 
+						"This application uses a database and images made by github.com/gatheringhallstudios\n" +
+						"as well as some of their SQL queries and their sharpness adjust function.\n" +
+						"All licenses are MIT.",
+						"About",
 						wx.OK|wx.ICON_INFORMATION)
 
 

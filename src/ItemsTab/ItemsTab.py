@@ -76,8 +76,6 @@ class ItemsTab:
 		self.initItemObtaining()
 		self.loadItemObtaining()
 
-		self.root.SetSize(self.root.windowWidth, self.root.windowHeight) # REMOVE if you move away from grid
-
 
 	def initItemButtons(self):
 		self.itemsButton = wx.Button(self.itemPanel, label="Items", name="item")
