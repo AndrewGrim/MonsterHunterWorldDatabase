@@ -1,41 +1,7 @@
 # TODO
 
-- [x] split source into more files/classes
-- [x] monsters tab
-- [x] weapons tab
-  - [x] weapons tree
-  - [x] weapon detail
-    - [x] add checks for colors
-    - [ ] change all instances of song/songs to melody/melodies since thats the language the game uses
-    - [x] images for ammo and notes still need to be done
-- [x] armor tab
-  - [x] armor tree
-  - [x] individual pieces / armor set images - individual easy peasy, set might be annoying or just not up to standard
-  - [x] armor detail
-    - [x] detail
-    - [x] skills
-    - [x] req. mats
-    - [x] icons for mats and skills
-  - [x] armor set detail
-    - [x] detail
-    - [x] skills
-    - [x] req. mats
-    - [x] icons for mats and skills
-- [x] item tab
-  - [x] probably change to listctrl since grid can be painful to work with sometimes
-  - [x] images
-  - [x] layout
-- [x] decorations tab
-  - [x] images
-  - [x] layout
-- [x] skills tab
-  - [x] images
-  - [x] layout
 - [ ] charms tab
   - [ ] images
-  - [x] layout
-- [x] locations tab
-  - [x] images
   - [x] layout
 - [ ] kinsect tab
   - [x] layout
@@ -44,7 +10,6 @@
   - [x] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
   - [x] make all the variations of images ie different colors/sizes
   - [x] make better transparent icons - right now it only works if its on a white background!!!
-- [x] probably rework damage tab, so that each section is divided into their own collapsible panes: physical, element, break
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
   - [ ] habitat data
@@ -64,10 +29,14 @@
 - [ ] change some TODO tags to ICEBORNE
 - [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow
 - [ ] change all "row[index]" to object.attribute
-  - [ ] WeaponsTab
-    - [x] weapon tree
-    - [x] melodies
-    - [x] weapon detail, materials
   - [ ] MonstersTab
 - [ ] change column width to adjust dynamically according to the window size, for some of the widgets
+- [ ] change back the eq images to have a black background since its proving problematic
+- [ ] get images for all levels of charms
+- [ ] add colors to ele res cells in armor tab
+- [ ] next to summary in monster tab maybe put in-game charts for breaks
+- [ ] proper icons for appraisail kulve weapons
+- [ ] resize egg icon or make proper svg
+- [ ] get icons for kinsect tab
+- [ ] preferences
   
