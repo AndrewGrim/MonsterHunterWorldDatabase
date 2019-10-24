@@ -623,29 +623,29 @@ class WeaponsTab:
 
 		affinity = "-"
 		if wep.affinity != 0:
-			affinity = str(wep.affinity) + "%"
+			affinity = f"{wep.affinity}%"
 
 		element1 = "-"
 		if wep.element1 == None:
 			pass
 		elif wep.element_hidden == 0:
-			element1 = str(wep.element1) + " " + str(wep.element1_attack)
+			element1 = f"{wep.element1} {wep.element1_attack}"
 		elif wep.element_hidden == 1:
-			element1 = str(wep.element1) + " (" + str(wep.element1_attack) + ")"
+			element1 = f"{wep.element1} ({wep.element1_attack})"
 
 		element2 = "-"
 		if wep.element2 == None:
 			pass
 		else:
-			element2 = str(wep.element2) + " " + str(wep.element2_attack)
+			element2 = f"{wep.element2} {wep.element2_attack}"
 
 		elderseal = "-"
 		if wep.elderseal != None:
-			elderseal = str(wep.elderseal).capitalize()
+			elderseal = wep.elderseal.capitalize()
 
 		defense = "-"
 		if wep.defense > 0:
-			defense = "+" + str(wep.defense)
+			defense = f"+{wep.defense}"
 
 		phial = "-"
 		if wep.phial != None:
@@ -711,7 +711,7 @@ class WeaponsTab:
 		note2 = str(wep.notes)[1]
 		note3 = str(wep.notes)[2]
 
-		shelling = str(wep.shelling).capitalize() + " Lv " + str(wep.shelling_level)
+		shelling = f"{str(wep.shelling).capitalize()} Lv {wep.shelling_level}"
 		
 
 		additionalDetails = {
@@ -779,20 +779,22 @@ class WeaponsTab:
 				self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D7CCC8"))
 
 			if key in ["Slot I", "Slot II", "Slot III"]:
-				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/slots.png"), key))	
+				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+					wx.Bitmap("images/weapon-detail-24/slots.png"), key))	
 				if value[0] != 0:
-					self.weaponDetailList.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(wx.Bitmap("images/decoration-slots-24/" + str(value[0]) + ".png"), str(value[0])))
+					self.weaponDetailList.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(
+						wx.Bitmap(f"images/decoration-slots-24/{value[0]}.png"), str(value[0])))
 				else:
 					self.weaponDetailList.SetCellValue(row, 1, str(value[0]))
 			if key in ["Element I", "Element II"]:
 				try:
 					if str(value[0].split(" ")[0]) != "-":
-						self.weaponDetailList.SetCellRenderer(row, 0, \
-							cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/element.png") \
-							, key, util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
-						self.weaponDetailList.SetCellRenderer(row, 1, \
-							cgr.ImageTextCellRenderer(wx.Bitmap("images/damage-types-24/" + str(value[0].split(" ")[0]) + ".png") \
-							, value[0], util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
+						self.weaponDetailList.SetCellRenderer(row, 0,
+							cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/element.png"),
+								key,util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
+						self.weaponDetailList.SetCellRenderer(row, 1,
+							cgr.ImageTextCellRenderer(wx.Bitmap(f"images/damage-types-24/{str(value[0].split(' ')[0])}.png"),
+								value[0], util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
 				except:
 					self.weaponDetailList.SetCellValue(row, 1, "-")
 			else:
@@ -802,10 +804,11 @@ class WeaponsTab:
 					self.weaponDetailList.SetCellValue(row, 1, str(value[0]))
 			try:
 				if key == "Rarity":
-					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( \
-						"images/weapons/" + self.currentWeaponTree + "/rarity-24/" + str(value[0]) + ".png"), key))
+					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+						wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/rarity-24/{value[0]}.png"), key))
 				else:
-					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap(self.weaponDetailIcons[key]), key))
+					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+						wx.Bitmap(self.weaponDetailIcons[key]), key))
 			except:
 				pass
 
@@ -1066,11 +1069,11 @@ class WeaponsTab:
 					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, img)
 					self.weaponAmmoList.SetItem(index, 1, str(data[col]))
 					if data[col + 1] == 1:
-						self.weaponAmmoList.SetItem(index, 2, "Rapid+" + str(data[col + 2]))
+						self.weaponAmmoList.SetItem(index, 2, f"Rapid+{data[col + 2]}")
 					elif data[col + 2] == - 1:
 						self.weaponAmmoList.SetItem(index, 2, "Auto Reload")
 					else:
-						self.weaponAmmoList.SetItem(index, 2, "Normal+" + str(data[col + 2]))
+						self.weaponAmmoList.SetItem(index, 2, f"Normal+{data[col + 2]}")
 					self.weaponAmmoList.SetItem(index, 3, str(data[col + 3]).capitalize())
 			if col == 127:
 				col += 2
@@ -1218,7 +1221,9 @@ class WeaponsTab:
 			A list of the unmodified sharpness when sharpnessMaxed is True or
 			A list of the readjusted sharpness values when sharpnessMaxed is False.
 		"""
+
 		assert handicraftLevel >= 0 and handicraftLevel <= 5, "Handicraft only goes from 0 to 5!"
+		
 		if sharpnessMaxed:
 			return data[16].split(",")
 		else:
@@ -1242,11 +1247,11 @@ class WeaponsTab:
 		if self.currentlySelectedWeaponID != "":
 			weaponName = (self.weaponsTree.GetItemText(event.GetItem(), 0)).replace(" 🔨", "").replace("\"", "'")
 			weaponType = self.currentWeaponTree
-			placeholder = self.currentWeaponTree
-			if os.path.isfile("images/weapons/" + weaponType + "/" + weaponName + ".png"):
-				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + weaponName + ".png", wx.BITMAP_TYPE_ANY)
+			placeholder = "noImage"
+			if os.path.isfile(f"images/weapons/{weaponType}/{weaponName}.png"):
+				self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{weaponName}.png", wx.BITMAP_TYPE_ANY)
 			else:
-				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
+				self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{placeholder}.png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.ClearGrid()
 			self.weaponMelodiesList.ClearGrid()
@@ -1255,7 +1260,7 @@ class WeaponsTab:
 				self.weaponSharpnessTable.ClearGrid()
 			except:
 				pass
-			self.materialsRequiredList.ClearAll() # propertygrid actually needs a page otherwise clear doesnt work
+			self.materialsRequiredList.ClearAll()
 	
 			self.loadWeaponDetails()
 			self.loadWeaponMaterials()

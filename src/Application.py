@@ -40,7 +40,7 @@ class Application(wx.Frame):
 		self.initMainNotebook()
 		il = wx.ImageList(24, 24)
 		mon = il.Add(wx.Bitmap("images/Nergigante24.png"))
-		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/6.png"))
+		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/5.png"))
 		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
 		charm = il.Add(wx.Bitmap("images/charms-24/7.png"))
 		deco = il.Add(wx.Bitmap("images/materials-24/FeystoneGold.png"))

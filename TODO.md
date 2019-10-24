@@ -63,3 +63,11 @@
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
 - [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow
+- [ ] change all "row[index]" to object.attribute
+  - [ ] WeaponsTab
+    - [x] weapon tree
+    - [x] melodies
+    - [x] weapon detail, materials
+  - [ ] MonstersTab
+- [ ] change column width to adjust dynamically according to the window size, for some of the widgets
+  
