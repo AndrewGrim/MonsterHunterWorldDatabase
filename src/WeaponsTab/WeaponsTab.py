@@ -14,6 +14,7 @@ from typing import Tuple
 from typing import Dict
 from typing import NewType
 import Utilities as util
+import WeaponsTab as w
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 
@@ -124,16 +125,16 @@ class WeaponsTab:
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponsPanel)
 		self.weaponDetailPanel = wx.Panel(self.weaponDetailsNotebook)
-		self.weaponSongsPanel = wx.Panel(self.weaponDetailsNotebook)
+		self.weaponMelodiesPanel = wx.Panel(self.weaponDetailsNotebook)
 		self.weaponAmmoPanel = wx.Panel(self.weaponDetailsNotebook)
 		
 		self.weaponDetailSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponDetailsNotebook.AddPage(self.weaponDetailPanel, "Detail")
 		self.weaponDetailPanel.SetSizer(self.weaponDetailSizer)
 
-		self.weaponSongsSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
-		self.weaponSongsPanel.SetSizer(self.weaponSongsSizer)
+		self.weaponMelodiesSizer = wx.BoxSizer(wx.VERTICAL)
+		self.weaponDetailsNotebook.AddPage(self.weaponMelodiesPanel, "Melodies")
+		self.weaponMelodiesPanel.SetSizer(self.weaponMelodiesSizer)
 
 		self.weaponAmmoSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
@@ -426,18 +427,22 @@ class WeaponsTab:
 
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentWeaponTree, ))
-		# TODO change row to Weapon object(already made)
+		data = data.fetchall()
 
 		weaponNodes = {}
+		weapons = []
 
 		for row in data:
-			if row[2] != "Kulve":
-				if row[18] == None:
-					self.populateWeaponsTree(normalWeaponNode, row, weaponNodes)
+			weapons.append(w.Weapon(row))
+
+		for wep in weapons:
+			if wep.category != "Kulve":
+				if wep.previous_weapon_id == None:
+					self.populateWeaponsTree(normalWeaponNode, wep, weaponNodes)
 				else:
-					self.populateWeaponsTree(weaponNodes[row[18]], row, weaponNodes)
+					self.populateWeaponsTree(weaponNodes[wep.previous_weapon_id], wep, weaponNodes)
 			else:
-				self.populateWeaponsTree(kulveWeaponNode, row, weaponNodes)
+				self.populateWeaponsTree(kulveWeaponNode, wep, weaponNodes)
 
 		# PREFERENCES again add this as a setting in the preferences window/tab/whatever
 		self.weaponsTree.ExpandAll()
@@ -445,53 +450,53 @@ class WeaponsTab:
 		#self.weaponsTree.Expand(kulveWeaponNode)
 
 
-	def populateWeaponsTree(self, weaponNode: wxTreeListItem, row: Tuple[str], weaponNodes: Dict[int, wxTreeListItem]) -> None:
-		if bool(row[19]):
-			# TODO maybe add rarity in a similar manner?? row[3]
-			name = str(row[34]) + " 🔨" # TODO make this clearer that it means craftable
+	def populateWeaponsTree(self, weaponNode: wxTreeListItem, wep: Tuple[str], weaponNodes: Dict[int, wxTreeListItem]) -> None:
+		if bool(wep.craftable):
+			# TODO maybe add rarity in a similar manner?? wep.rarity
+			name = str(wep.name) + " 🔨" # TODO make this clearer that it means craftable
 		else:
-			name = str(row[34])
+			name = str(wep.name)
 		weapon = self.weaponsTree.AppendItem(weaponNode,  name)
-		self.weaponsTree.SetItemText(weapon, str(row[4]), 1)
+		self.weaponsTree.SetItemText(weapon, str(wep.attack), 1)
 
 		# TODO change the element implementation to the one below in weapon detail, shorten the name column
-		if row[15] == 0 and row[12] == None:
+		if wep.element_hidden == 0 and wep.element1_attack == None:
 			element = ""
-		elif row[15] == 1:
-			element = "(" + str(row[12]) + ")"
+		elif wep.element_hidden == 1:
+			element = "(" + str(wep.element1_attack) + ")"
 		else:
-			element = str(row[12])
+			element = str(wep.element1_attack)
 		try:
-			weapon.SetImage(2, self.damageTypes[row[11]], wx.TreeItemIcon_Normal)
+			weapon.SetImage(2, self.damageTypes[wep.element1], wx.TreeItemIcon_Normal)
 		except:
 			pass
-		if row[14] != None:
+		if wep.element2_attack != None:
 			# either keep this custom icon or change back to generic element
 			weapon.SetImage(2, self.iceAndBlast, wx.TreeItemIcon_Normal)
-		if row[6] == 0:
+		if wep.affinity == 0:
 			affinity = ""
 		else:
-			affinity = str(row[6]) + "%" # TODO maybe add a plus in here when affinity is positive
-		if row[7] == 0:
+			affinity = str(wep.affinity) + "%" # TODO maybe add a plus in here when affinity is positive
+		if wep.defense == 0:
 			defense = ""
 		else:
-			defense = "+" + str(row[7])
+			defense = "+" + str(wep.defense)
 
 		self.weaponsTree.SetItemText(weapon, element, 2) 
 		self.weaponsTree.SetItemText(weapon, affinity, 3)
 		self.weaponsTree.SetItemText(weapon, defense, 4)
 
-		if row[8] != 0:
-			weapon.SetImage(5, self.decorationSlotsIcons[row[8]], wx.TreeItemIcon_Normal)
-		if row[9] != 0:
-			weapon.SetImage(6, self.decorationSlotsIcons[row[9]], wx.TreeItemIcon_Normal)
-		if row[10] != 0:
-			weapon.SetImage(7, self.decorationSlotsIcons[row[10]], wx.TreeItemIcon_Normal)
+		if wep.slot_1 != 0:
+			weapon.SetImage(5, self.decorationSlotsIcons[wep.slot_1], wx.TreeItemIcon_Normal)
+		if wep.slot_2 != 0:
+			weapon.SetImage(6, self.decorationSlotsIcons[wep.slot_2], wx.TreeItemIcon_Normal)
+		if wep.slot_3 != 0:
+			weapon.SetImage(7, self.decorationSlotsIcons[wep.slot_3], wx.TreeItemIcon_Normal)
 		
 		# sharpness
 		try:
-			sharpnessSplit = str(row[16]).replace("(", "").replace(")", "").replace(" ", "").split(",")
-			weaponName = row[34].replace('"', "'") + ".png"
+			sharpnessSplit = str(wep.sharpness).replace("(", "").replace(")", "").replace(" ", "").split(",")
+			weaponName = wep.name.replace('"', "'") + ".png"
 			weapon.SetImage(8, self.sharpnessImages[weaponName], wx.TreeItemIcon_Normal)
 			weapon.SetImage(9, self.sharpnessImages[weaponName] + 1, wx.TreeItemIcon_Normal)
 			weapon.SetImage(10, self.sharpnessImages[weaponName] + 2, wx.TreeItemIcon_Normal)
@@ -512,10 +517,10 @@ class WeaponsTab:
 
 		
 		# id - hidden, icon
-		self.weaponsTree.SetItemText(weapon, str(row[0]), 15)
+		self.weaponsTree.SetItemText(weapon, str(wep.id), 15)
 
-		self.weaponsTree.SetItemImage(weapon, self.rarityIcons[row[3]], which=wx.TreeItemIcon_Normal)
-		weaponNodes[row[0]] = weapon
+		self.weaponsTree.SetItemImage(weapon, self.rarityIcons[wep.rarity], which=wx.TreeItemIcon_Normal)
+		weaponNodes[wep.id] = weapon
 
 
 	def initWeaponDetailTab(self):
@@ -547,31 +552,31 @@ class WeaponsTab:
 		self.materialsRequiredList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.weaponDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND)
 
-		self.weaponSongsList = cgr.HeaderBitmapGrid(self.weaponSongsPanel)
-		self.weaponSongsList.EnableEditing(False)
-		self.weaponSongsList.EnableDragRowSize(False)
-		self.weaponSongsList.CreateGrid(15, 7)
+		self.weaponMelodiesList = cgr.HeaderBitmapGrid(self.weaponMelodiesPanel)
+		self.weaponMelodiesList.EnableEditing(False)
+		self.weaponMelodiesList.EnableDragRowSize(False)
+		self.weaponMelodiesList.CreateGrid(15, 7)
 
-		self.weaponSongsList.SetColLabelSize(0)
-		self.weaponSongsList.SetRowLabelSize(0)
-		self.weaponSongsList.SetColLabelValue(0, "")
-		self.weaponSongsList.SetColLabelValue(1, "")
-		self.weaponSongsList.SetColLabelValue(2, "")
-		self.weaponSongsList.SetColLabelValue(3, "")
-		self.weaponSongsList.SetColLabelValue(4, "Duration")
-		self.weaponSongsList.SetColLabelValue(5, "Extension")
-		self.weaponSongsList.SetColLabelValue(6, "Effects")
+		self.weaponMelodiesList.SetColLabelSize(0)
+		self.weaponMelodiesList.SetRowLabelSize(0)
+		self.weaponMelodiesList.SetColLabelValue(0, "")
+		self.weaponMelodiesList.SetColLabelValue(1, "")
+		self.weaponMelodiesList.SetColLabelValue(2, "")
+		self.weaponMelodiesList.SetColLabelValue(3, "")
+		self.weaponMelodiesList.SetColLabelValue(4, "Duration")
+		self.weaponMelodiesList.SetColLabelValue(5, "Extension")
+		self.weaponMelodiesList.SetColLabelValue(6, "Effects")
 
-		self.weaponSongsList.SetColSize(0, 26)
-		self.weaponSongsList.SetColSize(1, 26)
-		self.weaponSongsList.SetColSize(2, 26)
-		self.weaponSongsList.SetColSize(3, 26)
-		self.weaponSongsList.SetColSize(4, 55)
-		self.weaponSongsList.SetColSize(5, 60)
+		self.weaponMelodiesList.SetColSize(0, 26)
+		self.weaponMelodiesList.SetColSize(1, 26)
+		self.weaponMelodiesList.SetColSize(2, 26)
+		self.weaponMelodiesList.SetColSize(3, 26)
+		self.weaponMelodiesList.SetColSize(4, 55)
+		self.weaponMelodiesList.SetColSize(5, 60)
 
-		self.weaponSongsList.SetDefaultRowSize(32, resizeExistingRows=True)
-		self.weaponSongsList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.weaponSongsSizer.Add(self.weaponSongsList, 1, wx.EXPAND)
+		self.weaponMelodiesList.SetDefaultRowSize(32, resizeExistingRows=True)
+		self.weaponMelodiesList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.weaponMelodiesSizer.Add(self.weaponMelodiesList, 1, wx.EXPAND)
 
 		self.weaponAmmoList = wx.ListCtrl(self.weaponAmmoPanel, style=wx.LC_REPORT
 																	#| wx.LC_NO_HEADER
@@ -614,35 +619,37 @@ class WeaponsTab:
 		data = conn.execute(sql, (self.currentlySelectedWeaponID, "en"))
 		data = data.fetchone()
 
+		wep = w.Weapon(data)
+
 		affinity = "-"
-		if data[6] != 0:
-			affinity = str(data[6]) + "%"
+		if wep.affinity != 0:
+			affinity = str(wep.affinity) + "%"
 
 		element1 = "-"
-		if data[11] == None:
+		if wep.element1 == None:
 			pass
-		elif data[15] == 0:
-			element1 = str(data[11]) + " " + str(data[12])
-		elif data[15] == 1:
-			element1 = str(data[11]) + " (" + str(data[12]) + ")"
+		elif wep.element_hidden == 0:
+			element1 = str(wep.element1) + " " + str(wep.element1_attack)
+		elif wep.element_hidden == 1:
+			element1 = str(wep.element1) + " (" + str(wep.element1_attack) + ")"
 
 		element2 = "-"
-		if data[13] == None:
+		if wep.element2 == None:
 			pass
 		else:
-			element2 = str(data[13]) + " " + str(data[14])
+			element2 = str(wep.element2) + " " + str(wep.element2_attack)
 
 		elderseal = "-"
-		if data[21] != None:
-			elderseal = str(data[21]).capitalize()
+		if wep.elderseal != None:
+			elderseal = str(wep.elderseal).capitalize()
 
 		defense = "-"
-		if data[7] > 0:
-			defense = "+" + str(data[7])
+		if wep.defense > 0:
+			defense = "+" + str(wep.defense)
 
 		phial = "-"
-		if data[22] != None:
-			phial = data[22]
+		if wep.phial != None:
+			phial = wep.phial
 
 		close = ""
 		power = ""
@@ -650,30 +657,30 @@ class WeaponsTab:
 		poison = ""
 		sleep = ""
 		blast = ""
-		if data[26] == 1:
+		if wep.coating_close == 1:
 			close = "✓"
-		if data[27] == 1:
+		if wep.coating_power == 1:
 			power = "✓"
-		if data[28] == 1:
+		if wep.coating_poison == 1:
 			paralysis = "✓"
-		if data[29] == 1:
+		if wep.coating_paralysis == 1:
 			poison = "✓"
-		if data[30] == 1:
+		if wep.coating_sleep == 1:
 			sleep = "✓"
-		if data[31] == 1:
+		if wep.coating_blast == 1:
 			blast = "✓"
 
 		# TODO prob replaces any "None"'s with "-" or ""
 		weaponDetail = {
-			"Rarity": (data[3], self.rarityIcons[data[3]]),
-			"Attack": (data[4], self.attack),
-			"Attack (True)": (data[5], self.attack),
+			"Rarity": (wep.rarity, self.rarityIcons[wep.rarity]),
+			"Attack": (wep.attack, self.attack),
+			"Attack (True)": (wep.attack_true, self.attack),
 			"Affinity": (affinity, self.affinity),
 			"Element I": (element1, self.element),
 			"Element II": (element2, self.element),
-			"Slot I": (data[8], self.slots),
-			"Slot II": (data[9], self.slots),
-			"Slot III": (data[10], self.slots),
+			"Slot I": (wep.slot_1, self.slots),
+			"Slot II": (wep.slot_2, self.slots),
+			"Slot III": (wep.slot_3, self.slots),
 			"Elderseal": (elderseal, self.elderseal),
 			"Defense": (defense, self.defense),
 		}
@@ -700,29 +707,29 @@ class WeaponsTab:
 		# 31 = blast
 
 	
-		note1 = str(data[32])[0]
-		note2 = str(data[32])[1]
-		note3 = str(data[32])[2]
+		note1 = str(wep.notes)[0]
+		note2 = str(wep.notes)[1]
+		note3 = str(wep.notes)[2]
 
-		shelling = str(data[24]).capitalize() + " Lv " + str(data[25])
+		shelling = str(wep.shelling).capitalize() + " Lv " + str(wep.shelling_level)
 		
 
 		additionalDetails = {
-			"switch-axe": ["Phial Type", str(data[22]).capitalize(), self.phialType],
-			"charge-blade": ["Phial Type", str(data[22]).capitalize(), self.phialType],
+			"switch-axe": ["Phial Type", str(wep.phial).capitalize(), self.phialType],
+			"charge-blade": ["Phial Type", str(wep.phial).capitalize(), self.phialType],
 			"gunlance": ["Shelling", shelling, self.shelling],
-			"insect-glaive": ["Kinsect Bonus", str(data[20]).capitalize(), self.kinsectBonus],
+			"insect-glaive": ["Kinsect Bonus", str(wep.kinsect_bonus).capitalize(), self.kinsectBonus],
 
 			"hunting-horn": ["Notes", self.notes,
 							"Note I", note1, self.note1,
 							"Note II", note2, self.note2,
 							"Note III", note3, self.note3,],
 
-			"light-bowgun": ["Special Ammo", data[33], self.specialAmmo,
-							"Deviation", data[34], self.deviation,],
+			"light-bowgun": ["Special Ammo", wep.special_ammo, self.specialAmmo,
+							"Deviation", wep.name, self.deviation,],
 
-			"heavy-bowgun": ["Special Ammo", data[33], self.specialAmmo,
-							"Deviation", data[34], self.deviation],
+			"heavy-bowgun": ["Special Ammo", wep.special_ammo, self.specialAmmo,
+							"Deviation", wep.name, self.deviation],
 
 			"bow": ["Close", close, self.closeCoating,
 					"Power", power, self.powerCoating,
@@ -740,8 +747,8 @@ class WeaponsTab:
 
 		for row, (key, value) in enumerate(weaponDetail.items()):
 			if key == "Rarity":
-				self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.rarityColors[data[3]]))
-				self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.rarityColors[data[3]]))
+				self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.rarityColors[wep.rarity]))
+				self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.rarityColors[wep.rarity]))
 			elif key == "Affinity":
 				try:
 					if int(affinity.replace("%", "")) > 0:
@@ -754,14 +761,14 @@ class WeaponsTab:
 					pass
 			elif key == "Element I":
 				try:
-					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[data[11]]))
-					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[data[11]]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[wep.element1]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[wep.element1]))
 				except:
 					pass
 			elif key == "Element II":
 				try:
-					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[data[13]]))
-					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[data[13]]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[wep.element2]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[wep.element2]))
 				except:
 					pass
 			elif key == "Elderseal" and elderseal != "-":
@@ -860,9 +867,9 @@ class WeaponsTab:
 				noteNum += 1
 				row += 1
 
-			self.weaponDetailsNotebook.AddPage(self.weaponSongsPanel, "Songs")
+			self.weaponDetailsNotebook.AddPage(self.weaponMelodiesPanel, "Melodies")
 			self.weaponDetailsNotebook.SetPageImage(1, self.notes)
-			self.loadHuntingHornSongs([additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][9]])
+			self.loadHuntingHornMelodies([additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][9]])
 
 		if self.currentWeaponTree not in ["light-bowgun", "heavy-bowgun", "bow"]:
 			# TODO i think we want to do the insert method but actually destroy the widget and note hide it,
@@ -872,7 +879,7 @@ class WeaponsTab:
 				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
-			sharpnessMaxed = bool(data[17])
+			sharpnessMaxed = bool(wep.sharpness_maxed)
 			sharpnessLevels = {}
 			for num in (5, 4, 3, 2, 1, 0):
 				sharpnessLevels[num] = self.adjustSharpness(num, sharpnessMaxed, data)	
@@ -1073,9 +1080,9 @@ class WeaponsTab:
 				col += 4
 
 
-	def loadHuntingHornSongs(self, notes: List[str]):
-		size = self.weaponSongsPanel.GetSize()[0] - 4 * 29 - 60 - 65 - 6 - 20 + 27
-		self.weaponSongsList.SetColSize(6, size)
+	def loadHuntingHornMelodies(self, notes: List[str]):
+		size = self.weaponMelodiesPanel.GetSize()[0] - 4 * 29 - 60 - 65 - 6 - 20 + 27
+		self.weaponMelodiesList.SetColSize(6, size)
 		noteNumbers = {
 			notes[0]: "Note1",
 			notes[1]: "Note2",
@@ -1095,38 +1102,43 @@ class WeaponsTab:
 		data = conn.execute(sql, ("en",))
 		data = data.fetchall()
 
-		addSong = True
-		songList = []
-		for song in data:
-			songNotes = self.splitNotes(str(song[1]))
-			for note in songNotes:
+		melodies = []
+
+		for row in data:
+			melodies.append(w.Melody(row))
+
+		addMelody = True
+		melodyList = []
+		for melody in melodies:
+			melodyNotes = self.splitNotes(str(melody.notes))
+			for note in melodyNotes:
 				if note not in notes:
-					addSong = False
+					addMelody = False
 					break
 				else:
-					addSong = True
-			if addSong:
-				songList.append(song)
+					addMelody = True
+			if addMelody:
+				melodyList.append(melody)
 	
 		try:
-			self.weaponSongsList.DeleteRows(len(songList), self.weaponSongsList.GetNumberRows())
+			self.weaponMelodiesList.DeleteRows(len(melodyList), self.weaponMelodiesList.GetNumberRows())
 		except:
 			pass
-		if self.weaponSongsList.GetNumberRows() < len(songList):
-			self.weaponSongsList.AppendRows(len(songList) - self.weaponSongsList.GetNumberRows())
-		for row, song in enumerate(songList):
-			for i in range(len(song[1])):
-				self.weaponSongsList.SetCellRenderer(row, i, cgr.ImageCellRenderer(
-					wx.Bitmap(f"images/notes-24/{noteNumbers[song[1][i]]}{self.noteColors[song[1][i]]}.png")))
-			self.weaponSongsList.SetCellFont(row, 4, 
+		if self.weaponMelodiesList.GetNumberRows() < len(melodyList):
+			self.weaponMelodiesList.AppendRows(len(melodyList) - self.weaponMelodiesList.GetNumberRows())
+		for row, melody in enumerate(melodyList):
+			for i in range(len(melody.notes)):
+				self.weaponMelodiesList.SetCellRenderer(row, i, cgr.ImageCellRenderer(
+					wx.Bitmap(f"images/notes-24/{noteNumbers[melody.notes[i]]}{self.noteColors[melody.notes[i]]}.png")))
+			self.weaponMelodiesList.SetCellFont(row, 4, 
 				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-			self.weaponSongsList.SetCellValue(row, 4, str(song[4]))
-			self.weaponSongsList.SetCellFont(row, 5, 
+			self.weaponMelodiesList.SetCellValue(row, 4, str(melody.duration))
+			self.weaponMelodiesList.SetCellFont(row, 5, 
 				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-			self.weaponSongsList.SetCellValue(row, 5, str(song[5]))
-			self.weaponSongsList.SetCellFont(row, 6, 
+			self.weaponMelodiesList.SetCellValue(row, 5, str(melody.extension))
+			self.weaponMelodiesList.SetCellFont(row, 6, 
 				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-			self.weaponSongsList.SetCellValue(row, 6, str(song[2]) + "\n" + str(song[3]))
+			self.weaponMelodiesList.SetCellValue(row, 6, f"{melody.effect1}\n{melody.effect2}")
 			
 	def splitNotes(self, notes: str) -> List[str]:
 		return [note for note in notes]
@@ -1237,7 +1249,7 @@ class WeaponsTab:
 				self.weaponImage = wx.Bitmap("images/weapons/" + weaponType + "/" + placeholder + ".png", wx.BITMAP_TYPE_ANY)
 			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.ClearGrid()
-			self.weaponSongsList.ClearGrid()
+			self.weaponMelodiesList.ClearGrid()
 			self.weaponAmmoList.ClearAll()
 			try:
 				self.weaponSharpnessTable.ClearGrid()
