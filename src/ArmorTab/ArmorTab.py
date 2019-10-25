@@ -113,6 +113,7 @@ class ArmorTab:
 		self.armorPanel.SetSizer(self.armorSizer)
 		
 		self.initArmorButtons()
+		self.initSearch()
 		self.initArmorTree()
 		self.loadArmorTree()
 		self.initArmorDetailTab()
@@ -138,6 +139,18 @@ class ArmorTab:
 		#self.armorButtonsSizer.Add(self.masterRankButton)
 
 		self.armorTreeSizer.Add(self.armorButtonsSizer)
+
+	
+	def initSearch(self):
+		self.search = wx.TextCtrl(self.armorPanel)
+		self.search.SetHint("  search by name")
+		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.armorButtonsSizer.Add(380, 0, 0)
+		self.armorButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+
+
+	def onSearchTextEnter(self, event):
+		self.loadArmorTree()
 
 
 	def initArmorTree(self):
@@ -187,16 +200,32 @@ class ArmorTab:
 		except:
 			pass
 
-		sql = """
-			SELECT a.*, at.name, ast.name armorset_name
-			FROM armor a
-				JOIN armor_text at USING (id)
-				JOIN armorset_text ast
-					ON ast.id = a.armorset_id
-					AND ast.lang_id = at.lang_id
-			WHERE at.lang_id = :langId
-			AND (:rank IS NULL OR a.rank = :rank)
-		"""
+		searchText = self.search.GetValue()
+
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT a.*, at.name, ast.name armorset_name
+				FROM armor a
+					JOIN armor_text at USING (id)
+					JOIN armorset_text ast
+						ON ast.id = a.armorset_id
+						AND ast.lang_id = at.lang_id
+				WHERE at.lang_id = :langId
+				AND (:rank IS NULL OR a.rank = :rank)
+			"""
+		else:
+			sql = f"""
+				SELECT a.*, at.name, ast.name armorset_name
+				FROM armor a
+					JOIN armor_text at USING (id)
+					JOIN armorset_text ast
+						ON ast.id = a.armorset_id
+						AND ast.lang_id = at.lang_id
+				WHERE at.lang_id = :langId
+				AND (:rank IS NULL OR a.rank = :rank)
+				AND at.name like '%{searchText}%'
+			"""
+
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, ("en", self.currentArmorTree))
 		data = data.fetchall()

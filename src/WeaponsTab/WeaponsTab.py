@@ -423,7 +423,7 @@ class WeaponsTab:
 			WHERE wt.lang_id = :langId
 				AND w.weapon_type = :weaponType
 			ORDER BY w.id ASC
-			"""
+		"""
 
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentWeaponTree, ))
@@ -1181,9 +1181,8 @@ class WeaponsTab:
 			ORDER BY 
 				w.recipe_type ASC,
 				i.id ASC
-				
-
 		"""
+		
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", self.currentlySelectedWeaponID))
 		data = data.fetchall()
