@@ -71,7 +71,7 @@ class Application(wx.Frame):
 		self.makeMenuBar()
 		self.CreateStatusBar()
 
-		self.SetStatusText("Welcome to wxPython!")
+		self.SetStatusText("Copyright © AndrewGrim https://github.com/AndrewGrim")
 
 		self.SetSize(self.windowWidth, self.windowHeight)
 		self.Center()
