@@ -24,7 +24,7 @@
   - [x] monster materials to items link
 - [ ] change all the awful strings to fstrings
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
-- [ ] organize src files into separate folders
+- [x] organize src files into separate folders
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
 - [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow
@@ -39,4 +39,7 @@
 - [ ] resize egg icon or make proper svg
 - [ ] get icons for kinsect tab
 - [ ] preferences
+- [ ] implement sorting
+- [ ] implement searching
+  - [x] armorTab
   

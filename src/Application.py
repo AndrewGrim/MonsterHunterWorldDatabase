@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(2)
+		self.mainNotebook.SetSelection(0)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -128,15 +128,10 @@ class Application(wx.Frame):
 	# TODO make a preferences page
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
-		# The "\t..." syntax defines an accelerator key that also triggers the same event
-		helloItem = fileMenu.Append(-1, "&Hello...\tCtrl-H",
-				"Help string shown in status bar for this menu item")
-		fileMenu.AppendSeparator()
-
-		exitItem = fileMenu.Append(wx.ID_EXIT)
+		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")
 
 		helpMenu = wx.Menu()
-		aboutItem = helpMenu.Append(wx.ID_ABOUT)
+		aboutItem = helpMenu.Append(-1, "&About\tCtrl-A", "Shows a dialog with information about the application.")
 
 		optionsMenu = wx.Menu()
 		debugItem = optionsMenu.Append(-1, "&Debug\tCtrl-D", "A debug window that redirects the wx errors and stdout/sterr to itself.")
@@ -148,7 +143,6 @@ class Application(wx.Frame):
 
 		self.SetMenuBar(menuBar)
 
-		self.Bind(wx.EVT_MENU, self.OnHello, helloItem)
 		self.Bind(wx.EVT_MENU, self.OnExit,  exitItem)
 		self.Bind(wx.EVT_MENU, self.OnAbout, aboutItem)
 		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
@@ -177,18 +171,16 @@ class Application(wx.Frame):
 		self.Close(True)
 
 
-	def OnHello(self, event):
-		wx.MessageBox("Hello again from wxPython")
-
-
 	def OnAbout(self, event):
 		# TODO make a custom messagebox with links to github profiles
 		#https://wxpython.org/Phoenix/docs/html/wx.MessageDialog.html
 		#https://wxpython.org/Phoenix/docs/html/wx.lib.agw.hyperlink.HyperLinkCtrl.html
 		wx.MessageBox("Created by github.com/AndrewGrim.\n" + 
-						"This application uses a database and images made by github.com/gatheringhallstudios\n" +
+						"This application uses a database and images from github.com/gatheringhallstudios\n" +
 						"as well as some of their SQL queries and their sharpness adjust function.\n" +
-						"All licenses are MIT.",
+						"All licenses are MIT.\n" +
+						"https://github.com/gatheringhallstudios/MHWorldDatabase\n" +
+						"https://github.com/gatheringhallstudios/MHWorldData",
 						"About",
 						wx.OK|wx.ICON_INFORMATION)
 
