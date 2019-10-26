@@ -52,11 +52,35 @@ class CharmsTab:
 
 		self.charmPanel.SetSizer(self.charmSizer)
 
+		self.initSearch()
 		self.initCharmList()
 		self.loadCharmList()
 
 		self.initCharmDetail()
 		self.loadCharmDetail()
+
+
+	def initSearch(self):
+		self.searchName = wx.TextCtrl(self.charmPanel, name="byName")
+		self.searchName.SetHint("  search by name")
+		self.searchName.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.searchSkill = wx.TextCtrl(self.charmPanel, name="bySkill")
+		self.searchSkill.SetHint("  search by skill")
+		self.searchSkill.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.currentSearch = self.searchName
+
+		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.searchSizer.Add(self.searchName)
+		self.searchSizer.Add(self.searchSkill)
+
+		self.charmListSizer.Add(self.searchSizer)
+
+
+	def onSearchTextEnter(self, event):
+		self.currentSearch = event.GetEventObject()
+		self.loadCharmList()
 
 
 	def initCharmList(self):
@@ -65,7 +89,7 @@ class CharmsTab:
 														| wx.LC_HRULES
 														)
 		self.charmListSizer.Add(self.charmList, 1, wx.EXPAND)
-		self.charmList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onSkillSelected)
+		self.charmList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onCharmSelected)
 
 		self.il = wx.ImageList(24, 24)
 		self.test = self.il.Add(self.testIcon)
@@ -73,6 +97,15 @@ class CharmsTab:
 
 
 	def loadCharmList(self):
+		try:
+			self.charmList.ClearAll()
+			try:
+				self.il.RemoveAll()
+			except:
+				pass
+		except:
+			pass
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -83,15 +116,43 @@ class CharmsTab:
 		self.charmList.InsertColumn(1, info)
 		self.charmList.SetColumnWidth(1, 0)
 
+		searchText = self.currentSearch.GetValue()
 
-		sql = """
-			SELECT c.*, ct.name
-			FROM charm c
-				JOIN charm_text ct
-					ON ct.id = c.id
-					AND ct.lang_id = :langId
-			ORDER BY ct.name
-		"""
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT c.*, ct.name
+				FROM charm c
+					JOIN charm_text ct
+						ON ct.id = c.id
+						AND ct.lang_id = :langId
+				ORDER BY ct.name
+			"""
+		else:
+			if self.currentSearch.GetName() == "bySkill":
+				sql = f"""
+					SELECT c.*, ct.name, stt.name
+					FROM charm c
+						JOIN charm_text ct
+							ON ct.id = c.id
+							AND ct.lang_id = :langId
+						JOIN charm_skill cs
+							ON cs.charm_id = c.id
+						JOIN skilltree_text stt
+							ON stt.id = cs.skilltree_id
+							AND stt.lang_id = :langId
+						WHERE stt.name LIKE '%{searchText}%'
+					ORDER BY ct.name
+				"""
+			else:
+				sql = f"""
+					SELECT c.*, ct.name
+					FROM charm c
+						JOIN charm_text ct
+							ON ct.id = c.id
+							AND ct.lang_id = :langId
+							AND ct.name LIKE '%{searchText}%'
+					ORDER BY ct.name
+				"""
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, ("en", ))
@@ -212,7 +273,7 @@ class CharmsTab:
 			self.materialList.SetItem(index, 1, f"{mat.quantity}")
 
 
-	def onSkillSelected(self, event):
+	def onCharmSelected(self, event):
 		self.currentCharmName = self.charmList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
 		self.currentCharmID = self.charmList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentCharmID) > 0:

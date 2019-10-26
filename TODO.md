@@ -7,9 +7,7 @@
   - [x] layout
   - [ ] images
 - [ ] prep all images
-  - [x] maybe set the application icon to nergigante for mhw and velkhana for mhwi??
-  - [x] make all the variations of images ie different colors/sizes
-  - [x] make better transparent icons - right now it only works if its on a white background!!!
+  - [ ] prob go back to eq images with black background
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
   - [ ] habitat data
@@ -43,4 +41,10 @@
 - [ ] implement searching
   - [x] armorTab
   - [x] monstersTabs
+  - [x] charmTab
+  - [ ] decoTab
+  - [ ] skillTab
+  - [ ] itemTab
+  - [ ] locationsTab
+  - [ ] kinsectsTab
   
