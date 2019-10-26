@@ -175,7 +175,7 @@ class MonstersTab:
 					ON m.id = mt.id
 				WHERE size = :size
 					AND mt.lang_id = :langId
-					AND mt.name like '%{searchText}%'
+					AND mt.name LIKE '%{searchText}%'
 			"""
 
 		conn = sqlite3.connect("mhw.db")
@@ -741,8 +741,6 @@ class MonstersTab:
 		#for col in range(numOfColumnsDamage):
 		#	self.damageTable.SetColSize(col, ((width * 0.66) / numOfColumnsDamage - 13))
 		#	self.damageTable.SetColSize(0, ((width * 0.66) / numOfColumnsDamage + 80))
-
-		# TODO set the splitter in property grid
 
 		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
 		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)

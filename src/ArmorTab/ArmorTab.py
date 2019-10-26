@@ -223,7 +223,7 @@ class ArmorTab:
 						AND ast.lang_id = at.lang_id
 				WHERE at.lang_id = :langId
 				AND (:rank IS NULL OR a.rank = :rank)
-				AND at.name like '%{searchText}%'
+				AND at.name LIKE '%{searchText}%'
 			"""
 
 		conn = sqlite3.Connection("mhw.db")
