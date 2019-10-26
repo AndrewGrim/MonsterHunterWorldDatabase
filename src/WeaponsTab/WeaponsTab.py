@@ -152,6 +152,8 @@ class WeaponsTab:
 		self.initWeaponsTree()
 		self.initWeaponDetailTab()
 
+		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
+
 
 	def initWeaponButtons(self):
 		# TODO change to appropriate icons
@@ -525,7 +527,6 @@ class WeaponsTab:
 
 	def initWeaponDetailTab(self):
 		self.weaponDetailList = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
-		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
 		self.weaponDetailList.EnableEditing(False)
 		self.weaponDetailList.EnableDragRowSize(False)
 		self.weaponDetailSizer.Add(self.weaponDetailList, 1, wx.EXPAND)
@@ -1281,9 +1282,7 @@ class WeaponsTab:
 		"""
 		When the application window is resized some columns's width gets readjusted.
 		"""
-		try:
-			self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
-			self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
-		except:
-			self.weaponDetailList.SetColSize(0, 302)
-			self.weaponDetailList.SetColSize(1, 155 - 20)
+		self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
+		self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.materialsRequiredList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
+		self.materialsRequiredList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
