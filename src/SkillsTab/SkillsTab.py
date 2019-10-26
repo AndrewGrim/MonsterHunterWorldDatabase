@@ -54,9 +54,10 @@ class SkillsTab:
 
 		self.initSkillList()
 		self.loadSkillList()
-
 		self.initSkillDetail()
 		self.loadSkillDetail()
+
+		self.skillList.Bind(wx.EVT_SIZE, self.onSize)
 
 
 	def initSkillList(self):
@@ -338,3 +339,10 @@ class SkillsTab:
 			self.skillDetailList.ClearAll()
 			self.foundList.ClearAll()
 		self.loadSkillDetail()
+
+
+	def onSize(self, event):
+		self.skillDetailList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.14)
+		self.skillDetailList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.86 - 20)
+		self.foundList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.66)
+		self.foundList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.34 - 20)

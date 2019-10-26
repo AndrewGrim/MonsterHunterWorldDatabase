@@ -57,6 +57,7 @@ class CharmsTab:
 		self.loadCharmList()
 		self.initCharmDetail()
 		self.loadCharmDetail()
+		
 		self.charmList.Bind(wx.EVT_SIZE, self.onSize)
 
 
