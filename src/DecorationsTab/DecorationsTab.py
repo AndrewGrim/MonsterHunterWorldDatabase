@@ -53,9 +53,10 @@ class DecorationsTab:
 
 		self.initDecorationList()
 		self.loadDecorationList()
-
 		self.initDecorationDetail()
 		self.loadDecorationDetail()
+
+		self.decorationList.Bind(wx.EVT_SIZE, self.onSize)
 
 
 	def initDecorationList(self):
@@ -217,3 +218,16 @@ class DecorationsTab:
 			self.skillList.ClearAll()
 			self.dropList.ClearAll()
 		self.loadDecorationDetail()
+
+
+	def onSize(self, event):
+		try:
+			self.skillList.SetColumnWidth(0, self.decorationDetailPanel.GetSize()[0] * 0.66)
+			self.skillList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.dropList.SetColumnWidth(0, self.decorationDetailPanel.GetSize()[0] * 0.66)
+			self.dropList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
+		except:
+			self.skillList.SetColumnWidth(0, 580)
+			self.skillList.SetColumnWidth(1, 100)
+			self.dropList.SetColumnWidth(0, 580)
+			self.dropList.SetColumnWidth(1, 100)
