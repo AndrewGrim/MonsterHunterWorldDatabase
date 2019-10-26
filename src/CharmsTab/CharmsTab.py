@@ -55,9 +55,9 @@ class CharmsTab:
 		self.initSearch()
 		self.initCharmList()
 		self.loadCharmList()
-
 		self.initCharmDetail()
 		self.loadCharmDetail()
+		self.charmList.Bind(wx.EVT_SIZE, self.onSize)
 
 
 	def initSearch(self):
@@ -280,3 +280,16 @@ class CharmsTab:
 			self.charmSkillList.ClearAll()
 			self.materialList.ClearAll()
 		self.loadCharmDetail()
+
+
+	def onSize(self, event):
+		try:
+			self.charmSkillList.SetColumnWidth(0, self.charmDetailPanel.GetSize()[0] * 0.66)
+			self.charmSkillList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.materialList.SetColumnWidth(0, self.charmDetailPanel.GetSize()[0] * 0.66)
+			self.materialList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
+		except:
+			self.charmSkillList.SetColumnWidth(0, 580)
+			self.charmSkillList.SetColumnWidth(1, 100)
+			self.materialList.SetColumnWidth(0, 580)
+			self.materialList.SetColumnWidth(1, 100)
