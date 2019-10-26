@@ -63,13 +63,13 @@ class ItemsTab:
 		self.itemPanel.SetSizer(self.itemsSizer)
 		
 		self.initItemButtons()
+		self.initSearch()
 		self.initItemList()
-		self.loadItemList()
 		self.initItemDetail()
-		self.loadItemDetail()
 		self.initItemUsage()
-		self.loadItemUsage()
 		self.initItemObtaining()
+		self.loadItemList()
+		self.loadItemUsage()
 		self.loadItemObtaining()
 
 		self.itemList.Bind(wx.EVT_SIZE, self.onSize)
@@ -104,6 +104,21 @@ class ItemsTab:
 		self.itemListSizer.Add(self.itemButtonsSizer)
 
 
+	def initSearch(self):
+		self.search = wx.TextCtrl(self.itemPanel)
+		self.search.SetHint("  search by name")
+		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.itemButtonsSizer.Add(130, 0, 0)
+		self.itemButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+
+
+	def onSearchTextEnter(self, event):
+		if self.currentItemCategory == "crafting":
+			self.loadCraftingList()
+		else:
+			self.loadItemList()
+
+
 	def initItemList(self):
 		self.itemList = wx.ListCtrl(self.itemPanel, style=wx.LC_REPORT
 													| wx.LC_VRULES
@@ -119,7 +134,10 @@ class ItemsTab:
 
 
 	def loadItemList(self):
-		self.il.RemoveAll()
+		try:
+			self.itemList.ClearAll()
+		except:
+			pass
 		self.test = self.il.Add(self.testIcon)
 		
 		info = wx.ListItem()
@@ -128,19 +146,33 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemList.InsertColumn(0, info)
-		self.itemList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
+		self.itemList.SetColumnWidth(0, 680)
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
 		
-		sql = """
-			SELECT i.*, it.name, it.description
-			FROM item i
-				JOIN item_text it
-					ON it.id = i.id
-					AND it.lang_id = :langId
-			WHERE (:category IS NULL AND i.category != 'hidden') OR i.category = :category
-			ORDER BY i.id
-		"""
+		searchText = self.search.GetValue()
+
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT i.*, it.name, it.description
+				FROM item i
+					JOIN item_text it
+						ON it.id = i.id
+						AND it.lang_id = :langId
+				WHERE (:category IS NULL AND i.category != 'hidden') OR i.category = :category
+				ORDER BY i.id
+			"""
+		else:
+			sql = f"""
+				SELECT i.*, it.name, it.description
+				FROM item i
+					JOIN item_text it
+						ON it.id = i.id
+						AND it.lang_id = :langId
+				WHERE (:category IS NULL AND i.category != 'hidden') OR i.category = :category
+				AND it.name LIKE '%{searchText}%'
+				ORDER BY i.id
+			"""
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, ("en", self.currentItemCategory))
@@ -149,6 +181,9 @@ class ItemsTab:
 		items = []
 		for row in data:
 			items.append(i.Item(row))
+
+		if len(items) != 0:
+			self.il.RemoveAll()
 
 		for item in items:
 			if item.category in ["item", "material", "misc"]:
@@ -163,9 +198,15 @@ class ItemsTab:
 			index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{item.name}", img)
 			self.itemList.SetItem(index, 1, f"{item.id}")
 
+		if self.itemList.GetItemCount() != 0:
+			self.itemList.Select(0)
+
 
 	def loadCraftingList(self):
-		self.il.RemoveAll()
+		try:
+			self.itemList.ClearAll()
+		except:
+			pass
 		self.test = self.il.Add(self.testIcon)
 
 		info = wx.ListItem()
@@ -178,34 +219,64 @@ class ItemsTab:
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
 
-		sql = """
-			SELECT c.id,
-			r.id result_id, rt.name result_name, r.icon_name result_icon_name, r.icon_color result_icon_color, r.category result_category,
-			f.id first_id, ft.name first_name, f.icon_name first_icon_name, f.icon_color first_icon_color, f.category first_category,
-			s.id second_id, st.name second_name, s.icon_name second_icon_name, s.icon_color second_icon_color, s.category second_category,
-			c.quantity quantity
-			FROM item_combination c
-				JOIN item r
-					ON r.id = c.result_id
-				JOIN item_text rt
-					ON rt.id = r.id
-					AND rt.lang_id = :langId
-				JOIN item f
-					ON f.id = c.first_id
-				JOIN item_text ft
-					ON ft.id = f.id
-					AND ft.lang_id = :langId
-				LEFT JOIN item s
-					ON s.id = c.second_id
-				LEFT JOIN item_text st
-					ON st.id = s.id
-					AND st.lang_id = :langId
-			WHERE :itemId IS NULL
-				OR c.result_id = :itemId
-				OR c.first_id = :itemId
-				OR c.second_id = :itemId
-			ORDER BY c.id ASC
-		"""
+		searchText = self.search.GetValue()
+
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT c.id,
+				r.id result_id, rt.name result_name, r.icon_name result_icon_name, r.icon_color result_icon_color, r.category result_category,
+				f.id first_id, ft.name first_name, f.icon_name first_icon_name, f.icon_color first_icon_color, f.category first_category,
+				s.id second_id, st.name second_name, s.icon_name second_icon_name, s.icon_color second_icon_color, s.category second_category,
+				c.quantity quantity
+				FROM item_combination c
+					JOIN item r
+						ON r.id = c.result_id
+					JOIN item_text rt
+						ON rt.id = r.id
+						AND rt.lang_id = :langId
+					JOIN item f
+						ON f.id = c.first_id
+					JOIN item_text ft
+						ON ft.id = f.id
+						AND ft.lang_id = :langId
+					LEFT JOIN item s
+						ON s.id = c.second_id
+					LEFT JOIN item_text st
+						ON st.id = s.id
+						AND st.lang_id = :langId
+				WHERE :itemId IS NULL
+					OR c.result_id = :itemId
+					OR c.first_id = :itemId
+					OR c.second_id = :itemId
+				ORDER BY c.id ASC
+			"""
+		else:
+			sql = f"""
+				SELECT c.id,
+				r.id result_id, rt.name result_name, r.icon_name result_icon_name, r.icon_color result_icon_color, r.category result_category,
+				f.id first_id, ft.name first_name, f.icon_name first_icon_name, f.icon_color first_icon_color, f.category first_category,
+				s.id second_id, st.name second_name, s.icon_name second_icon_name, s.icon_color second_icon_color, s.category second_category,
+				c.quantity quantity
+				FROM item_combination c
+					JOIN item r
+						ON r.id = c.result_id
+					JOIN item_text rt
+						ON rt.id = r.id
+						AND rt.lang_id = :langId
+					JOIN item f
+						ON f.id = c.first_id
+					JOIN item_text ft
+						ON ft.id = f.id
+						AND ft.lang_id = :langId
+					LEFT JOIN item s
+						ON s.id = c.second_id
+					LEFT JOIN item_text st
+						ON st.id = s.id
+						AND st.lang_id = :langId
+				WHERE :itemId IS NULL
+					AND result_name LIKE '%{searchText}%'
+				ORDER BY c.id ASC
+			"""
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, ("en", None))
@@ -214,6 +285,9 @@ class ItemsTab:
 		combinations = []
 		for row in data:
 			combinations.append(i.CombinationObtaining(row))
+
+		if len(combinations) != 0:
+			self.il.RemoveAll()
 
 		for com in combinations:
 			if com.secondName != None:
@@ -239,6 +313,9 @@ class ItemsTab:
 					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 				index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemList.SetItem(index, 1, f"{com.resultID}")
+		
+		if self.itemList.GetItemCount() != 0:
+			self.itemList.Select(0)
 
 
 	def initItemDetail(self):
@@ -670,11 +747,9 @@ class ItemsTab:
 
 		if event.GetEventObject().GetName() != "crafting":
 			self.currentItemCategory = event.GetEventObject().GetName()
-			self.itemList.ClearAll()
 			self.loadItemList()
 		else:
 			self.currentItemCategory = event.GetEventObject().GetName()
-			self.itemList.ClearAll()
 			self.loadCraftingList()
 
 
@@ -698,7 +773,6 @@ class ItemsTab:
 		"""
 		When the application window is resized some columns's width gets readjusted.
 		"""
-		self.itemList.SetColumnWidth(0, self.itemPanel.GetSize()[0] * 0.50 - 20)
 		self.itemDetailList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 		self.itemDetailList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.itemUsageList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)

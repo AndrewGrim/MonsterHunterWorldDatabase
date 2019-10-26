@@ -20,7 +20,7 @@
 - [ ] write documentation - which might force me to change sql strings??
 - [ ] on double click show the weapon/armor etc. basically link stuff
   - [x] monster materials to items link
-- [ ] change all the awful strings to fstrings
+- [x] change all the awful strings to fstrings
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
 - [x] organize src files into separate folders
 - [ ] remove unnecessary import
@@ -42,9 +42,10 @@
   - [x] armorTab
   - [x] monstersTabs
   - [x] charmTab
-  - [ ] decoTab
-  - [ ] skillTab
-  - [ ] itemTab
-  - [ ] locationsTab
+  - [x] decoTab
+  - [x] skillTab
+  - [x] itemTab
+  - [x] locationsTab N/A
+  - [ ] weaponsTab
   - [ ] kinsectsTab
   
