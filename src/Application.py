@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(0)
+		self.mainNotebook.SetSelection(3)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -131,7 +131,7 @@ class Application(wx.Frame):
 		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")
 
 		helpMenu = wx.Menu()
-		aboutItem = helpMenu.Append(-1, "&About\tCtrl-A", "Shows a dialog with information about the application.")
+		aboutItem = helpMenu.Append(-1, "About", "Shows a dialog with information about the application.")
 
 		optionsMenu = wx.Menu()
 		debugItem = optionsMenu.Append(-1, "&Debug\tCtrl-D", "A debug window that redirects the wx errors and stdout/sterr to itself.")
