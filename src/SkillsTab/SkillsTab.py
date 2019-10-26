@@ -90,10 +90,6 @@ class SkillsTab:
 	def loadSkillList(self):
 		try:
 			self.skillList.ClearAll()
-			try:
-				self.il.RemoveAll()
-			except:
-				pass
 		except:
 			pass
 
@@ -133,6 +129,9 @@ class SkillsTab:
 		for row in data:
 			skills.append(s.Skill(row))
 
+		if len(skills) != 0:
+			self.il.RemoveAll()
+
 		for skill in skills:
 			if skill.iconColor != None:
 				img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
@@ -141,7 +140,8 @@ class SkillsTab:
 			index = self.skillList.InsertItem(self.skillList.GetItemCount(), skill.name, img)
 			self.skillList.SetItem(index, 1, f"{skill.id}")
 		
-		self.skillList.Select(0)
+		if self.skillList.GetItemCount() != 0:
+			self.skillList.Select(0)
 
 
 	def initSkillDetail(self):

@@ -53,9 +53,8 @@ class DecorationsTab:
 
 		self.initSearch()
 		self.initDecorationList()
-		self.loadDecorationList()
 		self.initDecorationDetail()
-		self.loadDecorationDetail()
+		self.loadDecorationList()
 
 		self.decorationList.Bind(wx.EVT_SIZE, self.onSize)
 
@@ -99,10 +98,6 @@ class DecorationsTab:
 	def loadDecorationList(self):
 		try:
 			self.decorationList.ClearAll()
-			try:
-				self.il.RemoveAll()
-			except:
-				pass
 		except:
 			pass
 
@@ -160,6 +155,9 @@ class DecorationsTab:
 		for row in data:
 			decorations.append(d.Decoration(row))
 
+		if len(decorations) != 0:
+			self.il.RemoveAll()
+
 		for deco in decorations:
 			if deco.iconColor != None:
 				img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.iconColor}.png"))
@@ -167,6 +165,9 @@ class DecorationsTab:
 				img = self.test
 			index = self.decorationList.InsertItem(self.decorationList.GetItemCount(), deco.name, img)
 			self.decorationList.SetItem(index, 1, f"{deco.id}")
+
+		if self.decorationList.GetItemCount() != 0:
+			self.decorationList.Select(0)
 
 
 	def initDecorationDetail(self):
@@ -192,7 +193,7 @@ class DecorationsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Skill"
 		self.skillList.InsertColumn(0, info)
-		self.skillList.SetColumnWidth(0, 580)
+		self.skillList.SetColumnWidth(0, self.decorationDetailPanel.GetSize()[0] * 0.66)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -200,7 +201,7 @@ class DecorationsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.skillList.InsertColumn(1, info)
-		self.skillList.SetColumnWidth(1, 100)
+		self.skillList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		sql = """
 			SELECT d.*, dtext.name,
@@ -247,7 +248,7 @@ class DecorationsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Drop"
 		self.dropList.InsertColumn(0, info)
-		self.dropList.SetColumnWidth(0, 580)
+		self.dropList.SetColumnWidth(0, self.decorationDetailPanel.GetSize()[0] * 0.66)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -255,7 +256,7 @@ class DecorationsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.dropList.InsertColumn(1, info)
-		self.dropList.SetColumnWidth(1, 100)
+		self.dropList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		
 		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneGray.png"))

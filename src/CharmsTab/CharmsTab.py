@@ -54,10 +54,9 @@ class CharmsTab:
 
 		self.initSearch()
 		self.initCharmList()
-		self.loadCharmList()
 		self.initCharmDetail()
-		self.loadCharmDetail()
-		
+		self.loadCharmList()
+
 		self.charmList.Bind(wx.EVT_SIZE, self.onSize)
 
 
@@ -100,10 +99,6 @@ class CharmsTab:
 	def loadCharmList(self):
 		try:
 			self.charmList.ClearAll()
-			try:
-				self.il.RemoveAll()
-			except:
-				pass
 		except:
 			pass
 
@@ -163,10 +158,16 @@ class CharmsTab:
 		for row in data:
 			charms.append(c.Charm(row))
 
+		if len(charms) != 0:
+			self.il.RemoveAll()
+
 		for charm in charms:
 			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
 			index = self.charmList.InsertItem(self.charmList.GetItemCount(), charm.name, img)
 			self.charmList.SetItem(index, 1, f"{charm.id}")
+
+		if self.charmList.GetItemCount() != 0:
+			self.charmList.Select(0)
 
 
 	def initCharmDetail(self):
@@ -197,7 +198,7 @@ class CharmsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Skills"
 		self.charmSkillList.InsertColumn(0, info)
-		self.charmSkillList.SetColumnWidth(0, 580)
+		self.charmSkillList.SetColumnWidth(0, self.charmDetailPanel.GetSize()[0] * 0.66)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -205,7 +206,7 @@ class CharmsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.charmSkillList.InsertColumn(1, info)
-		self.charmSkillList.SetColumnWidth(1, 100)
+		self.charmSkillList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		sql = """
 			SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level,
@@ -239,7 +240,7 @@ class CharmsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Req. Materials"
 		self.materialList.InsertColumn(0, info)
-		self.materialList.SetColumnWidth(0, 580)
+		self.materialList.SetColumnWidth(0, self.charmDetailPanel.GetSize()[0] * 0.66)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -247,7 +248,7 @@ class CharmsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.materialList.InsertColumn(1, info)
-		self.materialList.SetColumnWidth(1, 100)
+		self.materialList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		sql = """
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
