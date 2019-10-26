@@ -118,6 +118,7 @@ class ArmorTab:
 		self.loadArmorTree()
 		self.initArmorDetailTab()
 		self.initArmorSetDetails()
+		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
 
 	def initArmorButtons(self):
@@ -291,7 +292,6 @@ class ArmorTab:
 
 	def initArmorDetailTab(self):
 		self.armorDetailList = cgr.HeaderBitmapGrid(self.armorDetailPanel)
-		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
 		self.armorDetailList.EnableEditing(False)
 		self.armorDetailList.EnableDragRowSize(False)
 		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
@@ -867,56 +867,26 @@ class ArmorTab:
 		try:
 			self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 			self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
-			try:
-				self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-				self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
-			except:
-				pass
-			try:
-				self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-				self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
-			except:
-				pass
-			try:
-				self.armorSetDetailList.SetColSize(0, self.armorSetPanel.GetSize()[0] * 0.66)
-				self.armorSetDetailList.SetColSize(1, self.armorSetPanel.GetSize()[0] * 0.34 - 20)
-			except:
-				pass
-			try:
-				self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-				self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
-			except:
-				pass
-			try:
-				self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-				self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
-			except:
-				pass
+			self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
+			self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
+			self.armorSetDetailList.SetColSize(0, self.armorSetPanel.GetSize()[0] * 0.66)
+			self.armorSetDetailList.SetColSize(1, self.armorSetPanel.GetSize()[0] * 0.34 - 20)
+			self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+			self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
+			self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+			self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
 		except:
 			self.armorDetailList.SetColSize(0, 302)
 			self.armorDetailList.SetColSize(1, 155 - 20)
-			try:
-				self.armorSkillList.SetColumnWidth(0, 302)
-				self.armorSkillList.SetColumnWidth(1, 155 - 21)
-			except:
-				pass
-			try:
-				self.armorMaterialsList.SetColumnWidth(0, 302)
-				self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
-			except:
-				pass
-			try:
-				self.armorSetDetailList.SetColumnWidth(0, 302)
-				self.armorSetDetailList.SetColumnWidth(1, 155 - 20)
-			except:
-				pass
-			try:
-				self.armorSetSkillList.SetColumnWidth(0, 302)
-				self.armorSetSkillList.SetColumnWidth(1, 155 - 21)
-			except:
-				pass
-			try:
-				self.armorSetMaterialList.SetColumnWidth(0, 302)
-				self.armorSetMaterialList.SetColumnWidth(1, 155 - 21)
-			except:
-				pass
+			self.armorSkillList.SetColumnWidth(0, 302)
+			self.armorSkillList.SetColumnWidth(1, 155 - 21)
+			self.armorMaterialsList.SetColumnWidth(0, 302)
+			self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
+			self.armorSetDetailList.SetColumnWidth(0, 302)
+			self.armorSetDetailList.SetColumnWidth(1, 155 - 20)
+			self.armorSetSkillList.SetColumnWidth(0, 302)
+			self.armorSetSkillList.SetColumnWidth(1, 155 - 21)
+			self.armorSetMaterialList.SetColumnWidth(0, 302)
+			self.armorSetMaterialList.SetColumnWidth(1, 155 - 21)
