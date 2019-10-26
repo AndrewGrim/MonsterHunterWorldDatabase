@@ -51,12 +51,36 @@ class DecorationsTab:
 
 		self.decorationPanel.SetSizer(self.decorationSizer)
 
+		self.initSearch()
 		self.initDecorationList()
 		self.loadDecorationList()
 		self.initDecorationDetail()
 		self.loadDecorationDetail()
 
 		self.decorationList.Bind(wx.EVT_SIZE, self.onSize)
+
+	
+	def initSearch(self):
+		self.searchName = wx.TextCtrl(self.decorationPanel, name="byName")
+		self.searchName.SetHint("  search by name")
+		self.searchName.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.searchSkill = wx.TextCtrl(self.decorationPanel, name="bySkill")
+		self.searchSkill.SetHint("  search by skill")
+		self.searchSkill.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.currentSearch = self.searchName
+
+		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.searchSizer.Add(self.searchName)
+		self.searchSizer.Add(self.searchSkill)
+
+		self.decorationListSizer.Add(self.searchSizer)
+
+
+	def onSearchTextEnter(self, event):
+		self.currentSearch = event.GetEventObject()
+		self.loadDecorationList()
 
 
 	def initDecorationList(self):
@@ -73,6 +97,15 @@ class DecorationsTab:
 
 
 	def loadDecorationList(self):
+		try:
+			self.decorationList.ClearAll()
+			try:
+				self.il.RemoveAll()
+			except:
+				pass
+		except:
+			pass
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -83,14 +116,41 @@ class DecorationsTab:
 		self.decorationList.InsertColumn(1, info)
 		self.decorationList.SetColumnWidth(1, 0)
 
-		sql = """
-			SELECT d.id, dt.name, d.slot, d.icon_color
-			FROM decoration d
-				JOIN decoration_text dt
-					ON dt.id = d.id
-					AND dt.lang_id = :langId
-			ORDER BY dt.name
-		"""
+		searchText = self.currentSearch.GetValue()
+
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT d.id, dt.name, d.slot, d.icon_color
+				FROM decoration d
+					JOIN decoration_text dt
+						ON dt.id = d.id
+						AND dt.lang_id = :langId
+				ORDER BY dt.name
+			"""
+		else:
+			if self.currentSearch.GetName() == "bySkill":
+				sql = f"""
+					SELECT d.id, dt.name, d.slot, d.icon_color, stt.name
+					FROM decoration d
+						JOIN decoration_text dt
+							ON dt.id = d.id
+							AND dt.lang_id = :langId
+						JOIN skilltree_text stt
+							ON stt.id = d.skilltree_id
+							AND stt.lang_id = :langId
+						WHERE stt.name LIKE '%{searchText}%'
+					ORDER BY dt.name
+				"""
+			else:
+				sql = f"""
+					SELECT d.id, dt.name, d.slot, d.icon_color
+					FROM decoration d
+						JOIN decoration_text dt
+							ON dt.id = d.id
+							AND dt.lang_id = :langId
+						WHERE dt.name LIKE '%{searchText}%'
+					ORDER BY dt.name
+				"""
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, ("en", ))
