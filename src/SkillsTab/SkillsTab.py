@@ -52,12 +52,26 @@ class SkillsTab:
 
 		self.skillPanel.SetSizer(self.skillSizer)
 
+		self.initSearch()
 		self.initSkillList()
-		self.loadSkillList()
 		self.initSkillDetail()
-		self.loadSkillDetail()
+		self.loadSkillList()
 
 		self.skillList.Bind(wx.EVT_SIZE, self.onSize)
+
+
+	def initSearch(self):
+		self.search = wx.TextCtrl(self.skillPanel)
+		self.search.SetHint("  search by name")
+		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.searchSizer.Add(self.search)
+
+		self.skillListSizer.Add(self.searchSizer)
+
+	def onSearchTextEnter(self, event):
+		self.loadSkillList()
 
 
 	def initSkillList(self):
@@ -74,6 +88,15 @@ class SkillsTab:
 
 
 	def loadSkillList(self):
+		try:
+			self.skillList.ClearAll()
+			try:
+				self.il.RemoveAll()
+			except:
+				pass
+		except:
+			pass
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -84,13 +107,23 @@ class SkillsTab:
 		self.skillList.InsertColumn(1, info)
 		self.skillList.SetColumnWidth(1, 0)
 
+		searchText = self.search.GetValue()
 
-		sql = """
-			SELECT id, name, max_level, description, icon_color
-			FROM skilltree s join skilltree_text st USING (id)
-			WHERE lang_id = :langId
-			ORDER BY name 
-		"""
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT id, name, max_level, description, icon_color
+				FROM skilltree s join skilltree_text st USING (id)
+				WHERE lang_id = :langId
+				ORDER BY name 
+			"""
+		else:
+			sql = f"""
+				SELECT id, name, max_level, description, icon_color
+				FROM skilltree s join skilltree_text st USING (id)
+				WHERE lang_id = :langId
+				AND name LIKE '%{searchText}%'
+				ORDER BY name 
+			"""
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, ("en", ))
@@ -107,6 +140,8 @@ class SkillsTab:
 				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 			index = self.skillList.InsertItem(self.skillList.GetItemCount(), skill.name, img)
 			self.skillList.SetItem(index, 1, f"{skill.id}")
+		
+		self.skillList.Select(0)
 
 
 	def initSkillDetail(self):
@@ -135,7 +170,7 @@ class SkillsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.skillDetailList.InsertColumn(0, info)
-		self.skillDetailList.SetColumnWidth(0, 100)
+		self.skillDetailList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.20)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -143,8 +178,7 @@ class SkillsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.skillDetailList.InsertColumn(1, info)
-		self.skillDetailList.SetColumnWidth(1, 580)
-
+		self.skillDetailList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.80 - 20)
 
 		sql = """
 			SELECT st.id, stt.name skilltree_name, stt.description skilltree_description,
@@ -189,7 +223,7 @@ class SkillsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Found In"
 		self.foundList.InsertColumn(0, info)
-		self.foundList.SetColumnWidth(0, 580)
+		self.foundList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.66)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -197,7 +231,7 @@ class SkillsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.foundList.InsertColumn(1, info)
-		self.foundList.SetColumnWidth(1, 100)
+		self.foundList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		self.loadSkillDecorations()
 		self.loadSkillCharms()
@@ -342,7 +376,7 @@ class SkillsTab:
 
 
 	def onSize(self, event):
-		self.skillDetailList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.14)
-		self.skillDetailList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.86 - 20)
+		self.skillDetailList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.20)
+		self.skillDetailList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.80 - 20)
 		self.foundList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.66)
 		self.foundList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.34 - 20)
