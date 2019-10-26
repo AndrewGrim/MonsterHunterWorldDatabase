@@ -63,18 +63,16 @@ class ItemsTab:
 		self.itemPanel.SetSizer(self.itemsSizer)
 		
 		self.initItemButtons()
-
 		self.initItemList()
 		self.loadItemList()
-
 		self.initItemDetail()
 		self.loadItemDetail()
-
 		self.initItemUsage()
 		self.loadItemUsage()
-
 		self.initItemObtaining()
 		self.loadItemObtaining()
+
+		self.itemList.Bind(wx.EVT_SIZE, self.onSize)
 
 
 	def initItemButtons(self):
@@ -130,7 +128,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemList.InsertColumn(0, info)
-		self.itemList.SetColumnWidth(0, 680)
+		self.itemList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
 		
@@ -215,7 +213,7 @@ class ItemsTab:
 
 		combinations = []
 		for row in data:
-			combinations.append(c.CombinationObtaining(row))
+			combinations.append(i.CombinationObtaining(row))
 
 		for com in combinations:
 			if com.secondName != None:
@@ -267,7 +265,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.itemDetailList.InsertColumn(0, info)
-		self.itemDetailList.SetColumnWidth(0, 430)
+		self.itemDetailList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -275,7 +273,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemDetailList.InsertColumn(1, info)
-		self.itemDetailList.SetColumnWidth(1, 240)
+		self.itemDetailList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		sql = """
 			SELECT i.*, it.name, it.description
@@ -352,7 +350,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Usage"
 		self.itemUsageList.InsertColumn(0, info)
-		self.itemUsageList.SetColumnWidth(0, 480)
+		self.itemUsageList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -360,7 +358,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemUsageList.InsertColumn(1, info)
-		self.itemUsageList.SetColumnWidth(1, 190)
+		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		self.loadUsageCombinations()
 		self.loadUsageCharms()
@@ -527,7 +525,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Obtaining"
 		self.itemObtainingList.InsertColumn(0, info)
-		self.itemObtainingList.SetColumnWidth(0, 480)
+		self.itemObtainingList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -535,7 +533,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemObtainingList.InsertColumn(1, info)
-		self.itemObtainingList.SetColumnWidth(1, 190)
+		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		self.loadObtainingCombination()
 		self.loadObtainingLocations()
@@ -700,29 +698,10 @@ class ItemsTab:
 		"""
 		When the application window is resized some columns's width gets readjusted.
 		"""
-		try:
-			self.itemList.SetColumnWidth(0, self.itemPanel.GetSize()[0] * 0.50 - 70)
-		except:
-			self.itemList.SetColumnWidth(0, 680)
-		try:
-			colWidth = self.itemDetailPanel.GetSize()[0] / 6 + 40
-			self.itemDetailList.SetColSize(0, colWidth)
-			self.itemDetailList.SetColSize(1, colWidth)
-			self.itemDetailList.SetColSize(2, 36)
-			self.itemDetailList.SetColSize(3, colWidth)
-			self.itemDetailList.SetColSize(4, colWidth)
-			self.itemDetailList.SetColSize(5, 36)
-			try:
-				self.itemUsageList.SetColSize(0, 36)
-				self.itemUsageList.SetColSize(1, self.itemDetailPanel.GetSize()[0] - 36 - 90 - 20)
-				self.itemUsageList.SetColSize(2, 90)
-				try:
-					self.itemObtainingList.SetColSize(0, 36)
-					self.itemObtainingList.SetColSize(1, self.itemDetailPanel.GetSize()[0] - 36 - 90 - 20)
-					self.itemObtainingList.SetColSize(2, 90)
-				except:
-					pass
-			except:
-				pass
-		except:
-			pass
+		self.itemList.SetColumnWidth(0, self.itemPanel.GetSize()[0] * 0.50 - 20)
+		self.itemDetailList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
+		self.itemDetailList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.itemUsageList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
+		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.itemObtainingList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
+		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
