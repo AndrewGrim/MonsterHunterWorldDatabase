@@ -29,7 +29,7 @@
 - [ ] change some TODO tags to ICEBORNE
 - [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow
 - [ ] change all "row[index]" to object.attribute
-  - [ ] MonstersTab
+  - [x] MonstersTab
 - [ ] change column width to adjust dynamically according to the window size, for some of the widgets
 - [ ] change back the eq images to have a black background since its proving problematic
 - [ ] get images for all levels of charms
@@ -42,4 +42,5 @@
 - [ ] implement sorting
 - [ ] implement searching
   - [x] armorTab
+  - [x] monstersTabs
   

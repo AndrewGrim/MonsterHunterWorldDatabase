@@ -12,6 +12,7 @@ from typing import Dict
 from typing import NewType
 import Utilities as util
 import Links as link
+import MonstersTab as m
 
 wxColour = NewType("wxColour", None)
 sqlite3Connection = NewType("sqlite3Connection", None)
@@ -34,6 +35,7 @@ class MonstersTab:
 
 		self.initMonstersTab()
 		self.initMonsterSizeButtons()
+		self.initSearch()
 		self.initMonsterList()
 		self.loadMonsterList()
 		self.initMonsterSummary() # TODO sort weaknesses from highest to low/none
@@ -110,6 +112,18 @@ class MonstersTab:
 		self.largeMonstersButton.Bind(wx.EVT_BUTTON, self.onMonsterSizeSelect)
 
 
+	def initSearch(self):
+		self.search = wx.TextCtrl(self.monstersPanel)
+		self.search.SetHint("  search by name")
+		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.monsterSizeButtonsSizer.Add(180, 0, 0)
+		self.monsterSizeButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+
+
+	def onSearchTextEnter(self, event):
+		self.loadMonsterList()
+
+
 	def initMonsterList(self):
 		self.monsterList = wx.ListCtrl(self.monstersPanel, style=wx.LC_REPORT
 																| wx.LC_VRULES
@@ -127,6 +141,13 @@ class MonstersTab:
 
 
 	def loadMonsterList(self):
+		try:
+			self.monsterList.ClearAll()
+		except:
+			pass
+
+		searchText = self.search.GetValue()
+
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -137,25 +158,40 @@ class MonstersTab:
 		self.monsterList.InsertColumn(1, info)
 		self.monsterList.SetColumnWidth(1, 0)
 
-		sql = """
-			SELECT m.id, m.size, mt.name
-			FROM monster m
-			JOIN monster_text mt
-				ON m.id = mt.id
-			WHERE size = :size
-				AND mt.lang_id = :langId
-		"""
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT m.id, m.size, mt.name
+				FROM monster m
+				JOIN monster_text mt
+					ON m.id = mt.id
+				WHERE size = :size
+					AND mt.lang_id = :langId
+			"""
+		else:
+			sql = f"""
+				SELECT m.id, m.size, mt.name
+				FROM monster m
+				JOIN monster_text mt
+					ON m.id = mt.id
+				WHERE size = :size
+					AND mt.lang_id = :langId
+					AND mt.name like '%{searchText}%'
+			"""
 
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, (self.currentMonsterSize, "en"))
 		data = data.fetchall()
 
+		monsters = []
+		for row in data:
+			monsters.append(m.Monster(row))
+
 		self.ilBig.RemoveAll()
 
-		for row in data:
-			img = self.ilBig.Add(wx.Bitmap(f"images/monsters/56/{row[2]}.png"))
-			index = self.monsterList.InsertItem(self.monsterList.GetItemCount(), row[2], img)
-			self.monsterList.SetItem(index, 1, f"{row[0]}")
+		for monster in monsters:
+			img = self.ilBig.Add(wx.Bitmap(f"images/monsters/56/{monster.name}.png"))
+			index = self.monsterList.InsertItem(self.monsterList.GetItemCount(), monster.name, img)
+			self.monsterList.SetItem(index, 1, f"{monster.id}")
 
 
 
@@ -452,60 +488,53 @@ class MonstersTab:
 					AND pt.lang_id = :langId
 			WHERE h.monster_id = :monsterId
 			ORDER BY h.id
-			"""
-
-		# 2 - cut
-		# 3 - impact
-		# 4 - shot
-		# 5 - fire
-		# 6 - water
-		# 7 - ice
-		# 8 - thunder
-		# 9 - dragon
-		# 10 - ko
-		# 11 - body part name
+		"""
 		
-		weaknessData = conn.execute(sql, ("en", monsterID))
-		weaknessData = weaknessData.fetchall()
+		data = conn.execute(sql, ("en", monsterID))
+		data = data.fetchall()
+		
+		hitzones = []
+		for row in data:
+			hitzones.append(m.Hitzone(row))
 
-		for index, row in enumerate(weaknessData):
+		for index, hit in enumerate(hitzones):
 			self.physicalDamageTable.AppendRows(1)
-			self.physicalDamageTable.SetCellValue(index, 0, str(row[11]))
+			self.physicalDamageTable.SetCellValue(index, 0, hit.name)
 
 			bold = self.physicalDamageTable.GetCellFont(index, 1).Bold()
 
-			if row[2] >= 45:
+			if hit.cut >= 45:
 				self.physicalDamageTable.SetCellFont(index, 1, bold)
-			self.physicalDamageTable.SetCellValue(index, 1, str(row[2]))
+			self.physicalDamageTable.SetCellValue(index, 1, str(hit.cut))
 
-			if row[3] >= 45:
+			if hit.impact >= 45:
 				self.physicalDamageTable.SetCellFont(index, 2, bold)
-			self.physicalDamageTable.SetCellValue(index, 2, str(row[3]))
+			self.physicalDamageTable.SetCellValue(index, 2, str(hit.impact))
 
-			if row[4] >= 45:
+			if hit.shot >= 45:
 				self.physicalDamageTable.SetCellFont(index, 3, bold)
-			self.physicalDamageTable.SetCellValue(index, 3, str(row[4]))
+			self.physicalDamageTable.SetCellValue(index, 3, str(hit.shot))
 
-			if str(row[10]) != str(0):
-				self.physicalDamageTable.SetCellValue(index, 4, str(row[10]))
+			if str(hit.ko) != str(0):
+				self.physicalDamageTable.SetCellValue(index, 4, str(hit.ko))
 
 			self.elementDamageTable.AppendRows(1)
-			self.elementDamageTable.SetCellValue(index, 0, str(row[11]))
+			self.elementDamageTable.SetCellValue(index, 0, str(hit.name))
 
-			self.elementDamageTable.SetCellBackgroundColour(index, 1, util.hexToRGB(util.damageColors["fire"][row[5]]))
-			self.elementDamageTable.SetCellValue(index, 1, str(row[5]))
+			self.elementDamageTable.SetCellBackgroundColour(index, 1, util.hexToRGB(util.damageColors["fire"][hit.fire]))
+			self.elementDamageTable.SetCellValue(index, 1, str(hit.fire))
 
-			self.elementDamageTable.SetCellBackgroundColour(index, 2, util.hexToRGB(util.damageColors["water"][row[6]]))
-			self.elementDamageTable.SetCellValue(index, 2, str(row[6]))
+			self.elementDamageTable.SetCellBackgroundColour(index, 2, util.hexToRGB(util.damageColors["water"][hit.water]))
+			self.elementDamageTable.SetCellValue(index, 2, str(hit.water))
 
-			self.elementDamageTable.SetCellBackgroundColour(index, 3, util.hexToRGB(util.damageColors["ice"][row[7]]))
-			self.elementDamageTable.SetCellValue(index, 3, str(row[7]))
+			self.elementDamageTable.SetCellBackgroundColour(index, 3, util.hexToRGB(util.damageColors["ice"][hit.ice]))
+			self.elementDamageTable.SetCellValue(index, 3, str(hit.ice))
 
-			self.elementDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.damageColors["thunder"][row[8]]))
-			self.elementDamageTable.SetCellValue(index, 4, str(row[8]))
+			self.elementDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.damageColors["thunder"][hit.thunder]))
+			self.elementDamageTable.SetCellValue(index, 4, str(hit.thunder))
 
-			self.elementDamageTable.SetCellBackgroundColour(index, 5, util.hexToRGB(util.damageColors["dragon"][row[9]]))
-			self.elementDamageTable.SetCellValue(index, 5, str(row[9]))
+			self.elementDamageTable.SetCellBackgroundColour(index, 5, util.hexToRGB(util.damageColors["dragon"][hit.dragon]))
+			self.elementDamageTable.SetCellValue(index, 5, str(hit.dragon))
 
 		sql = """
 			SELECT b.flinch, b.wound, b.sever, b.extract, bt.part_name
@@ -514,28 +543,26 @@ class MonstersTab:
 			WHERE b.monster_id = :monsterId
 				AND bt.lang_id = :langId
 			ORDER BY b.id
-			"""
+		"""
 
-		# 0 - flinch
-		# 1 - wound
-		# 2 - sever
-		# 3 - extract
-		# 4 - body part name
+		data = conn.execute(sql, (monsterID, "en"))
+		data = data.fetchall()
 
-		breakData = conn.execute(sql, (monsterID, "en"))
-		breakData = breakData.fetchall()
+		breaks = []
+		for row in data:
+			breaks.append(m.Break(row))
 
-		for index, row in enumerate(breakData):
+		for index, b in enumerate(breaks):
 			self.breakDamageTable.AppendRows(1)
-			self.breakDamageTable.SetCellValue(index, 0, str(row[4]))
-			if row[0] != None:
-				self.breakDamageTable.SetCellValue(index, 1, str(row[0]))
-			if row[1] != None:
-				self.breakDamageTable.SetCellValue(index, 2, str(row[1]))
-			if row[2] != None:
-				self.breakDamageTable.SetCellValue(index, 3, str(row[2]))
-			self.breakDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.extractColors[row[3]]))
-			self.breakDamageTable.SetCellValue(index, 4, f"{row[3].capitalize()}")
+			self.breakDamageTable.SetCellValue(index, 0, b.name)
+			if b.flinch != None:
+				self.breakDamageTable.SetCellValue(index, 1, str(b.flinch))
+			if b.wound != None:
+				self.breakDamageTable.SetCellValue(index, 2, str(b.wound))
+			if b.sever != None:
+				self.breakDamageTable.SetCellValue(index, 3, str(b.sever))
+			self.breakDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.extractColors[b.extract]))
+			self.breakDamageTable.SetCellValue(index, 4, f"{b.extract.capitalize()}")
 
 		w, h = self.root.GetSize()
 		self.root.SetSize(w - 1, h)
@@ -606,10 +633,15 @@ class MonstersTab:
 					ON it.id = i.id
 					AND it.lang_id = :langId
 			WHERE r.monster_id = :monsterId ORDER BY r.id
-			"""
+		"""
 
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", monsterID, ))
+		data = data.fetchall()
+
+		rewards = []
+		for row in data:
+			rewards.append(m.Reward(row))
 
 		rewardCondition = 0
 		monsterMaterial = 0
@@ -627,50 +659,50 @@ class MonstersTab:
 		#noLog = wx.LogNull()
 	
 		# TODO refactor into function
-		for index, row in enumerate(data):
+		for index, r in enumerate(rewards):
 			if index == 0:
-				self.currentMonsterMaterialID = row[4]
-			currentCategory = str(row[1])
-			if row[0] == "LR":
+				self.currentMonsterMaterialID = r.itemID
+			currentCategory = str(r.conditionName)
+			if r.rank == "LR":
 				if currentCategory in categoriesLR:
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
 				else:
-					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
-				self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, str(row), 2)
+					rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
+				self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
+				self.materialsTree.SetItemText(monsterMaterial, str(r), 2)
 				try:
-					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{row[6]}{row[8]}.png"))
+					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
 				except:
 					self.materialsTree.SetItemImage(monsterMaterial, test, which=wx.TreeItemIcon_Normal)
 				categoriesLR.append(currentCategory)
 
-			elif row[0] == "HR":
+			elif r.rank == "HR":
 				if currentCategory in categoriesHR:
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
 				else:
-					rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
-				self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, str(row), 2)
+					rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
+					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
+				self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
+				self.materialsTree.SetItemText(monsterMaterial, str(r), 2)
 				try:
-					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{row[6]}{row[8]}.png"))
+					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
 				except:
 					self.materialsTree.SetItemImage(monsterMaterial, test, which=wx.TreeItemIcon_Normal)
 				categoriesHR.append(currentCategory)
 
-			#elif row[0] == "MR":
+			#elif r.rank == "MR":
 			#	if currentCategory in categoriesMR:
-			#		monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+			#		monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
 			#	else:
-			#		rewardCondition = self.materialsTree.AppendItem(rankNodes[row[0]], str(row[1]))
-			#		monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(row[5]))
+			#		rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
+			#		monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
 			#		self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
 			#	self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
-			#	self.materialsTree.SetItemText(monsterMaterial, f"{row[2]} x {row[3]}%", 1)
-			#	self.materialsTree.SetItemText(monsterMaterial, str(row[4]), 2)
+			#	self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
+			#	self.materialsTree.SetItemText(monsterMaterial, str(r.itemID), 2)
 			#	self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal)
 			#		
 			#	categoriesMR.append(currentCategory)
@@ -767,5 +799,4 @@ class MonstersTab:
 	
 	def onMonsterSizeSelect(self, event):
 		self.currentMonsterSize = event.GetEventObject().GetName()
-		self.monsterList.ClearAll()
 		self.loadMonsterList()
