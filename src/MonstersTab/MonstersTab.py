@@ -4,12 +4,14 @@ import wx.lib.gizmos as gizmos
 import CustomGridRenderer as cgr
 import wx.propgrid as wxpg
 import sqlite3
+import ast
 import typing
 from typing import List
 from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import Utilities as util
 import Links as link
 import MonstersTab as m
@@ -749,13 +751,13 @@ class MonstersTab:
 
 	def onMaterialSelection(self, event):
 		materialInfo = self.materialsTree.GetItemText(event.GetItem(), 2)
-		materialInfo = materialInfo.replace("(", "").replace(")", "").replace("'", "").split(",")
-		for i, item in enumerate(materialInfo):
-			if item[0] == " ":
-				materialInfo[i] = item[1:]
+		materialInfo = ast.literal_eval(materialInfo)
+		materialInfoList = []
+		for k, v in materialInfo.items():
+			materialInfoList.append(v)
 		self.link.event = True
 		self.link.eventType = "item"
-		self.link.item =  link.MonsterMaterialLink(materialInfo)
+		self.link.item =  link.MonsterMaterialLink(materialInfoList)
 		self.root.followLink()
 		self.link.reset()
 

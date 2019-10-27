@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(2)
+		self.mainNotebook.SetSelection(0)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -109,7 +109,6 @@ class Application(wx.Frame):
 	def followLink(self):
 		if self.link.event == True:
 			if self.link.eventType == "item":
-				self.items.itemList.ClearAll()
 				self.items.currentItemCategory = self.link.item.category
 				self.items.loadItemList()
 				self.items.currentlySelectedItemID = self.link.item.id
