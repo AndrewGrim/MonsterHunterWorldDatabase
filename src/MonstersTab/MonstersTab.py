@@ -4,7 +4,6 @@ import wx.lib.gizmos as gizmos
 import CustomGridRenderer as cgr
 import wx.propgrid as wxpg
 import sqlite3
-import ast
 import typing
 from typing import List
 from typing import Union
@@ -13,6 +12,7 @@ from typing import Dict
 from typing import NewType
 
 import Utilities as util
+from Utilities import debug
 import Links as link
 import MonstersTab as m
 
@@ -687,7 +687,7 @@ class MonstersTab:
 					rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
 					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
 				self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, str(r), 2)
+				self.materialsTree.SetItemText(monsterMaterial, f"{r.itemID},{r.category}", 2)
 				try:
 					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
 					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
@@ -751,13 +751,10 @@ class MonstersTab:
 
 	def onMaterialDoubleClick(self, event):
 		materialInfo = self.materialsTree.GetItemText(event.GetItem(), 2)
-		materialInfo = ast.literal_eval(materialInfo)
-		materialInfoList = []
-		for k, v in materialInfo.items():
-			materialInfoList.append(v)
+		materialInfo = materialInfo.split(",")
 		self.link.event = True
 		self.link.eventType = "item"
-		self.link.item =  link.MonsterMaterialLink(materialInfoList)
+		self.link.item =  link.ItemLink(materialInfo)
 		self.root.followLink()
 		self.link.reset()
 

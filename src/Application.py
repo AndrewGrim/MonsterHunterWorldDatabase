@@ -50,7 +50,7 @@ class Application(wx.Frame):
 		self.mainNotebook.AssignImageList(il)
 
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
-		w.WeaponsTab(root, self.mainNotebook)
+		w.WeaponsTab(root, self.mainNotebook, self.link)
 		a.ArmorTab(root, self.mainNotebook)
 		c.CharmsTab(root, self.mainNotebook)
 		d.DecorationsTab(root, self.mainNotebook)
@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(0)
+		self.mainNotebook.SetSelection(1)
 
 		self.Show()
 		if "-debug" in cmdArgs:

@@ -13,16 +13,20 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import Utilities as util
+from Utilities import debug
+import Links as link
 import WeaponsTab as w
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 
 class WeaponsTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
 		self.c = wx.ColourDatabase()
 
 		self.currentlySelectedWeaponID = 1
@@ -587,6 +591,7 @@ class WeaponsTab:
 																			| wx.LC_VRULES
 																			| wx.LC_HRULES
 																			)
+		self.materialsRequiredList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.ilMats = wx.ImageList(24, 24)
 		self.materialsRequiredList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.weaponDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND)
@@ -1215,6 +1220,9 @@ class WeaponsTab:
 		self.materialsRequiredList.InsertColumn(1, info)
 		self.materialsRequiredList.SetColumnWidth(1, 137)
 
+		self.materialsRequiredList.InsertColumn(2, info)
+		self.materialsRequiredList.SetColumnWidth(2, 0)
+
 		sql = """
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
 				i.category item_category, i.icon_color item_icon_color, w.quantity, w.recipe_type
@@ -1235,24 +1243,28 @@ class WeaponsTab:
 		data = conn.execute(sql, ("en", self.currentlySelectedWeaponID))
 		data = data.fetchall()
 
-		for item in data:
-			img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{item[2]}{item[4]}.png"))
-			if item[6] == "Create":
+		materials = []
+		for row in data:
+			materials.append(w.WeaponMaterial(row))
+
+		for item in materials:
+			img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{item.iconName}{item.iconColor}.png"))
+			if item.recipeType == "Create":
 				try:
 					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
-						f"Create:    {item[1]}", img)
+						f"Create:    {item.name}", img)
 				except:
 					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
-						f"Create:    {item[1]}", test)
-				self.materialsRequiredList.SetItem(index, 1, f"{item[5]}")
+						f"Create:    {item.name}", test)
 			else:
 				try:
 					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
-						f"Upgrade:    {item[1]}", img)
+						f"Upgrade:    {item.name}", img)
 				except:
 					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),
-						f"Upgrade:    {item[1]}", test)
-				self.materialsRequiredList.SetItem(index, 1, f"{item[5]}")
+						f"Upgrade:    {item.name}", test)
+			self.materialsRequiredList.SetItem(index, 1, f"{item.quantity}")
+			self.materialsRequiredList.SetItem(index, 2, f"{item.id},{item.category}")
 
 
 	def adjustSharpness(self, handicraftLevel: int, sharpnessMaxed: bool, data: Tuple[str]) -> Union[List[str], List[int]]:
@@ -1322,6 +1334,16 @@ class WeaponsTab:
 		"""
 		self.currentWeaponTree = event.GetEventObject().GetName()
 		self.loadweaponTree()
+
+
+	def onMaterialDoubleClick(self, event):
+		materialInfo = self.materialsRequiredList.GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		materialInfo = materialInfo.split(",")
+		self.link.event = True
+		self.link.eventType = "item"
+		self.link.item =  link.ItemLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):
