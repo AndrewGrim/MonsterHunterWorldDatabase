@@ -582,7 +582,7 @@ class MonstersTab:
 												| gizmos.TR_FULL_ROW_HIGHLIGHT
 												| gizmos.TR_HIDE_ROOT
 												)
-		self.materialsTree.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onMaterialSelection)
+		self.materialsTree.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 
 		self.materialsTree.AddColumn("")
 		self.materialsTree.AddColumn("")
@@ -749,7 +749,7 @@ class MonstersTab:
 		self.materialsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
 
 
-	def onMaterialSelection(self, event):
+	def onMaterialDoubleClick(self, event):
 		materialInfo = self.materialsTree.GetItemText(event.GetItem(), 2)
 		materialInfo = ast.literal_eval(materialInfo)
 		materialInfoList = []
