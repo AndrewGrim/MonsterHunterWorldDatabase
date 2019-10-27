@@ -13,13 +13,18 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import CharmsTab as c
+from Utilities import debug
+import Links as link
 
 class CharmsTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
+
 		self.currentCharmID = 1
 		self.currentCharmName = "Poison Charm I"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
@@ -185,6 +190,7 @@ class CharmsTab:
 																| wx.LC_VRULES
 																| wx.LC_HRULES
 																)
+		self.materialList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.charmDetailSizer.Add(self.materialList, 7, wx.EXPAND)
 		self.materialList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -250,6 +256,9 @@ class CharmsTab:
 		self.materialList.InsertColumn(1, info)
 		self.materialList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
 
+		self.materialList.InsertColumn(2, info)
+		self.materialList.SetColumnWidth(2, 0)
+
 		sql = """
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
 				i.category item_category, i.icon_color item_icon_color, cr.quantity
@@ -273,6 +282,7 @@ class CharmsTab:
 			img = self.il.Add(wx.Bitmap(f"images/materials-24/{mat.iconName}{mat.iconColor}.png"))
 			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, img)
 			self.materialList.SetItem(index, 1, f"{mat.quantity}")
+			self.materialList.SetItem(index, 2, f"{mat.id},{mat.category}")
 
 
 	def onCharmSelected(self, event):
@@ -282,6 +292,16 @@ class CharmsTab:
 			self.charmSkillList.ClearAll()
 			self.materialList.ClearAll()
 		self.loadCharmDetail()
+
+	
+	def onMaterialDoubleClick(self, event):
+		materialInfo = self.materialList.GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		materialInfo = materialInfo.split(",")
+		self.link.event = True
+		self.link.eventType = "item"
+		self.link.item =  link.ItemLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):

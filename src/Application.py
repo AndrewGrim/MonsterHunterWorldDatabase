@@ -52,7 +52,7 @@ class Application(wx.Frame):
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
 		w.WeaponsTab(root, self.mainNotebook, self.link)
 		a.ArmorTab(root, self.mainNotebook, self.link)
-		c.CharmsTab(root, self.mainNotebook)
+		c.CharmsTab(root, self.mainNotebook, self.link)
 		d.DecorationsTab(root, self.mainNotebook)
 		s.SkillsTab(root, self.mainNotebook)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(1)
+		self.mainNotebook.SetSelection(3)
 
 		self.Show()
 		if "-debug" in cmdArgs:
