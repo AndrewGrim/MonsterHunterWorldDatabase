@@ -252,10 +252,10 @@ class ArmorTab:
 				if a.armorSetName[0:11] == "King Beetle":
 					name = a.name.replace("King", "King / Queen")
 					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"        {name} ▼", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+						img, f"        {name}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
 				else:
 					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"        {a.armorSetName} ▼", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+						img, f"        {a.armorSetName}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
 				self.armorTree.AppendRows()
 				row += 1
 			armorSet = a.armorSetName
