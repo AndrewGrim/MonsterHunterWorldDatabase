@@ -233,8 +233,7 @@ class WeaponsTab:
 		self.weaponTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponSelection)
 		self.weaponTreeSizer.Add(self.weaponTree, 1, wx.EXPAND)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		self.il = wx.ImageList(24, 24)
 
 		self.test = self.il.Add(self.testIcon)
 
@@ -779,6 +778,15 @@ class WeaponsTab:
 					"Blast", blast, self.blastCoating,],
 		}
 
+		coatingIconColors = {
+			0: "White",
+			3: "Red",
+			6: "Gold",
+			9: "Violet",
+			12: "Cyan",
+			15: "Lime",
+		} 
+
 		for num in range(self.weaponRowNumbers[self.currentWeaponTree]):
 			self.weaponDetailList.SetCellRenderer(num, 0, wx.grid.GridCellStringRenderer())
 			self.weaponDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
@@ -891,7 +899,7 @@ class WeaponsTab:
 		elif self.currentWeaponTree == "bow":
 			for num in range(0, 17, 3):
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
-							"images/weapon-detail-24/coating.png") 
+							f"images/coatings-24/Bottle{coatingIconColors[num]}.png") 
 							, additionalDetails[self.currentWeaponTree][num]))
 				self.weaponDetailList.SetCellValue(row, 0, additionalDetails[self.currentWeaponTree][num])
 				self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][num + 1]))
