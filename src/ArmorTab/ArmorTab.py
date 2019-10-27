@@ -546,6 +546,7 @@ class ArmorTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
+		self.armorSetMaterialList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.armorSetMaterialList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.armorSetSizer.Add(self.armorSetMaterialList, 1, wx.EXPAND)
 
@@ -810,6 +811,7 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_LEFT
 			info.Text = "Req. Materials"
 			self.armorSetMaterialList.InsertColumn(0, info)
+			self.armorSetMaterialList.SetColumnWidth(0, 302)
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -817,9 +819,10 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_CENTER
 			info.Text = ""
 			self.armorSetMaterialList.InsertColumn(1, info)
-
-			self.armorSetMaterialList.SetColumnWidth(0, 302)
 			self.armorSetMaterialList.SetColumnWidth(1, 155 - 22)
+
+			self.armorSetMaterialList.InsertColumn(2, info)
+			self.armorSetMaterialList.SetColumnWidth(2, 0)
 
 			for k, v in armorSetMaterials.items():
 				try:
@@ -828,6 +831,19 @@ class ArmorTab:
 					img = self.ilMats.Add(wx.Bitmap("images/unknown.png"))
 				index = self.armorSetMaterialList.InsertItem(self.armorSetMaterialList.GetItemCount(), k, img)
 				self.armorSetMaterialList.SetItem(index, 1, str(v))
+
+				sql = f"""
+					SELECT i.id, i.category
+					FROM item i
+					JOIN item_text it
+					ON it.id = i.id
+					WHERE it.name LIKE '%{k}%'
+					AND it.lang_id = :langId
+				"""
+
+				data = conn.execute(sql, ("en", ))
+				data = data.fetchone()
+				self.armorSetMaterialList.SetItem(index, 2, f"{data[0]},{data[1]}")
 
 
 	def onArmorTypeSelection(self, event):
@@ -869,7 +885,7 @@ class ArmorTab:
 
 
 	def onMaterialDoubleClick(self, event):
-		materialInfo = self.armorMaterialsList.GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2)
 		materialInfo = materialInfo.split(",")
 		self.link.event = True
 		self.link.eventType = "item"
