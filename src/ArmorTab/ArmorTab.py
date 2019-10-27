@@ -13,17 +13,21 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import ArmorTab as a
 import Utilities as util
+from Utilities import debug
+import Links as link
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 Armor = NewType('Armor', None)
 
 class ArmorTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
 
 		self.currentArmorTree = "HR"
 		self.currentlySelectedArmorID = 159
@@ -316,6 +320,7 @@ class ArmorTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
+		self.armorMaterialsList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.ilMats = wx.ImageList(24, 24)
 		self.armorMaterialsList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.armorDetailSizer.Add(self.armorMaterialsList, 1, wx.EXPAND)
@@ -495,6 +500,7 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_LEFT
 				info.Text = "Req. Materials"
 				self.armorMaterialsList.InsertColumn(0, info)
+				self.armorMaterialsList.SetColumnWidth(0, 302)
 
 				info = wx.ListItem()
 				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -502,9 +508,10 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_CENTER
 				info.Text = ""
 				self.armorMaterialsList.InsertColumn(1, info)
-
-				self.armorMaterialsList.SetColumnWidth(0, 302)
 				self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
+
+				self.armorMaterialsList.InsertColumn(2, info)
+				self.armorMaterialsList.SetColumnWidth(2, 0)
 
 				for material in armorMaterials:
 					try:
@@ -513,6 +520,7 @@ class ArmorTab:
 						img = self.ilMats.Add(wx.Bitmap(f"images/unknown.png"))
 					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
 					self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
+					self.armorMaterialsList.SetItem(index, 2, f"{material.id},{material.category}")
 
 
 	def initArmorSetDetails(self):
@@ -858,6 +866,16 @@ class ArmorTab:
 				width, height = self.armorSetPanel.GetSize()
 				self.armorSetPanel.SetSize(width + 1, height + 1)
 				self.armorSetPanel.SetSize(width, height)
+
+
+	def onMaterialDoubleClick(self, event):
+		materialInfo = self.armorMaterialsList.GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		materialInfo = materialInfo.split(",")
+		self.link.event = True
+		self.link.eventType = "item"
+		self.link.item =  link.ItemLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):
