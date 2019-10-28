@@ -1,1 +1,1 @@
-python src\Application.py
+python src\Application.py -size 1420 850

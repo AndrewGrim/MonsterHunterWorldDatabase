@@ -56,7 +56,7 @@ class Application(wx.Frame):
 		d.DecorationsTab(root, self.mainNotebook)
 		s.SkillsTab(root, self.mainNotebook)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
-		l.LocationsTab(root, self.mainNotebook)
+		l.LocationsTab(root, self.mainNotebook, self.link)
 		#k.KinsectsTab(root, self.mainNotebook)
 
 		self.mainNotebook.SetPageImage(0, mon)

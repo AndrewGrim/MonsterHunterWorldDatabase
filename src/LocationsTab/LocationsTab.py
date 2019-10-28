@@ -13,13 +13,18 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import LocationsTab as l
+from Utilities import debug
+import Links as link
 
 class LocationsTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
+
 		self.currentLocationID = 1
 		self.currentLocationName = "Ancient Forest"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
@@ -120,6 +125,7 @@ class LocationsTab:
 																| wx.LC_VRULES
 																| wx.LC_HRULES
 																)
+		self.materialList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.materialList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.locationDetailSizer.Add(self.materialList, 7, wx.EXPAND)
 
@@ -187,6 +193,9 @@ class LocationsTab:
 		self.materialList.InsertColumn(2, info)
 		self.materialList.SetColumnWidth(2, 55)
 
+		self.materialList.InsertColumn(3, info)
+		self.materialList.SetColumnWidth(3, 0)
+
 		sql = """
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name, i.icon_color item_icon_color, i.category item_category,
 				li.rank, li.area, li.stack, li.percentage, li.nodes
@@ -213,6 +222,17 @@ class LocationsTab:
 			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, img)
 			self.materialList.SetItem(index, 1, f"{mat.stack} x {mat.percentage}%")
 			self.materialList.SetItem(index, 2, f"Area {mat.area}")
+			self.materialList.SetItem(index, 3, f"{mat.id},{mat.category}")
+
+
+	def onMaterialDoubleClick(self, event):
+		materialInfo = self.materialList.GetItemText(event.GetEventObject().GetFirstSelected(), 3)
+		materialInfo = materialInfo.split(",")
+		self.link.event = True
+		self.link.eventType = "item"
+		self.link.item =  link.ItemLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onLocationSelected(self, event):
