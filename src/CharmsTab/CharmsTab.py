@@ -183,6 +183,7 @@ class CharmsTab:
 																| wx.LC_VRULES
 																| wx.LC_HRULES
 																)
+		self.charmSkillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
 		self.charmDetailSizer.Add(self.charmSkillList, 1, wx.EXPAND)
 		self.charmSkillList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -214,6 +215,9 @@ class CharmsTab:
 		self.charmSkillList.InsertColumn(1, info)
 		self.charmSkillList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
 
+		self.charmSkillList.InsertColumn(2, info)
+		self.charmSkillList.SetColumnWidth(2, 0)
+
 		sql = """
 			SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level,
 				s.icon_color skill_icon_color, cs.level level
@@ -239,6 +243,7 @@ class CharmsTab:
 			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
 			index = self.charmSkillList.InsertItem(self.charmSkillList.GetItemCount(), skill.name, img)
 			self.charmSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+			self.charmSkillList.SetItem(index, 2, f"{skill.id}")
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -292,6 +297,15 @@ class CharmsTab:
 			self.charmSkillList.ClearAll()
 			self.materialList.ClearAll()
 		self.loadCharmDetail()
+
+
+	def onSkillDoubleClick(self, event):
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		self.link.event = True
+		self.link.eventType = "skill"
+		self.link.skill =  link.SkillLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 	
 	def onMaterialDoubleClick(self, event):
