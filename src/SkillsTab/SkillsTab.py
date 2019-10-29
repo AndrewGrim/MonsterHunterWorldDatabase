@@ -164,6 +164,11 @@ class SkillsTab:
 
 
 	def loadSkillDetail(self):
+		try:
+			self.skillDetailList.ClearAll()
+		except:
+			pass
+			
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -217,6 +222,11 @@ class SkillsTab:
 
 
 	def loadSkillFound(self):
+		try:
+			self.foundList.ClearAll()
+		except:
+			pass
+		
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -370,9 +380,7 @@ class SkillsTab:
 	def onSkillSelected(self, event):
 		self.currentSkillID = self.skillList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentSkillID) > 0:
-			self.skillDetailList.ClearAll()
-			self.foundList.ClearAll()
-		self.loadSkillDetail()
+			self.loadSkillDetail()
 
 
 	def onSize(self, event):

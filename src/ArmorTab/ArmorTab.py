@@ -312,6 +312,7 @@ class ArmorTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
+		self.armorSkillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
 		self.ilSkills = wx.ImageList(24, 24)
 		self.armorSkillList.SetImageList(self.ilSkills, wx.IMAGE_LIST_SMALL)
 		self.armorDetailSizer.Add(self.armorSkillList, 1, wx.EXPAND)
@@ -447,6 +448,7 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_LEFT
 				info.Text = "Skills"
 				self.armorSkillList.InsertColumn(0, info)
+				self.armorSkillList.SetColumnWidth(0, 302)
 
 				info = wx.ListItem()
 				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -454,9 +456,10 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_CENTER
 				info.Text = ""
 				self.armorSkillList.InsertColumn(1, info)
-
-				self.armorSkillList.SetColumnWidth(0, 302)
 				self.armorSkillList.SetColumnWidth(1, 155 - 21)
+
+				self.armorSkillList.InsertColumn(2, info)
+				self.armorSkillList.SetColumnWidth(2, 0)
 
 				for skill in armorSkills:
 					lvl = skill.skillLevel * "◈"
@@ -465,6 +468,7 @@ class ArmorTab:
 						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
 						index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, img)
 						self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+						self.armorSkillList.SetItem(index, 2, f"{skill.id}")
 
 
 	def loadArmorMaterials(self):
@@ -539,6 +543,7 @@ class ArmorTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
+		self.armorSetSkillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
 		self.armorSetSkillList.SetImageList(self.ilSkills, wx.IMAGE_LIST_SMALL)
 		self.armorSetSizer.Add(self.armorSetSkillList, 1, wx.EXPAND)
 
@@ -756,6 +761,7 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_LEFT
 			info.Text = "Skills"
 			self.armorSetSkillList.InsertColumn(0, info)
+			self.armorSetSkillList.SetColumnWidth(0, 302)
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -763,9 +769,10 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_CENTER
 			info.Text = ""
 			self.armorSetSkillList.InsertColumn(1, info)
-
-			self.armorSetSkillList.SetColumnWidth(0, 302)
 			self.armorSetSkillList.SetColumnWidth(1, 155 - 22)
+
+			self.armorSetSkillList.InsertColumn(2, info)
+			self.armorSetSkillList.SetColumnWidth(2, 0)
 
 			for k, v in armorSetSkills.items():
 				lvl = v[0] * "◈"
@@ -773,6 +780,21 @@ class ArmorTab:
 				img = self.ilSkills.Add(wx.Bitmap(skillIcons[k]))
 				index = self.armorSetSkillList.InsertItem(self.armorSetSkillList.GetItemCount(), k, img)
 				self.armorSetSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+
+				sql = f"""
+					SELECT st.id
+					FROM skilltree st
+					JOIN skilltree_text stt
+						ON st.id = stt.id
+					WHERE stt.name LIKE '%{k}%'
+					AND stt.lang_id = :langId
+				"""
+
+				data = conn.execute(sql, ("en", ))
+				data = data.fetchone()
+
+				self.armorSetSkillList.SetItem(index, 2, f"{data[0]}")
+
 			if armorSetBonus:
 				sql = """
 					SELECT st.id as skilltree_id, stt.name as skilltree_name, st.max_level skilltree_max_level,
@@ -882,6 +904,15 @@ class ArmorTab:
 				width, height = self.armorSetPanel.GetSize()
 				self.armorSetPanel.SetSize(width + 1, height + 1)
 				self.armorSetPanel.SetSize(width, height)
+
+
+	def onSkillDoubleClick(self, event):
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		self.link.event = True
+		self.link.eventType = "skill"
+		self.link.skill =  link.SkillLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onMaterialDoubleClick(self, event):

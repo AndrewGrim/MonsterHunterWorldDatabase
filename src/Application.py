@@ -54,7 +54,7 @@ class Application(wx.Frame):
 		a.ArmorTab(root, self.mainNotebook, self.link)
 		c.CharmsTab(root, self.mainNotebook, self.link)
 		d.DecorationsTab(root, self.mainNotebook)
-		s.SkillsTab(root, self.mainNotebook)
+		self.skills = s.SkillsTab(root, self.mainNotebook)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		l.LocationsTab(root, self.mainNotebook, self.link)
 		#k.KinsectsTab(root, self.mainNotebook)
@@ -118,6 +118,17 @@ class Application(wx.Frame):
 				index = -1
 				for i in range(self.mainNotebook.GetPageCount()):
 					if self.mainNotebook.GetPageText(i) == "Items":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index) 
+
+			elif self.link.eventType == "skill":
+				self.skills.currentSkillID = self.link.skill.id
+				self.skills.loadSkillDetail()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Skills":
 						index = i
 						break
 				assert index > -1, "The page index must be at least 0 and usually higher!"
