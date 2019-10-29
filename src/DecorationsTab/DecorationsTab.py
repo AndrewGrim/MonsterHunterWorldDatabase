@@ -13,13 +13,18 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import DecorationsTab as d
+from Utilities import debug
+import Links as link
 
 class DecorationsTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
+
 		self.currentDecorationID = 1
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 		self.initItemTab()
@@ -175,6 +180,7 @@ class DecorationsTab:
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
+		self.skillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
 		self.decorationDetailSizer.Add(self.skillList, 1, wx.EXPAND)
 		self.skillList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -202,6 +208,9 @@ class DecorationsTab:
 		info.Text = ""
 		self.skillList.InsertColumn(1, info)
 		self.skillList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
+
+		self.skillList.InsertColumn(2, info)
+		self.skillList.SetColumnWidth(2, 0)
 
 		sql = """
 			SELECT d.*, dtext.name,
@@ -235,6 +244,7 @@ class DecorationsTab:
 			img = self.test
 		index = self.skillList.InsertItem(self.skillList.GetItemCount(), deco.skillName, img)
 		self.skillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+		self.skillList.SetItem(index, 2, f"{deco.skillTreeID}")
 
 		self.loadDecorationDrop(deco)
 
@@ -279,6 +289,15 @@ class DecorationsTab:
 			self.skillList.ClearAll()
 			self.dropList.ClearAll()
 		self.loadDecorationDetail()
+
+	
+	def onSkillDoubleClick(self, event):
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2)
+		self.link.event = True
+		self.link.eventType = "skill"
+		self.link.skill =  link.SkillLink(materialInfo)
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):
