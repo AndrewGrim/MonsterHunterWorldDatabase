@@ -15,6 +15,7 @@ import CharmsTab as c
 import LocationsTab as l
 import KinsectsTab as k
 import Utilities as util
+from Utilities import debug
 import Links as link
 
 class Application(wx.Frame):
@@ -50,14 +51,14 @@ class Application(wx.Frame):
 		self.mainNotebook.AssignImageList(il)
 
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
-		w.WeaponsTab(root, self.mainNotebook, self.link)
-		a.ArmorTab(root, self.mainNotebook, self.link)
-		c.CharmsTab(root, self.mainNotebook, self.link)
+		self.weapons = w.WeaponsTab(root, self.mainNotebook, self.link)
+		self.armor = a.ArmorTab(root, self.mainNotebook, self.link)
+		self.charms = c.CharmsTab(root, self.mainNotebook, self.link)
 		self.decos = d.DecorationsTab(root, self.mainNotebook, self.link)
 		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
-		l.LocationsTab(root, self.mainNotebook, self.link)
-		#k.KinsectsTab(root, self.mainNotebook)
+		self.locations = l.LocationsTab(root, self.mainNotebook, self.link)
+		#self.kinsects = k.KinsectsTab(root, self.mainNotebook)
 
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, wep)
@@ -144,6 +145,31 @@ class Application(wx.Frame):
 						break
 				assert index > -1, "The page index must be at least 0 and usually higher!"
 				self.mainNotebook.SetSelection(index) 
+
+			elif self.link.eventType == "charm":
+				self.charms.currentCharmID = self.link.info.id
+				self.charms.loadCharmDetail()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Charms":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index) 
+
+			elif self.link.eventType == "armor":
+				self.armor.currentlySelectedArmorID = self.link.info.id
+				self.armor.loadArmorDetails()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Armor":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index)
+
+			else:
+				debug(self.link, "self.link", "Link type not supported!")
 
 
 

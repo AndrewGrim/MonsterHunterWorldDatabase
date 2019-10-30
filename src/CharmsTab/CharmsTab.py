@@ -197,6 +197,9 @@ class CharmsTab:
 
 
 	def loadCharmDetail(self):
+		self.charmSkillList.ClearAll()
+		self.materialList.ClearAll()
+
 		self.charmNameLabel.SetLabelText(f"\n{self.currentCharmName}")
 
 		info = wx.ListItem()
@@ -206,8 +209,8 @@ class CharmsTab:
 		info.Text = "Skills"
 		self.charmSkillList.InsertColumn(0, info)
 		self.charmSkillList.SetColumnWidth(0, self.charmDetailPanel.GetSize()[0] * 0.66)
-		info = wx.ListItem()
 
+		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
 		info.Align = wx.LIST_FORMAT_LEFT
@@ -293,10 +296,8 @@ class CharmsTab:
 	def onCharmSelected(self, event):
 		self.currentCharmName = self.charmList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
 		self.currentCharmID = self.charmList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
-		if int(self.currentCharmID) > 0:
-			self.charmSkillList.ClearAll()
-			self.materialList.ClearAll()
-		self.loadCharmDetail()
+		if int(self.currentCharmID) > 0:	
+			self.loadCharmDetail()
 
 
 	def onSkillDoubleClick(self, event):

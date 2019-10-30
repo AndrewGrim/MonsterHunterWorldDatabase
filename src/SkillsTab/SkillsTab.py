@@ -323,6 +323,7 @@ class SkillsTab:
 			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), charm.name, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
+			self.foundList.SetItem(index, 2, f"charm,{charm.id}")
 
 
 	def loadSkillArmor(self):
@@ -356,6 +357,8 @@ class SkillsTab:
 			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.armorRarity}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), arm.armorName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
+			# TODO need armorSetID as well!
+			self.foundList.SetItem(index, 2, f"armor,{arm.armorID}")
 
 
 	def loadSkillArmorSetBonuses(self):
@@ -385,6 +388,7 @@ class SkillsTab:
 			img = self.il.Add(wx.Bitmap(f"images/skills-24/{util.setBonusColors[bonus.setBonusName]}"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), f"{bonus.name} / {bonus.setBonusName}", img)
 			self.foundList.SetItem(index, 1, f"Req. {bonus.setBonusRequired}")
+			self.foundList.SetItem(index, 2, f"skill,{bonus.id}")
 
 
 	def onSkillSelected(self, event):

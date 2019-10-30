@@ -186,7 +186,7 @@ class RedirectText():
 		self.out.WriteText(string)
 
 
-def debug(variable: object, name: str = "None") -> None: 
+def debug(variable: object, name: str = "None", message: str = "None") -> None: 
 	"""
 	variable = The variable you want to print out.
 
@@ -249,7 +249,8 @@ def debug(variable: object, name: str = "None") -> None:
 		print(e)
 		content = None
 
-	print(f"\nName: {name}")
+	print(f"\nMessage: {message}")
+	print(f"Name: {name}")
 	print(f"Type: {typeVar}")
 	print(f"Length: {length}")
 	print(f"Content: {content}")
