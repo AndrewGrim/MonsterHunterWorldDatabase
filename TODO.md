@@ -7,7 +7,7 @@
   - [x] layout
   - [ ] images
 - [ ] prep all images
-  - [ ] prob go back to eq images with black background
+  - [ ] change back the eq images to have a black background since its proving problematic
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
   - [ ] habitat data
@@ -19,17 +19,20 @@
 - [ ] wishlist support
 - [ ] write documentation - which might force me to change sql strings??
 - [ ] on double click show the weapon/armor etc. basically link stuff
-  - [x] monster materials to items link
+  - [x] monster materials to itemsTab link
+  - [x] all req.materials to itemsTab link
+  - [x] all skill to skillTab link
+  - [ ] skills.found -> deco, armor, charms, weapon
+  - [ ] items.usage/obtaining -> loc, monsters, items, weapons, armor, charms
 - [x] change all the awful strings to fstrings
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
 - [x] organize src files into separate folders
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
 - [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow
-- [ ] change all "row[index]" to object.attribute
+- [x] change all "row[index]" to object.attribute
   - [x] MonstersTab
-- [ ] change column width to adjust dynamically according to the window size, for some of the widgets
-- [ ] change back the eq images to have a black background since its proving problematic
+- [x] change column width to adjust dynamically according to the window size, for some of the widgets
 - [ ] get images for all levels of charms
 - [ ] add colors to ele res cells in armor tab
 - [ ] next to summary in monster tab maybe put in-game charts for breaks
@@ -46,6 +49,6 @@
   - [x] skillTab
   - [x] itemTab
   - [x] locationsTab N/A
-  - [ ] weaponsTab
+  - [x] weaponsTab
   - [ ] kinsectsTab
   
