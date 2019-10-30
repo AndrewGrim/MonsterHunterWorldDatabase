@@ -5,4 +5,4 @@ class GenericSingleLink:
 
 
 	def __repr__(self):
-		return f"ID = {self.id}"
+		return f"{self.__dict__!r}"

@@ -28,6 +28,7 @@ class WeaponsTab:
 		self.mainNotebook = mainNotebook
 		self.link = link
 		self.c = wx.ColourDatabase()
+		self.skip = False
 
 		self.currentlySelectedWeaponID = 1
 		self.currentWeaponTree = "great-sword"
@@ -221,7 +222,7 @@ class WeaponsTab:
 
 
 	def onSearchTextEnter(self, event):
-		self.loadweaponTree()
+		self.loadWeaponTree()
 
 
 	def initweaponTree(self):
@@ -385,10 +386,10 @@ class WeaponsTab:
 		
 		self.weaponTree.SetColumnWidth(15, 0)
 
-		self.loadweaponTree()
+		self.loadWeaponTree()
 
 
-	def loadweaponTree(self):
+	def loadWeaponTree(self):
 		try:
 			self.weaponTree.DeleteAllItems()
 		except:
@@ -443,7 +444,7 @@ class WeaponsTab:
 				SELECT w.id, w.weapon_type, w.category, w.rarity, w.attack, w.attack_true, w.affinity, w.defense, w.slot_1, w.slot_2, w.slot_3, w.element1, w.element1_attack,
 					w.element2, w.element2_attack, w.element_hidden, w.sharpness, w.sharpness_maxed, w.previous_weapon_id, w.craftable, w.kinsect_bonus,
 					w.elderseal, w.phial, w.phial_power, w.shelling, w.shelling_level, w.coating_close, w.coating_power, w.coating_poison, w.coating_paralysis, w.coating_sleep, w.coating_blast,
-					w.notes, wa.special_ammo, wt.name
+					w.notes, wa.special_ammo, wa.deviation, wt.name
 				FROM weapon w
 					JOIN weapon_text wt USING (id)
 					LEFT JOIN weapon_ammo wa ON w.ammo_id = wa.id
@@ -456,7 +457,7 @@ class WeaponsTab:
 				SELECT w.id, w.weapon_type, w.category, w.rarity, w.attack, w.attack_true, w.affinity, w.defense, w.slot_1, w.slot_2, w.slot_3, w.element1, w.element1_attack,
 					w.element2, w.element2_attack, w.element_hidden, w.sharpness, w.sharpness_maxed, w.previous_weapon_id, w.craftable, w.kinsect_bonus,
 					w.elderseal, w.phial, w.phial_power, w.shelling, w.shelling_level, w.coating_close, w.coating_power, w.coating_poison, w.coating_paralysis, w.coating_sleep, w.coating_blast,
-					w.notes, wa.special_ammo, wt.name
+					w.notes, wa.special_ammo, wa.deviation, wt.name
 				FROM weapon w
 					JOIN weapon_text wt USING (id)
 					LEFT JOIN weapon_ammo wa ON w.ammo_id = wa.id
@@ -664,6 +665,15 @@ class WeaponsTab:
 		data = data.fetchone()
 
 		wep = w.Weapon(data)
+
+		weaponName = wep.name.replace('"', "'")
+		weaponType = self.currentWeaponTree
+		placeholder = "noImage"
+		if os.path.isfile(f"images/weapons/{weaponType}/{weaponName}.png"):
+			self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{weaponName}.png", wx.BITMAP_TYPE_ANY)
+		else:
+			self.weaponImage = wx.Bitmap(f"images/{placeholder}.png", wx.BITMAP_TYPE_ANY)
+		self.weaponImageLabel.SetBitmap(self.weaponImage)
 
 		affinity = "-"
 		if wep.affinity != 0:
@@ -1302,16 +1312,18 @@ class WeaponsTab:
 		"""
 		When a specific weapon is selected in the tree, the detail view gets populated with the information from the database.
 		"""
+		
+		if self.skip:
+			# when you double click with the mouse over the area where the tree widget is located on the other tab 
+			# it will trigger the onWeaponSelection event
+			# i know this because i tested it with the return key, and double click 
+			# but outside of the tree area and it works as it should
+			# wtf
+			self.skip = False
+			return "fuck this, three hours i'll never get back :("
+
 		self.currentlySelectedWeaponID = self.weaponTree.GetItemText(event.GetItem(), 15)
 		if self.currentlySelectedWeaponID != "":
-			weaponName = (self.weaponTree.GetItemText(event.GetItem(), 0)).replace(" 🔨", "").replace("\"", "'")
-			weaponType = self.currentWeaponTree
-			placeholder = "noImage"
-			if os.path.isfile(f"images/weapons/{weaponType}/{weaponName}.png"):
-				self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{weaponName}.png", wx.BITMAP_TYPE_ANY)
-			else:
-				self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{placeholder}.png", wx.BITMAP_TYPE_ANY)
-			self.weaponImageLabel.SetBitmap(self.weaponImage)
 			self.weaponDetailList.ClearGrid()
 			self.weaponMelodiesList.ClearGrid()
 			self.weaponAmmoList.ClearAll()
@@ -1320,7 +1332,6 @@ class WeaponsTab:
 			except:
 				pass
 			self.materialsRequiredList.ClearAll()
-	
 			self.loadWeaponDetails()
 			self.loadWeaponMaterials()
 			width, height = self.weaponDetailPanel.GetSize()
@@ -1333,7 +1344,7 @@ class WeaponsTab:
 		When a weapon button at the top of the screen is pressed the weapon tree is reloaded with the new weapon type information.
 		"""
 		self.currentWeaponTree = event.GetEventObject().GetName()
-		self.loadweaponTree()
+		self.loadWeaponTree()
 
 
 	def onMaterialDoubleClick(self, event):

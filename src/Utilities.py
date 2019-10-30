@@ -195,14 +195,14 @@ def debug(variable: object, name: str = "None", message: str = "None") -> None:
 	try:
 		typeVar = type(variable)
 	except Exception as e:
-		print(e)
+		print("type:", e)
 		typeVar = None
 
 	try:
 		length = len(variable)
 	except Exception as e:
-		print(e)
-		length = len(str(variable))
+		print("length:", e)
+		length = None
 
 	try:
 		content = ""
@@ -246,7 +246,7 @@ def debug(variable: object, name: str = "None", message: str = "None") -> None:
 		else:
 			content = repr(variable)
 	except Exception as e:
-		print(e)
+		print("content:", e)
 		content = None
 
 	print(f"\nMessage: {message}")

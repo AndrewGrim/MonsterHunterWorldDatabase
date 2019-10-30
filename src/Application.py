@@ -78,7 +78,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(5)
+		self.mainNotebook.SetSelection(6)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -110,8 +110,8 @@ class Application(wx.Frame):
 	def followLink(self):
 		if self.link.event == True:
 			if self.link.eventType == "item":
-				self.items.currentItemCategory = self.link.info.category
-				self.items.loadItemList()
+				#self.items.currentItemCategory = self.link.info.category
+				#self.items.loadItemList()
 				self.items.currentlySelectedItemID = self.link.info.id
 				self.items.loadItemDetail()
 				self.items.loadItemUsage()
@@ -163,6 +163,21 @@ class Application(wx.Frame):
 				index = -1
 				for i in range(self.mainNotebook.GetPageCount()):
 					if self.mainNotebook.GetPageText(i) == "Armor":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index)
+
+			elif self.link.eventType == "weapon":
+				self.weapons.skip = True
+				self.weapons.currentlySelectedWeaponID = self.link.info.id
+				if self.weapons.currentWeaponTree != self.link.info.category:
+					self.weapons.currentWeaponTree = self.link.info.category
+					self.weapons.loadWeaponTree()
+				self.weapons.loadWeaponDetails()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Weapons":
 						index = i
 						break
 				assert index > -1, "The page index must be at least 0 and usually higher!"

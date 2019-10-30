@@ -13,11 +13,14 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import ItemsTab as i
 import CharmsTab as c
 import ArmorTab as a
 import WeaponsTab as w
 import LocationsTab as l
+from Utilities import debug
+import Links as link
 
 class ItemsTab:
 
@@ -415,6 +418,7 @@ class ItemsTab:
 																| wx.LC_HRULES
 																)
 		self.itemUsageList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.itemUsageList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onUsageOrObtainingDoubleClick)
 		self.itemDetailSizer.Add(self.itemUsageList, 12, wx.EXPAND)
 
 
@@ -436,6 +440,9 @@ class ItemsTab:
 		info.Text = ""
 		self.itemUsageList.InsertColumn(1, info)
 		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+
+		self.itemUsageList.InsertColumn(2, info)
+		self.itemUsageList.SetColumnWidth(2, 0)
 
 		self.loadUsageCombinations()
 		self.loadUsageCharms()
@@ -506,6 +513,9 @@ class ItemsTab:
 					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
+			self.itemUsageList.SetItem(index, 2, f"item,{com.resultID},{com.resultCategory}")
+			# TODO usage and obtaining for combinations from links dont seem to load
+			# the proper data that you would get by selecting the resutl in the item list
 
 
 	def loadUsageCharms(self):
@@ -532,6 +542,7 @@ class ItemsTab:
 			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), charm.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{charm.quantity}")
+			self.itemUsageList.SetItem(index, 2, f"charm,{charm.id}")
 
 
 	def loadUsageArmor(self):
@@ -558,6 +569,7 @@ class ItemsTab:
 			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.rarity}.png"))
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), arm.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{arm.quantity}")
+			self.itemUsageList.SetItem(index, 2, f"armor,{arm.id}")
 
 
 	def loadUsageWeapons(self):
@@ -582,6 +594,7 @@ class ItemsTab:
 			img = self.il.Add(wx.Bitmap(f"images/weapons/{weapon.weaponType}/rarity-24/{weapon.rarity}.png"))
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), weapon.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{weapon.quantity}")
+			self.itemUsageList.SetItem(index, 2, f"weapon,{weapon.id},{weapon.weaponType}")
 
 
 	def initItemObtaining(self):
@@ -589,6 +602,7 @@ class ItemsTab:
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
+		self.itemObtainingList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onUsageOrObtainingDoubleClick)
 		self.itemObtainingList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.itemDetailSizer.Add(self.itemObtainingList, 12, wx.EXPAND)
 
@@ -767,6 +781,21 @@ class ItemsTab:
 			self.loadItemDetail()
 			self.loadItemUsage()
 			self.loadItemObtaining()
+
+
+	def onUsageOrObtainingDoubleClick(self, event):
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2).split(",")
+		self.link.event = True
+		self.link.eventType = materialInfo[0]
+		materialInfo.remove(materialInfo[0])
+		if len(materialInfo) == 1:
+			self.link.info = link.GenericSingleLink(materialInfo[0])
+		elif len(materialInfo) == 2:
+			self.link.info = link.GenericDoubleLink(materialInfo)
+		else:
+			debug(materialInfo, "materialInfo", "materialInfo length is other than accounted for!")
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):

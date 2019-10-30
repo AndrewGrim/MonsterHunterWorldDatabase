@@ -6,4 +6,4 @@ class GenericDoubleLink:
 
 
 	def __repr__(self):
-		return f"ID = {self.id}\nCategory = {self.category}"
+		return f"{self.__dict__!r}"

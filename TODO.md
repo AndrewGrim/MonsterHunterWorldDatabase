@@ -51,4 +51,6 @@
   - [x] locationsTab N/A
   - [x] weaponsTab
   - [ ] kinsectsTab
+- [ ] add name to weapon detail since the wep link problem causes a select and its not obvious anymore
+- [ ] make names bold/bigger
   
