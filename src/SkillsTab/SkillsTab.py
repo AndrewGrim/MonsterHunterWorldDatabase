@@ -13,14 +13,19 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import SkillsTab as s
 import Utilities as util
+from Utilities import debug
+import Links as link
 
 class SkillsTab:
 
-	def __init__(self, root, mainNotebook):
+	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
+		
 		self.currentSkillID = 1
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 		self.initSkillTab()
@@ -159,6 +164,7 @@ class SkillsTab:
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
+		self.foundList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onFoundInDoubleClick)
 		self.skillDetailSizer.Add(self.foundList, 7, wx.EXPAND)
 		self.foundList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -243,6 +249,9 @@ class SkillsTab:
 		self.foundList.InsertColumn(1, info)
 		self.foundList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.34 - 20)
 
+		self.foundList.InsertColumn(2, info)
+		self.foundList.SetColumnWidth(2, 0)
+
 		self.loadSkillDecorations()
 		self.loadSkillCharms()
 		self.loadSkillArmor()
@@ -281,6 +290,7 @@ class SkillsTab:
 			img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.decorationIconColor}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
+			self.foundList.SetItem(index, 2, f"decoration,{deco.decorationID}")
 
 		
 	def loadSkillCharms(self):
@@ -381,6 +391,15 @@ class SkillsTab:
 		self.currentSkillID = self.skillList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentSkillID) > 0:
 			self.loadSkillDetail()
+
+
+	def onFoundInDoubleClick(self, event):
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2).split(",")
+		self.link.event = True
+		self.link.eventType = materialInfo[0]
+		self.link.info = link.GenericSingleLink(materialInfo[1])
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):

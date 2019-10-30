@@ -193,6 +193,8 @@ class DecorationsTab:
 
 
 	def loadDecorationDetail(self):
+		self.skillList.ClearAll()
+		
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
@@ -250,6 +252,8 @@ class DecorationsTab:
 
 
 	def loadDecorationDrop(self, Decoration):
+		self.dropList.ClearAll()
+
 		deco = Decoration
 
 		info = wx.ListItem()
@@ -286,16 +290,14 @@ class DecorationsTab:
 	def onDecorationSelected(self, event):
 		self.currentDecorationID = self.decorationList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentDecorationID) > 0:
-			self.skillList.ClearAll()
-			self.dropList.ClearAll()
-		self.loadDecorationDetail()
+			self.loadDecorationDetail()
 
 	
 	def onSkillDoubleClick(self, event):
 		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2)
 		self.link.event = True
 		self.link.eventType = "skill"
-		self.link.skill =  link.SkillLink(materialInfo)
+		self.link.info =  link.GenericSingleLink(materialInfo)
 		self.root.followLink()
 		self.link.reset()
 

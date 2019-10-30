@@ -53,8 +53,8 @@ class Application(wx.Frame):
 		w.WeaponsTab(root, self.mainNotebook, self.link)
 		a.ArmorTab(root, self.mainNotebook, self.link)
 		c.CharmsTab(root, self.mainNotebook, self.link)
-		d.DecorationsTab(root, self.mainNotebook, self.link)
-		self.skills = s.SkillsTab(root, self.mainNotebook)
+		self.decos = d.DecorationsTab(root, self.mainNotebook, self.link)
+		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		l.LocationsTab(root, self.mainNotebook, self.link)
 		#k.KinsectsTab(root, self.mainNotebook)
@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(3)
+		self.mainNotebook.SetSelection(5)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -109,9 +109,9 @@ class Application(wx.Frame):
 	def followLink(self):
 		if self.link.event == True:
 			if self.link.eventType == "item":
-				self.items.currentItemCategory = self.link.item.category
+				self.items.currentItemCategory = self.link.info.category
 				self.items.loadItemList()
-				self.items.currentlySelectedItemID = self.link.item.id
+				self.items.currentlySelectedItemID = self.link.info.id
 				self.items.loadItemDetail()
 				self.items.loadItemUsage()
 				self.items.loadItemObtaining()
@@ -124,7 +124,7 @@ class Application(wx.Frame):
 				self.mainNotebook.SetSelection(index) 
 
 			elif self.link.eventType == "skill":
-				self.skills.currentSkillID = self.link.skill.id
+				self.skills.currentSkillID = self.link.info.id
 				self.skills.loadSkillDetail()
 				index = -1
 				for i in range(self.mainNotebook.GetPageCount()):
@@ -133,6 +133,18 @@ class Application(wx.Frame):
 						break
 				assert index > -1, "The page index must be at least 0 and usually higher!"
 				self.mainNotebook.SetSelection(index) 
+
+			elif self.link.eventType == "decoration":
+				self.decos.currentDecorationID = self.link.info.id
+				self.decos.loadDecorationDetail()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Decorations":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index) 
+
 
 
 	# TODO make a preferences page

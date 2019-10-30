@@ -1,3 +1,3 @@
 from .Link import *
-from .ItemLink import *
-from .SkillLink import *
+from .GenericSingleLink import *
+from .GenericDoubleLink import *

@@ -910,7 +910,7 @@ class ArmorTab:
 		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2)
 		self.link.event = True
 		self.link.eventType = "skill"
-		self.link.skill =  link.SkillLink(materialInfo)
+		self.link.info =  link.GenericSingleLink(materialInfo)
 		self.root.followLink()
 		self.link.reset()
 
@@ -920,7 +920,7 @@ class ArmorTab:
 		materialInfo = materialInfo.split(",")
 		self.link.event = True
 		self.link.eventType = "item"
-		self.link.item =  link.ItemLink(materialInfo)
+		self.link.info =  link.GenericDoubleLink(materialInfo)
 		self.root.followLink()
 		self.link.reset()
 

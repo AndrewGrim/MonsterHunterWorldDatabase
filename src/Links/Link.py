@@ -6,15 +6,8 @@ class Link:
 
 	def reset(self):
 		self.event = False
-		self.eventType = ""
-		self.item = 0
-		self.weapon = 0
-		self.armor = 0
-		self.decoration = 0
-		self.skill = 0
-		self.location = 0
-		self.charm = 0
-		self.kinsect = 0
+		self.eventType = None
+		self.info = 0
 
 
 	def __repr__(self):

@@ -230,7 +230,7 @@ class LocationsTab:
 		materialInfo = materialInfo.split(",")
 		self.link.event = True
 		self.link.eventType = "item"
-		self.link.item =  link.ItemLink(materialInfo)
+		self.link.info =  link.GenericDoubleLink(materialInfo)
 		self.root.followLink()
 		self.link.reset()
 
