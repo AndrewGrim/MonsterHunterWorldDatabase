@@ -35,7 +35,8 @@ class Weapon:
 		self.coating_blast = dbRow[31]
 		self.notes = dbRow[32]
 		self.special_ammo = dbRow[33]
-		self.name = dbRow[34]
+		self.deviation = dbRow[34]
+		self.name = dbRow[35]
 
 
 	def __repr__(self):
