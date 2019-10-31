@@ -183,6 +183,32 @@ class Application(wx.Frame):
 				assert index > -1, "The page index must be at least 0 and usually higher!"
 				self.mainNotebook.SetSelection(index)
 
+			elif self.link.eventType == "monster":
+				self.monsters.currentMonsterID = self.link.info.id
+				self.monsters.currentMonsterName = self.link.info.category
+				self.monsters.loadMonsterSummary()
+				self.monsters.loadMonsterDamage()
+				self.monsters.loadMonsterMaterials()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Monsters":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index)
+
+			elif self.link.eventType == "location":
+				self.locations.currentLocationID = self.link.info.id
+				self.locations.currentLocationName = self.link.info.category
+				self.locations.loadLocationDetail()
+				index = -1
+				for i in range(self.mainNotebook.GetPageCount()):
+					if self.mainNotebook.GetPageText(i) == "Locations":
+						index = i
+						break
+				assert index > -1, "The page index must be at least 0 and usually higher!"
+				self.mainNotebook.SetSelection(index)
+
 			else:
 				debug(self.link, "self.link", "Link type not supported!")
 

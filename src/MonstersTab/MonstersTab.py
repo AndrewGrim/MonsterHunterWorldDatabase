@@ -264,10 +264,12 @@ class MonstersTab:
 
 		self.summaryPanel.SetSizer(self.monsterSummarySizer)
 
-		self.loadMonsterSummary(self.currentMonsterID)
+		self.loadMonsterSummary()
 
 	
-	def loadMonsterSummary(self, monsterID: int) -> None:
+	def loadMonsterSummary(self):
+		self.summaryTree.DeleteAllItems()
+
 		monster = """
 			SELECT m.*, t.name, t.ecology, t.description, t.alt_state_description
 			from monster m JOIN monster_text t USING (id)
@@ -276,7 +278,7 @@ class MonstersTab:
 		"""
 
 		conn = sqlite3.connect("mhw.db")
-		data = conn.execute(monster, ("en", monsterID))
+		data = conn.execute(monster, ("en", self.currentMonsterID))
 		data = data.fetchone()
 	
 		# 5 - has alt weakness
@@ -299,6 +301,12 @@ class MonstersTab:
 		# 22 - wind ailment
 		# 23 - tremor ailment
 		# -> 37 ailments
+
+		if self.currentMonsterID != "":
+			self.monsterImage.LoadFile(f"images/monsters/160/{self.currentMonsterName}.png")
+		else:
+			self.monsterImage.LoadFile("images/monsters/160/Unknown.png")
+		self.monsterImageLabel.SetBitmap(self.monsterImage)
 		
 		monsterName = data[38]
 		self.monsterSummaryNameLabel.SetLabelText(f"\n{monsterName}:\n{data[40]}") 
@@ -402,7 +410,7 @@ class MonstersTab:
 			ORDER BY h.id
 			"""
 
-		data = conn.execute(habitats, ("en", monsterID))
+		data = conn.execute(habitats, ("en", self.currentMonsterID))
 		data = data.fetchall()
 		# 0 - start area
 		# 1 - move area
@@ -476,10 +484,27 @@ class MonstersTab:
 		self.breakDamageTable.SetColSize(0, 200)
 		self.breakDamageTable.SetDefaultCellAlignment( wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 		
-		self.loadMonsterDamage(self.currentMonsterID)
+		self.loadMonsterDamage()
 
 
-	def loadMonsterDamage(self, monsterID: int) -> None:
+	def loadMonsterDamage(self):
+		self.physicalDamageTable.ClearGrid()
+		try:
+			self.physicalDamageTable.DeleteRows(0, self.physicalDamageTable.GetNumberRows())
+		except:
+			pass
+
+		self.elementDamageTable.ClearGrid()
+		try:
+			self.elementDamageTable.DeleteRows(0, self.elementDamageTable.GetNumberRows())
+		except:
+			pass
+		self.breakDamageTable.ClearGrid()
+		try:
+			self.breakDamageTable.DeleteRows(0, self.breakDamageTable.GetNumberRows())
+		except:
+			pass
+
 		conn = sqlite3.connect("mhw.db")
 		
 		sql = """
@@ -492,7 +517,7 @@ class MonstersTab:
 			ORDER BY h.id
 		"""
 		
-		data = conn.execute(sql, ("en", monsterID))
+		data = conn.execute(sql, ("en", self.currentMonsterID))
 		data = data.fetchall()
 		
 		hitzones = []
@@ -547,7 +572,7 @@ class MonstersTab:
 			ORDER BY b.id
 		"""
 
-		data = conn.execute(sql, (monsterID, "en"))
+		data = conn.execute(sql, (self.currentMonsterID, "en"))
 		data = data.fetchall()
 
 		breaks = []
@@ -598,10 +623,12 @@ class MonstersTab:
 		self.monsterMaterialsSizer.Add(self.materialsTree, 1, wx.EXPAND)
 		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
 
-		self.loadMonsterMaterials(self.currentMonsterID)
+		self.loadMonsterMaterials()
 	
 
-	def loadMonsterMaterials(self, monsterID: int) -> None:
+	def loadMonsterMaterials(self):
+		self.materialsTree.DeleteAllItems()
+
 		root = self.materialsTree.AddRoot("Materials")
 		
 		# TODO only make the node if the monster exists in that rank
@@ -638,7 +665,7 @@ class MonstersTab:
 		"""
 
 		conn = sqlite3.connect("mhw.db")
-		data = conn.execute(sql, ("en", monsterID, ))
+		data = conn.execute(sql, ("en", self.currentMonsterID, ))
 		data = data.fetchall()
 
 		rewards = []
@@ -761,37 +788,10 @@ class MonstersTab:
 
 	def onMonsterSelected(self, event):
 		self.currentMonsterID = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
-		self.currentMonsterName = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 0))
-		if self.currentMonsterID != "":
-			self.monsterImage.LoadFile(f"images/monsters/160/{self.currentMonsterName}.png")
-		else:
-			self.monsterImage.LoadFile("images/monsters/160/Unknown.png")
-		self.monsterImageLabel.SetBitmap(self.monsterImage)
-		self.monsterImageLabel.SetSize((160, 160))
-
-		self.physicalDamageTable.ClearGrid()
-		try:
-			self.physicalDamageTable.DeleteRows(0, self.physicalDamageTable.GetNumberRows())
-		except:
-			pass
-
-		self.elementDamageTable.ClearGrid()
-		try:
-			self.elementDamageTable.DeleteRows(0, self.elementDamageTable.GetNumberRows())
-		except:
-			pass
-
-		self.breakDamageTable.ClearGrid()
-		try:
-			self.breakDamageTable.DeleteRows(0, self.breakDamageTable.GetNumberRows())
-		except:
-			pass
-		
-		self.materialsTree.DeleteAllItems()
-		self.summaryTree.DeleteAllItems()
-		self.loadMonsterSummary(self.currentMonsterID)
-		self.loadMonsterDamage(self.currentMonsterID)
-		self.loadMonsterMaterials(self.currentMonsterID)
+		self.currentMonsterName = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 0))	
+		self.loadMonsterSummary()
+		self.loadMonsterDamage()
+		self.loadMonsterMaterials()
 
 	
 	def onMonsterSizeSelect(self, event):

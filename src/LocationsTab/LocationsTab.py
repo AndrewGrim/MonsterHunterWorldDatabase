@@ -131,6 +131,9 @@ class LocationsTab:
 
 
 	def loadLocationDetail(self):
+		self.baseCampList.ClearAll()
+		self.materialList.ClearAll()
+
 		self.locationNameLabel.SetLabelText(f"\n{self.currentLocationName}")
 		self.locationImageLabel.SetBitmap(wx.Bitmap(f"images/locations-160/{self.currentLocationName}.png"))
 
@@ -239,6 +242,4 @@ class LocationsTab:
 		self.currentLocationName = self.locationList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
 		self.currentLocationID = self.locationList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentLocationID) > 0:
-			self.baseCampList.ClearAll()
-			self.materialList.ClearAll()
-		self.loadLocationDetail()
+			self.loadLocationDetail()

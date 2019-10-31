@@ -1320,6 +1320,7 @@ class WeaponsTab:
 			# but outside of the tree area and it works as it should
 			# wtf
 			self.skip = False
+			self.weaponTree.SelectItem(event.GetItem(), False)
 			return "fuck this, three hours i'll never get back :("
 
 		self.currentlySelectedWeaponID = self.weaponTree.GetItemText(event.GetItem(), 15)

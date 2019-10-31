@@ -18,12 +18,12 @@
 - [ ] update with iceborne info - prob make a separate version
 - [ ] wishlist support
 - [ ] write documentation - which might force me to change sql strings??
-- [ ] on double click show the weapon/armor etc. basically link stuff
+- [x] on double click show the weapon/armor etc. basically link stuff
   - [x] monster materials to itemsTab link
   - [x] all req.materials to itemsTab link
   - [x] all skill to skillTab link
-  - [ ] skills.found -> deco, armor, charms, weapon
-  - [ ] items.usage/obtaining -> loc, monsters, items, weapons, armor, charms
+  - [x] skills.found -> deco, armor, charms, weapon
+  - [x] items.usage/obtaining -> loc, monsters, items, weapons, armor, charms
 - [x] change all the awful strings to fstrings
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
 - [x] organize src files into separate folders
@@ -41,7 +41,7 @@
 - [ ] get icons for kinsect tab
 - [ ] preferences
 - [ ] implement sorting
-- [ ] implement searching
+- [x] implement searching
   - [x] armorTab
   - [x] monstersTabs
   - [x] charmTab
@@ -50,7 +50,6 @@
   - [x] itemTab
   - [x] locationsTab N/A
   - [x] weaponsTab
-  - [ ] kinsectsTab
 - [ ] add name to weapon detail since the wep link problem causes a select and its not obvious anymore
 - [ ] make names bold/bigger
   

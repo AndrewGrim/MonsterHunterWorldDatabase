@@ -626,6 +626,9 @@ class ItemsTab:
 		self.itemObtainingList.InsertColumn(1, info)
 		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 
+		self.itemObtainingList.InsertColumn(2, info)
+		self.itemObtainingList.SetColumnWidth(2, 0)
+
 		self.loadObtainingCombination()
 		self.loadObtainingLocations()
 		self.loadObtainingRewards()
@@ -694,6 +697,7 @@ class ItemsTab:
 					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemObtainingList.SetItem(index, 1, f"x {com.quantity}")
+			self.itemObtainingList.SetItem(index, 2, f"item,{com.resultID}")
 
 
 	def loadObtainingLocations(self):
@@ -720,6 +724,7 @@ class ItemsTab:
 			index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
 				f"{local.name} - Area {local.area}", img)
 			self.itemObtainingList.SetItem(index, 1, f"{local.stack} x {local.percentage}%")
+			self.itemObtainingList.SetItem(index, 2, f"location,{local.id},{local.name}")
 
 
 	def loadObtainingRewards(self):
@@ -752,6 +757,7 @@ class ItemsTab:
 			index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(),
 				f"{reward.monsterName} - {reward.rank} {reward.rewardName}", img)
 			self.itemObtainingList.SetItem(index, 1, f"{reward.stack} x {reward.percentage}%")
+			self.itemObtainingList.SetItem(index, 2, f"monster,{reward.id},{reward.monsterName}")
 
 
 	def onItemTypeSelection(self, event):
