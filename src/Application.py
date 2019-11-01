@@ -108,57 +108,27 @@ class Application(wx.Frame):
 				self.items.loadItemDetail()
 				self.items.loadItemUsage()
 				self.items.loadItemObtaining()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Items":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index) 
+				self.selectTab("Items")
 
 			elif self.link.eventType == "skill":
 				self.skills.currentSkillID = self.link.info.id
 				self.skills.loadSkillDetail()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Skills":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index) 
+				self.selectTab("Skills")
 
 			elif self.link.eventType == "decoration":
 				self.decos.currentDecorationID = self.link.info.id
 				self.decos.loadDecorationDetail()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Decorations":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index) 
+				self.selectTab("Decorations")
 
 			elif self.link.eventType == "charm":
 				self.charms.currentCharmID = self.link.info.id
 				self.charms.loadCharmDetail()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Charms":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index) 
+				self.selectTab("Charms")
 
 			elif self.link.eventType == "armor":
 				self.armor.currentlySelectedArmorID = self.link.info.id
 				self.armor.loadArmorDetails()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Armor":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index)
+				self.selectTab("Armor")
 
 			elif self.link.eventType == "weapon":
 				self.weapons.skip = True
@@ -167,13 +137,7 @@ class Application(wx.Frame):
 					self.weapons.currentWeaponTree = self.link.info.category
 					self.weapons.loadWeaponTree()
 				self.weapons.loadWeaponDetails()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Weapons":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index)
+				self.selectTab("Weapons")
 
 			elif self.link.eventType == "monster":
 				self.monsters.currentMonsterID = self.link.info.id
@@ -181,28 +145,26 @@ class Application(wx.Frame):
 				self.monsters.loadMonsterSummary()
 				self.monsters.loadMonsterDamage()
 				self.monsters.loadMonsterMaterials()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Monsters":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index)
+				self.selectTab("Monsters")
 
 			elif self.link.eventType == "location":
 				self.locations.currentLocationID = self.link.info.id
 				self.locations.currentLocationName = self.link.info.category
 				self.locations.loadLocationDetail()
-				index = -1
-				for i in range(self.mainNotebook.GetPageCount()):
-					if self.mainNotebook.GetPageText(i) == "Locations":
-						index = i
-						break
-				assert index > -1, "The page index must be at least 0 and usually higher!"
-				self.mainNotebook.SetSelection(index)
+				self.selectTab("Locations")
 
 			else:
 				debug(self.link, "self.link", "Link type not supported!")
+
+
+	def selectTab(self, text:str) -> None:
+		index = -1
+		for i in range(self.mainNotebook.GetPageCount()):
+			if self.mainNotebook.GetPageText(i) == text:
+				index = i
+				break
+		assert index > -1, "Tab not found! The page index is -1, must be >= 0."
+		self.mainNotebook.SetSelection(index) 
 
 
 
