@@ -10,6 +10,7 @@
   - [ ] change back the eq images to have a black background since its proving problematic
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
+  - [ ] geralt and ciri armor sets
   - [ ] habitat data
   - [ ] nerg definitely has tremor :( and you can definitely break diablos's head! twice even
   - [ ] descriptions for small monsters that i added
@@ -21,7 +22,7 @@
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
-- [ ] Linux: in monstersTab materialTab is fucked, prob something to do with scrolledWindow
+- [ ] Linux: in monstersTab materialTab is fucked
 - [ ] get images for all levels of charms
 - [ ] add colors to ele res cells in armor tab
 - [ ] next to summary in monster tab maybe put in-game charts for breaks

@@ -126,7 +126,7 @@ class WeaponsTab:
 		
 		self.weaponsDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
-		self.weaponImageLabel = wx.StaticBitmap(self.weaponPanel, bitmap=self.weaponImage, size=(160, 160))
+		self.weaponImageLabel = wx.StaticBitmap(self.weaponPanel, bitmap=self.weaponImage, size=(230, 230))
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponPanel)
 		self.weaponDetailPanel = wx.ScrolledWindow(self.weaponDetailsNotebook)
@@ -1381,7 +1381,7 @@ class WeaponsTab:
 		"""
 		On every scroll event in weaponDetail, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
 		"""
-		
+
 		if event.GetWheelRotation() > 0:
 			if self.weaponDetailPanel.GetViewStart()[1] < 3:
 				self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 1 * -1)

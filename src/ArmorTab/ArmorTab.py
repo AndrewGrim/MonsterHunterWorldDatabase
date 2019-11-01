@@ -89,8 +89,8 @@ class ArmorTab:
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.png", wx.BITMAP_TYPE_ANY)
-		self.armorMaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(160, 160))
-		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(160, 160))
+		self.armorMaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
+		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
 
 		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
 		self.armorDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
@@ -287,13 +287,13 @@ class ArmorTab:
 
 			if a.slot1 != 0:
 				self.armorTree.SetCellRenderer(row, 1,  cgr.ImageCellRenderer(
-					wx.Bitmap("images/decoration-slots-24/1.png")))
+					wx.Bitmap(f"images/decoration-slots-24/{a.slot1}.png")))
 			if a.slot2 != 0:
 				self.armorTree.SetCellRenderer(row, 2, cgr.ImageCellRenderer(
-					wx.Bitmap("images/decoration-slots-24/2.png")))
+					wx.Bitmap(f"images/decoration-slots-24/{a.slot2}.png")))
 			if a.slot3 != 0:
 				self.armorTree.SetCellRenderer(row, 3,  cgr.ImageCellRenderer(
-					wx.Bitmap("images/decoration-slots-24/3.png")))
+					wx.Bitmap(f"images/decoration-slots-24/{a.slot3}.png")))
 			row += 1
 
 
@@ -791,11 +791,11 @@ class ArmorTab:
 					FROM skilltree st
 					JOIN skilltree_text stt
 						ON st.id = stt.id
-					WHERE stt.name LIKE '%{k}%'
+					WHERE stt.name LIKE :skillName
 					AND stt.lang_id = :langId
 				"""
 
-				data = conn.execute(sql, ("en", ))
+				data = conn.execute(sql, (k, "en"))
 				data = data.fetchone()
 
 				self.armorSetSkillList.SetItem(index, 2, f"{data[0]}")
