@@ -431,18 +431,21 @@ class MonstersTab:
 	def initMonsterDamage(self):
 		# physical damage grid
 		self.physicalDamageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.physicalDamageTable.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.physicalDamageTable.CreateGrid(0, 5)
 		self.physicalDamageTable.EnableEditing(False)
 		self.physicalDamageTable.EnableDragRowSize(False)
 
 		# element damage grid
 		self.elementDamageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.elementDamageTable.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.elementDamageTable.CreateGrid(0, 6)
 		self.elementDamageTable.EnableEditing(False)
 		self.elementDamageTable.EnableDragRowSize(False)
 
 		# break damage grid
 		self.breakDamageTable = cgr.HeaderBitmapGrid(self.damagePanel)
+		self.breakDamageTable.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.breakDamageTable.CreateGrid(0, 5)
 		self.breakDamageTable.EnableEditing(False)
 		self.breakDamageTable.EnableDragRowSize(False)
@@ -797,3 +800,14 @@ class MonstersTab:
 	def onMonsterSizeSelect(self, event):
 		self.currentMonsterSize = event.GetEventObject().GetName()
 		self.loadMonsterList()
+
+	
+	def onScroll(self, event):
+		"""
+		On every scroll event in the three damage grids, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
+		"""
+		
+		if event.GetWheelRotation() > 0:
+			self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 3 * -1)
+		else:
+			self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 3)

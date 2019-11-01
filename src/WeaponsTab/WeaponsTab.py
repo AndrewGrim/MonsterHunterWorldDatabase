@@ -572,6 +572,7 @@ class WeaponsTab:
 
 	def initWeaponDetailTab(self):
 		self.weaponDetailList = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
+		self.weaponDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.weaponDetailList.EnableEditing(False)
 		self.weaponDetailList.EnableDragRowSize(False)
 		self.weaponDetailSizer.Add(self.weaponDetailList, 1, wx.EXPAND)
@@ -585,6 +586,7 @@ class WeaponsTab:
 		self.weaponDetailList.SetRowLabelSize(0)
 
 		self.weaponSharpnessTable = cgr.HeaderBitmapGrid(self.weaponDetailPanel)
+		self.weaponSharpnessTable.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.weaponSharpnessTable.CreateGrid(6, 7)
 		self.weaponSharpnessTable.EnableEditing(False)
 		self.weaponSharpnessTable.EnableDragRowSize(False)
@@ -594,6 +596,7 @@ class WeaponsTab:
 																			| wx.LC_VRULES
 																			| wx.LC_HRULES
 																			)
+		self.materialsRequiredList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.materialsRequiredList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.ilMats = wx.ImageList(24, 24)
 		self.materialsRequiredList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
@@ -1372,3 +1375,14 @@ class WeaponsTab:
 		self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.materialsRequiredList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
 		self.materialsRequiredList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
+
+
+	def onScroll(self, event):
+		"""
+		On every scroll event in weaponDetail, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
+		"""
+		
+		if event.GetWheelRotation() > 0:
+			self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 3 * -1)
+		else:
+			self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 3)
