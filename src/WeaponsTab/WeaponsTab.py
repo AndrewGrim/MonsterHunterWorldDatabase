@@ -127,6 +127,7 @@ class WeaponsTab:
 		self.weaponsDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		self.weaponImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
 		self.weaponImageLabel = wx.StaticBitmap(self.weaponPanel, bitmap=self.weaponImage, size=(230, 230))
+		self.weaponImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponPanel)
 		self.weaponDetailPanel = wx.ScrolledWindow(self.weaponDetailsNotebook)
@@ -145,7 +146,7 @@ class WeaponsTab:
 		self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
 		self.weaponAmmoPanel.SetSizer(self.weaponAmmoSizer)
 		
-		self.weaponsDetailedSizer.Add(self.weaponImageLabel, 1, wx.ALIGN_CENTER)
+		self.weaponsDetailedSizer.Add(self.weaponImageLabel, 1, wx.EXPAND)
 		self.weaponsDetailedSizer.Add(self.weaponDetailsNotebook, 3, wx.EXPAND)
 
 		self.weaponsSizer.Add(self.weaponTreeSizer, 2, wx.EXPAND)
@@ -1345,7 +1346,7 @@ class WeaponsTab:
 			self.loadWeaponDetails()
 			self.loadWeaponMaterials()
 			width, height = self.weaponDetailPanel.GetSize()
-			self.weaponDetailPanel.SetSize(width + 1, height + 1)
+			self.weaponDetailPanel.SetSize(width + 1, height)
 			self.weaponDetailPanel.SetSize(width, height)
 
 		

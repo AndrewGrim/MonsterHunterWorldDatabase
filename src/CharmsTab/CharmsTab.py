@@ -41,6 +41,7 @@ class CharmsTab:
 		self.charmDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		self.charmImage = wx.Bitmap("images/charms/Artillery Charm I.png", wx.BITMAP_TYPE_ANY)
 		self.charmImageLabel = wx.StaticBitmap(self.charmPanel, bitmap=self.charmImage, size=(160, 160))
+		self.charmImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.charmDetailsNotebook = wx.Notebook(self.charmPanel)
 		self.charmDetailPanel = wx.Panel(self.charmDetailsNotebook)
@@ -49,7 +50,7 @@ class CharmsTab:
 		self.charmDetailsNotebook.AddPage(self.charmDetailPanel, "Detail")
 		self.charmDetailPanel.SetSizer(self.charmDetailSizer)
 		
-		self.charmDetailedSizer.Add(self.charmImageLabel, 1, wx.ALIGN_CENTER)
+		self.charmDetailedSizer.Add(self.charmImageLabel, 1, wx.EXPAND)
 		self.charmDetailedSizer.Add(self.charmDetailsNotebook, 3, wx.EXPAND)
 
 		self.charmSizer.Add(self.charmListSizer, 1, wx.EXPAND)

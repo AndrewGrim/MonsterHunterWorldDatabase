@@ -82,6 +82,7 @@ class ArmorTab:
 
 	def initArmorTab(self):
 		self.armorPanel = wx.Panel(self.mainNotebook)
+		
 		self.mainNotebook.AddPage(self.armorPanel, "Armor")
 		self.armorSizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -91,6 +92,8 @@ class ArmorTab:
 		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.png", wx.BITMAP_TYPE_ANY)
 		self.armorMaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
 		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
+		self.armorMaleImageLabel.SetBackgroundColour((0, 0, 0))
+		self.armorFemaleImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
 		self.armorDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
@@ -367,7 +370,7 @@ class ArmorTab:
 			except:
 				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 			del noLog
-			self.root.SetSize(self.root.windowWidth + 3, self.root.windowHeight)
+			self.root.SetSize(self.root.windowWidth + 1, self.root.windowHeight)
 			self.root.SetSize(self.root.windowWidth, self.root.windowHeight)
 			
 			armorDetail = {
@@ -864,11 +867,11 @@ class ArmorTab:
 					FROM item i
 					JOIN item_text it
 					ON it.id = i.id
-					WHERE it.name LIKE '%{k}%'
+					WHERE it.name LIKE :matName
 					AND it.lang_id = :langId
 				"""
 
-				data = conn.execute(sql, ("en", ))
+				data = conn.execute(sql, (k, "en"))
 				data = data.fetchone()
 				self.armorSetMaterialList.SetItem(index, 2, f"{data[0]},{data[1]}")
 
@@ -934,6 +937,7 @@ class ArmorTab:
 		"""
 		When the application window is resized some columns's width gets readjusted.
 		"""
+
 		self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 		self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
