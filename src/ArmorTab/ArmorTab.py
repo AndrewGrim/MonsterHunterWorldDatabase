@@ -93,8 +93,8 @@ class ArmorTab:
 		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(160, 160))
 
 		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
-		self.armorDetailPanel = wx.Panel(self.armorDetailsNotebook)
-		self.armorSetPanel = wx.Panel(self.armorDetailsNotebook)
+		self.armorDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
+		self.armorSetPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
 		
 		self.armorDetailSizer = wx.BoxSizer(wx.VERTICAL)
 		self.armorDetailsNotebook.AddPage(self.armorDetailPanel, "Detail")
@@ -123,6 +123,9 @@ class ArmorTab:
 		self.initArmorDetailTab()
 		self.initArmorSetDetails()
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
+
+		self.armorDetailPanel.SetScrollRate(20, 20)
+		self.armorSetPanel.SetScrollRate(20, 20)
 
 
 	def initArmorButtons(self):
@@ -296,6 +299,7 @@ class ArmorTab:
 
 	def initArmorDetailTab(self):
 		self.armorDetailList = cgr.HeaderBitmapGrid(self.armorDetailPanel)
+		self.armorDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.armorDetailList.EnableEditing(False)
 		self.armorDetailList.EnableDragRowSize(False)
 		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
@@ -315,7 +319,7 @@ class ArmorTab:
 		self.armorSkillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
 		self.ilSkills = wx.ImageList(24, 24)
 		self.armorSkillList.SetImageList(self.ilSkills, wx.IMAGE_LIST_SMALL)
-		self.armorDetailSizer.Add(self.armorSkillList, 1, wx.EXPAND)
+		self.armorDetailSizer.Add(self.armorSkillList, 0.7, wx.EXPAND)
 
 		self.armorMaterialsList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
@@ -324,7 +328,7 @@ class ArmorTab:
 		self.armorMaterialsList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.ilMats = wx.ImageList(24, 24)
 		self.armorMaterialsList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
-		self.armorDetailSizer.Add(self.armorMaterialsList, 1, wx.EXPAND)
+		self.armorDetailSizer.Add(self.armorMaterialsList, 0.9, wx.EXPAND)
 
 		self.loadArmorDetails()
 		self.loadArmorSkills()
@@ -448,7 +452,7 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_LEFT
 				info.Text = "Skills"
 				self.armorSkillList.InsertColumn(0, info)
-				self.armorSkillList.SetColumnWidth(0, 302)
+				self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 
 				info = wx.ListItem()
 				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -456,7 +460,7 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_CENTER
 				info.Text = ""
 				self.armorSkillList.InsertColumn(1, info)
-				self.armorSkillList.SetColumnWidth(1, 155 - 21)
+				self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 
 				self.armorSkillList.InsertColumn(2, info)
 				self.armorSkillList.SetColumnWidth(2, 0)
@@ -504,7 +508,7 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_LEFT
 				info.Text = "Req. Materials"
 				self.armorMaterialsList.InsertColumn(0, info)
-				self.armorMaterialsList.SetColumnWidth(0, 302)
+				self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 
 				info = wx.ListItem()
 				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -512,7 +516,7 @@ class ArmorTab:
 				info.Align = wx.LIST_FORMAT_CENTER
 				info.Text = ""
 				self.armorMaterialsList.InsertColumn(1, info)
-				self.armorMaterialsList.SetColumnWidth(1, 155 - 21)
+				self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 
 				self.armorMaterialsList.InsertColumn(2, info)
 				self.armorMaterialsList.SetColumnWidth(2, 0)
@@ -529,6 +533,7 @@ class ArmorTab:
 
 	def initArmorSetDetails(self):
 		self.armorSetDetailList = cgr.HeaderBitmapGrid(self.armorSetPanel)
+		self.armorSetDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onSetScroll)
 		self.armorSetSizer.Add(self.armorSetDetailList, 1, wx.EXPAND)
 
 		self.armorSetDetailList.CreateGrid(12, 2)
@@ -545,7 +550,7 @@ class ArmorTab:
 																	)
 		self.armorSetSkillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
 		self.armorSetSkillList.SetImageList(self.ilSkills, wx.IMAGE_LIST_SMALL)
-		self.armorSetSizer.Add(self.armorSetSkillList, 1, wx.EXPAND)
+		self.armorSetSizer.Add(self.armorSetSkillList, 0.7, wx.EXPAND)
 
 		self.armorSetMaterialList = wx.ListCtrl(self.armorSetPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
@@ -553,7 +558,7 @@ class ArmorTab:
 																	)
 		self.armorSetMaterialList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.armorSetMaterialList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
-		self.armorSetSizer.Add(self.armorSetMaterialList, 1, wx.EXPAND)
+		self.armorSetSizer.Add(self.armorSetMaterialList, 0.9, wx.EXPAND)
 
 		self.loadArmorSetDetails()
 
@@ -761,7 +766,7 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_LEFT
 			info.Text = "Skills"
 			self.armorSetSkillList.InsertColumn(0, info)
-			self.armorSetSkillList.SetColumnWidth(0, 302)
+			self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.64)
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -769,7 +774,7 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_CENTER
 			info.Text = ""
 			self.armorSetSkillList.InsertColumn(1, info)
-			self.armorSetSkillList.SetColumnWidth(1, 155 - 22)
+			self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
 
 			self.armorSetSkillList.InsertColumn(2, info)
 			self.armorSetSkillList.SetColumnWidth(2, 0)
@@ -833,7 +838,7 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_LEFT
 			info.Text = "Req. Materials"
 			self.armorSetMaterialList.InsertColumn(0, info)
-			self.armorSetMaterialList.SetColumnWidth(0, 302)
+			self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -841,7 +846,7 @@ class ArmorTab:
 			info.Align = wx.LIST_FORMAT_CENTER
 			info.Text = ""
 			self.armorSetMaterialList.InsertColumn(1, info)
-			self.armorSetMaterialList.SetColumnWidth(1, 155 - 22)
+			self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
 
 			self.armorSetMaterialList.InsertColumn(2, info)
 			self.armorSetMaterialList.SetColumnWidth(2, 0)
@@ -932,12 +937,45 @@ class ArmorTab:
 		self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 		self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-		self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
+		self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 		self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-		self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 21)
+		self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 		self.armorSetDetailList.SetColSize(0, self.armorSetPanel.GetSize()[0] * 0.66)
 		self.armorSetDetailList.SetColSize(1, self.armorSetPanel.GetSize()[0] * 0.34 - 20)
 		self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-		self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
+		self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
 		self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-		self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 21)
+		self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
+
+
+	def onScroll(self, event):
+		"""
+		On every scroll event in armorDetail, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
+		"""
+
+		if event.GetWheelRotation() > 0:
+			if self.armorDetailPanel.GetViewStart()[1] < 3:
+				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 1 * -1)
+			else:
+				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 3 * -1)
+		else:
+			if self.armorDetailPanel.GetViewStart()[1] < 3:
+				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 1)
+			else:
+				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 3)
+
+	def onSetScroll(self, event):
+		"""
+		On every scroll event in armorSetDetail, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
+		"""
+
+		if event.GetWheelRotation() > 0:
+			if self.armorSetPanel.GetViewStart()[1] < 3:
+				self.armorSetPanel.Scroll(0, self.armorSetPanel.GetViewStart()[1] + 1 * -1)
+			else:
+				self.armorSetPanel.Scroll(0, self.armorSetPanel.GetViewStart()[1] + 3 * -1)
+		else:
+			if self.armorSetPanel.GetViewStart()[1] < 3:
+				self.armorSetPanel.Scroll(0, self.armorSetPanel.GetViewStart()[1] + 1)
+			else:
+				self.armorSetPanel.Scroll(0, self.armorSetPanel.GetViewStart()[1] + 3)

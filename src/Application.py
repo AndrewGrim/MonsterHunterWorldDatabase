@@ -78,7 +78,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(6)
+		self.mainNotebook.SetSelection(2)
 
 		self.Show()
 		if "-debug" in cmdArgs:
