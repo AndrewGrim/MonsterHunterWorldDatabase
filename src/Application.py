@@ -78,7 +78,7 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(6)
+		self.mainNotebook.SetSelection(0)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -92,19 +92,11 @@ class Application(wx.Frame):
 		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
 		# main notebook holding the top tabs ie: monsters, weapons etc.
 		self.mainNotebook = wx.Notebook(self.mainPanel)
-		self.mainNotebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChanged)
 		# add notebook to sizer
 		self.mainSizer.Add(self.mainNotebook, 1, wx.EXPAND)
 
 		# set the sizer for mainWindow
 		self.mainPanel.SetSizer(self.mainSizer)
-
-
-	def onTabChanged(self, event):
-		if event.GetEventObject() == self.mainNotebook:
-			w, h = self.GetSize()
-			self.SetSize(w + 3, h)
-			self.SetSize(w, h)
 
 
 	def followLink(self):

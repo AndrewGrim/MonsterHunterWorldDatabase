@@ -129,7 +129,7 @@ class WeaponsTab:
 		self.weaponImageLabel = wx.StaticBitmap(self.weaponPanel, bitmap=self.weaponImage, size=(160, 160))
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponPanel)
-		self.weaponDetailPanel = wx.Panel(self.weaponDetailsNotebook)
+		self.weaponDetailPanel = wx.ScrolledWindow(self.weaponDetailsNotebook)
 		self.weaponMelodiesPanel = wx.Panel(self.weaponDetailsNotebook)
 		self.weaponAmmoPanel = wx.Panel(self.weaponDetailsNotebook)
 		
@@ -159,6 +159,8 @@ class WeaponsTab:
 		self.initWeaponDetailTab()
 
 		self.weaponDetailList.Bind(wx.EVT_SIZE, self.onSize)
+
+		self.weaponDetailPanel.SetScrollRate(20, 20)
 
 
 	def initWeaponButtons(self):
@@ -586,7 +588,7 @@ class WeaponsTab:
 		self.weaponSharpnessTable.CreateGrid(6, 7)
 		self.weaponSharpnessTable.EnableEditing(False)
 		self.weaponSharpnessTable.EnableDragRowSize(False)
-		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 1, wx.EXPAND)
+		self.weaponDetailSizer.Add(self.weaponSharpnessTable, 1, wx.EXPAND|wx.TOP, 5)
 
 		self.materialsRequiredList = wx.ListCtrl(self.weaponDetailPanel, style=wx.LC_REPORT
 																			| wx.LC_VRULES
@@ -595,7 +597,7 @@ class WeaponsTab:
 		self.materialsRequiredList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.ilMats = wx.ImageList(24, 24)
 		self.materialsRequiredList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
-		self.weaponDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND)
+		self.weaponDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND|wx.TOP, 5)
 
 		self.weaponMelodiesList = cgr.HeaderBitmapGrid(self.weaponMelodiesPanel)
 		self.weaponMelodiesList.EnableEditing(False)
@@ -640,7 +642,7 @@ class WeaponsTab:
 				self.weaponDetailSizer.Remove(1)
 		if not self.weaponSharpnessTable.IsShown():
 			self.weaponSharpnessTable.Show()
-			self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND)
+			self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND|wx.TOP, 5)
 			self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())		
 
 
@@ -942,7 +944,7 @@ class WeaponsTab:
 			# unless we can get the sizer to act like its not there
 			if not self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Show()
-				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND)
+				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND|wx.TOP, 5)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
 			sharpnessMaxed = bool(wep.sharpness_maxed)
@@ -987,6 +989,10 @@ class WeaponsTab:
 				self.weaponSharpnessTable.Hide()
 				self.weaponDetailSizer.Remove(1)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
+
+		wi, h = self.root.GetSize()
+		self.root.SetSize(wi - 1, h)
+		self.root.SetSize(wi, h)
 
 	def loadBowgunAmmo(self):
 		self.ilAmmo.RemoveAll()
