@@ -806,8 +806,14 @@ class MonstersTab:
 		"""
 		On every scroll event in the three damage grids, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
 		"""
-		
+
 		if event.GetWheelRotation() > 0:
-			self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 3 * -1)
+			if self.damagePanel.GetViewStart()[1] < 3:
+				self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 1 * -1)
+			else:
+				self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 3 * -1)
 		else:
-			self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 3)
+			if self.damagePanel.GetViewStart()[1] < 3:
+				self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 1)
+			else:
+				self.damagePanel.Scroll(0, self.damagePanel.GetViewStart()[1] + 3)

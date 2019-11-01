@@ -1383,6 +1383,12 @@ class WeaponsTab:
 		"""
 		
 		if event.GetWheelRotation() > 0:
-			self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 3 * -1)
+			if self.weaponDetailPanel.GetViewStart()[1] < 3:
+				self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 1 * -1)
+			else:
+				self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 3 * -1)
 		else:
-			self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 3)
+			if self.weaponDetailPanel.GetViewStart()[1] < 3:
+				self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 1)
+			else:
+				self.weaponDetailPanel.Scroll(0, self.weaponDetailPanel.GetViewStart()[1] + 3)

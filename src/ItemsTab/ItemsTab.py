@@ -825,6 +825,12 @@ class ItemsTab:
 		"""
 		
 		if event.GetWheelRotation() > 0:
-			self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 3 * -1)
+			if self.itemDetailPanel.GetViewStart()[1] < 3:
+				self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 1 * -1)
+			else:
+				self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 3 * -1)
 		else:
-			self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 3)
+			if self.itemDetailPanel.GetViewStart()[1] < 3:
+				self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 1)
+			else:
+				self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 3)
