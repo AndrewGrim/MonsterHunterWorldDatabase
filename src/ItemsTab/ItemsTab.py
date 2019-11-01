@@ -51,7 +51,7 @@ class ItemsTab:
 		self.itemImageLabel = wx.StaticBitmap(self.itemPanel, bitmap=self.itemImage, size=(160, 160))
 
 		self.itemDetailsNotebook = wx.Notebook(self.itemPanel)
-		self.itemDetailPanel = wx.Panel(self.itemDetailsNotebook)
+		self.itemDetailPanel = wx.ScrolledWindow(self.itemDetailsNotebook)
 
 		self.itemDetailSizer = wx.BoxSizer(wx.VERTICAL)
 		self.itemDetailsNotebook.AddPage(self.itemDetailPanel, "Detail")
@@ -76,6 +76,8 @@ class ItemsTab:
 		self.loadItemObtaining()
 
 		self.itemList.Bind(wx.EVT_SIZE, self.onSize)
+
+		self.itemDetailPanel.SetScrollRate(20, 20)
 
 
 	def initItemButtons(self):
@@ -323,17 +325,18 @@ class ItemsTab:
 
 	def initItemDetail(self):
 		self.itemNameLabel = wx.StaticText(self.itemDetailPanel, label="Name:", style=wx.ALIGN_LEFT)
-		self.itemDetailSizer.Add(self.itemNameLabel, 1, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemNameLabel, 0.2, wx.EXPAND)
 		self.itemDescriptionLabel = wx.StaticText(self.itemDetailPanel, label="Description", style=wx.ALIGN_LEFT)
-		self.itemDetailSizer.Add(self.itemDescriptionLabel, 2, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemDescriptionLabel, 0.5, wx.EXPAND)
 
 		self.itemDetailList = wx.ListCtrl(self.itemDetailPanel, size=(600, 124), style=wx.LC_REPORT
 																		| wx.LC_VRULES
 																		| wx.LC_HRULES
 																		| wx.LC_NO_HEADER
 																		)
+		self.itemDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.itemDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.itemDetailSizer.Add(self.itemDetailList, 1, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemDetailList, 0.8, wx.EXPAND)
 
 
 	def loadItemDetail(self):
@@ -419,7 +422,7 @@ class ItemsTab:
 																)
 		self.itemUsageList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.itemUsageList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onUsageOrObtainingDoubleClick)
-		self.itemDetailSizer.Add(self.itemUsageList, 12, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemUsageList, 2, wx.EXPAND)
 
 
 	def loadItemUsage(self):
@@ -439,7 +442,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemUsageList.InsertColumn(1, info)
-		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 40)
 
 		self.itemUsageList.InsertColumn(2, info)
 		self.itemUsageList.SetColumnWidth(2, 0)
@@ -604,7 +607,7 @@ class ItemsTab:
 																	)
 		self.itemObtainingList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onUsageOrObtainingDoubleClick)
 		self.itemObtainingList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.itemDetailSizer.Add(self.itemObtainingList, 12, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemObtainingList, 2, wx.EXPAND)
 
 
 	def loadItemObtaining(self):
@@ -624,7 +627,7 @@ class ItemsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.itemObtainingList.InsertColumn(1, info)
-		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 40)
 
 		self.itemObtainingList.InsertColumn(2, info)
 		self.itemObtainingList.SetColumnWidth(2, 0)
@@ -811,6 +814,17 @@ class ItemsTab:
 		self.itemDetailList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 		self.itemDetailList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.itemUsageList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
-		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 40)
 		self.itemObtainingList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
-		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 40)
+
+
+	def onScroll(self, event):
+		"""
+		On every scroll event in itemDetail, scrolls the parent ScrolledWindow by 3 in the appropriate direction.
+		"""
+		
+		if event.GetWheelRotation() > 0:
+			self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 3 * -1)
+		else:
+			self.itemDetailPanel.Scroll(0, self.itemDetailPanel.GetViewStart()[1] + 3)
