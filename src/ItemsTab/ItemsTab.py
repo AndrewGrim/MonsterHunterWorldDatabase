@@ -422,7 +422,7 @@ class ItemsTab:
 																)
 		self.itemUsageList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.itemUsageList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onUsageOrObtainingDoubleClick)
-		self.itemDetailSizer.Add(self.itemUsageList, 2, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemUsageList, 6, wx.EXPAND)
 
 
 	def loadItemUsage(self):
@@ -607,7 +607,7 @@ class ItemsTab:
 																	)
 		self.itemObtainingList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onUsageOrObtainingDoubleClick)
 		self.itemObtainingList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.itemDetailSizer.Add(self.itemObtainingList, 2, wx.EXPAND)
+		self.itemDetailSizer.Add(self.itemObtainingList, 4, wx.EXPAND)
 
 
 	def loadItemObtaining(self):
