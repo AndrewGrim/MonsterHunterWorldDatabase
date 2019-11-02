@@ -477,7 +477,6 @@ class ItemsTab:
 					ON st.id = s.id
 					AND st.lang_id = :langId
 			WHERE :itemId IS NULL
-				OR c.result_id = :itemId
 				OR c.first_id = :itemId
 				OR c.second_id = :itemId
 			ORDER BY c.id ASC
@@ -516,9 +515,7 @@ class ItemsTab:
 					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
-			self.itemUsageList.SetItem(index, 2, f"item,{com.resultID},{com.resultCategory}")
-			# TODO usage and obtaining for combinations from links dont seem to load
-			# the proper data that you would get by selecting the resutl in the item list
+			self.itemUsageList.SetItem(index, 2, f"item,{com.resultID},{com.resultCategory},{com.resultName}")
 
 
 	def loadUsageCharms(self):
@@ -662,8 +659,6 @@ class ItemsTab:
 					AND st.lang_id = :langId
 			WHERE :itemId IS NULL
 				OR c.result_id = :itemId
-				OR c.first_id = :itemId
-				OR c.second_id = :itemId
 			ORDER BY c.id ASC
 		"""
 
@@ -794,6 +789,9 @@ class ItemsTab:
 
 	def onUsageOrObtainingDoubleClick(self, event):
 		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2).split(",")
+		if len(materialInfo) == 4:
+			self.currentItemName = materialInfo[-1]
+			materialInfo.remove(materialInfo[-1])
 		self.link.event = True
 		self.link.eventType = materialInfo[0]
 		materialInfo.remove(materialInfo[0])

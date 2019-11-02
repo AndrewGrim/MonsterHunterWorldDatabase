@@ -1,13 +1,12 @@
 # TODO
 
-- [ ] charms tab
-  - [ ] images
-  - [x] layout
 - [ ] kinsect tab
   - [x] layout
   - [ ] images
 - [ ] prep all images
-  - [ ] change back the eq images to have a black background since its proving problematic
+  - [ ] proper icons for appraisail kulve weapons
+  - [ ] resize egg icon or make proper svg
+  - [ ] get icons for kinsect tab
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
   - [ ] geralt and ciri armor sets
@@ -23,12 +22,8 @@
 - [ ] remove unnecessary import
 - [ ] change some TODO tags to ICEBORNE
 - [ ] Linux: in monstersTab materialTab is fucked
-- [ ] get images for all levels of charms
 - [ ] add colors to ele res cells in armor tab
 - [ ] next to summary in monster tab maybe put in-game charts for breaks
-- [ ] proper icons for appraisail kulve weapons
-- [ ] resize egg icon or make proper svg
-- [ ] get icons for kinsect tab
 - [ ] preferences
 - [ ] implement sorting
 - [ ] add name to weapon detail since the wep link problem causes a select and its not obvious anymore
