@@ -17,6 +17,7 @@ import KinsectsTab as k
 import Utilities as util
 from Utilities import debug
 import Links as link
+import Preferences as p
 
 class Application(wx.Frame):
 
@@ -78,7 +79,12 @@ class Application(wx.Frame):
 		self.Center()
 
 		# TEST
-		self.mainNotebook.SetSelection(0)
+		pref = p.Preferences(root)
+		try:
+			self.mainNotebook.SetSelection(pref.getTabIndex(pref.initialTab))
+		except Exception as e:
+			print(e)
+			self.mainNotebook.SetSelection(0)
 
 		self.Show()
 		if "-debug" in cmdArgs:
@@ -219,9 +225,8 @@ class Application(wx.Frame):
 		#https://wxpython.org/Phoenix/docs/html/wx.MessageDialog.html
 		#https://wxpython.org/Phoenix/docs/html/wx.lib.agw.hyperlink.HyperLinkCtrl.html
 		wx.MessageBox("Created by github.com/AndrewGrim.\n" + 
-						"This application uses a database and images from github.com/gatheringhallstudios\n" +
+						"This application uses the database and images from github.com/gatheringhallstudios\n" +
 						"as well as some of their SQL queries and their sharpness adjust function.\n" +
-						"All licenses are MIT.\n" +
 						"https://github.com/gatheringhallstudios/MHWorldDatabase\n" +
 						"https://github.com/gatheringhallstudios/MHWorldData",
 						"About",
