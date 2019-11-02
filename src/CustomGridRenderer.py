@@ -32,8 +32,6 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 
 
 	def Draw(self, grid, attr, dc, rect, row, col, isSelected):
-		#image = wx.MemoryDC()
-		#image.SelectObject(self.img) # REMOVE this was being problematic when trying to get bitmap from imagelist
 		dc.SetBackgroundMode(wx.SOLID)
 		if isSelected:
 			dc.SetBrush(wx.Brush(self.selectedColour, wx.SOLID))
@@ -47,7 +45,6 @@ class ImageTextCellRenderer(wx.grid.GridCellRenderer):
 			width = rect.width-2
 		if height > rect.height-2:
 			height = rect.height-2
-		#dc.Blit(rect.x+1, rect.y+1, width, height, image, 0, 0, wx.COPY, True)
 		x = rect.left + (rect.width - self.img.GetWidth()) / 2
 		y = rect.top + (rect.height - self.img.GetHeight()) / 2
 		if self.autoImageOffset:

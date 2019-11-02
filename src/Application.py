@@ -78,7 +78,6 @@ class Application(wx.Frame):
 		self.SetSize(self.windowWidth, self.windowHeight)
 		self.Center()
 
-		# TEST
 		pref = p.Preferences(root)
 		try:
 			self.mainNotebook.SetSelection(pref.getTabIndex(pref.initialTab))
@@ -243,7 +242,6 @@ if __name__ == '__main__':
 		speedTest = True
 	else:
 		speedTest = False
-	# TEST
 	if speedTest:
 		sys.exit()
 	app.MainLoop()

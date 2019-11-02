@@ -32,7 +32,7 @@ class WeaponsTab:
 
 		self.currentlySelectedWeaponID = 1
 		self.currentWeaponTree = "great-sword"
-		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
+		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.rarityColors = {
 			1: "#C2BFBF",
@@ -43,7 +43,7 @@ class WeaponsTab:
 			6: "#6764d7",
 			7: "#895edc",
 			8: "#c47c5e",
-			# MR rarity colors
+			# ICEBORNE rarity colors
 			#9: "#cb7793",
 			#10: "#4fd1f5",
 			#11: "#f5d569",
@@ -89,19 +89,8 @@ class WeaponsTab:
 			"Poison": "AB47BC",
 			"Paralysis": "FFCA28",
 			"Blast": "8D6E63",
-			"Sleep": "78909C", # 26C6DA
+			"Sleep": "78909C",
 		}	
-
-		# TODO maybe remove or change the colors to the ones i actually want
-		self.sharpnessColors = {
-			"red": "d92c2c",
-			"orange": "d9662c",
-			"yellow": "d9d12c",
-			"green": "70d92c",
-			"blue": "2c86d9",
-			"white": "ffffff",
-			"purple": "cc99ff",
-		}
 
 		self.noteColors = {
 			"W": "White",
@@ -165,7 +154,6 @@ class WeaponsTab:
 
 
 	def initWeaponButtons(self):
-		# TODO change to appropriate icons
 		self.greatSwordButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/great-sword/rarity-24/0.png"), name="great-sword")
 		self.longSwordButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/long-sword/rarity-24/0.png"), name="long-sword")
 		self.swordAndShieldButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/sword-and-shield/rarity-24/0.png"), name="sword-and-shield")
@@ -253,7 +241,7 @@ class WeaponsTab:
 		self.rarity6 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/6.png", wx.BITMAP_TYPE_ANY))
 		self.rarity7 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/7.png", wx.BITMAP_TYPE_ANY))
 		self.rarity8 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/8.png", wx.BITMAP_TYPE_ANY))
-		# TODO iceborne
+		# ICEBORNE rarity icons
 		#self.rarity9 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/9.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
@@ -285,12 +273,12 @@ class WeaponsTab:
 		self.deviation = self.il.Add(wx.Bitmap("images/weapon-detail-24/deviation.png"))
 		self.ammo = self.il.Add(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
 
-		self.closeCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
-		self.powerCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
-		self.paralysisCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
-		self.poisonCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
-		self.sleepCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
-		self.blastCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png")) # TODO make all colors
+		self.closeCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
+		self.powerCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
+		self.paralysisCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
+		self.poisonCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
+		self.sleepCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
+		self.blastCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
 
 		self.shelling = self.il.Add(wx.Bitmap("images/weapon-detail-24/shelling.png", wx.BITMAP_TYPE_ANY))
 
@@ -403,7 +391,6 @@ class WeaponsTab:
 			normalWeaponNode = self.weaponTree.AppendItem(root, "Normal")
 			kulveWeaponNode = self.weaponTree.AppendItem(root, "Kulve")
 
-		# TODO icons dont change depending on rarity!!!
 		self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
 		self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
 		self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
@@ -412,6 +399,7 @@ class WeaponsTab:
 		self.rarity6 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/6.png", wx.BITMAP_TYPE_ANY))
 		self.rarity7 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/7.png", wx.BITMAP_TYPE_ANY))
 		self.rarity8 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/8.png", wx.BITMAP_TYPE_ANY))
+		# ICEBORNE rarity icons
 		#self.rarity9 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/9.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
 		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
@@ -434,10 +422,10 @@ class WeaponsTab:
 			6: self.rarity6,
 			7: self.rarity7,
 			8: self.rarity8,
-			#9: self.rarity9, # TODO iceborne
-			#10: self.rarity10, # TODO iceborne
-			#11: self.rarity11, # TODO iceborne
-			#12: self.rarity12, # TODO iceborne
+			#9: self.rarity9, # iceborne icons
+			#10: self.rarity10,
+			#11: self.rarity11,
+			#12: self.rarity12,
 		}
 
 		searchText = self.search.GetValue()
@@ -491,22 +479,17 @@ class WeaponsTab:
 			else:
 				self.populateweaponTree(kulveWeaponNode, wep, weaponNodes)
 
-		# PREFERENCES again add this as a setting in the preferences window/tab/whatever
 		self.weaponTree.ExpandAll()
-		#self.weaponTree.Expand(normalWeaponNode)
-		#self.weaponTree.Expand(kulveWeaponNode)
 
 
 	def populateweaponTree(self, weaponNode: wxTreeListItem, wep: Tuple[str], weaponNodes: Dict[int, wxTreeListItem]) -> None:
 		if bool(wep.craftable):
-			# TODO maybe add rarity in a similar manner?? wep.rarity
 			name = str(wep.name) + " 🔨" # TODO make this clearer that it means craftable
 		else:
 			name = str(wep.name)
 		weapon = self.weaponTree.AppendItem(weaponNode,  name)
 		self.weaponTree.SetItemText(weapon, str(wep.attack), 1)
 
-		# TODO change the element implementation to the one below in weapon detail, shorten the name column
 		if wep.element_hidden == 0 and wep.element1_attack == None:
 			element = ""
 		elif wep.element_hidden == 1:
@@ -730,7 +713,6 @@ class WeaponsTab:
 		if wep.coating_blast == 1:
 			blast = "✓"
 
-		# TODO prob replaces any "None"'s with "-" or ""
 		weaponDetail = {
 			"Rarity": (wep.rarity, self.rarityIcons[wep.rarity]),
 			"Attack": (wep.attack, self.attack),
@@ -944,8 +926,6 @@ class WeaponsTab:
 			self.loadHuntingHornMelodies([additionalDetails[self.currentWeaponTree][3], additionalDetails[self.currentWeaponTree][6], additionalDetails[self.currentWeaponTree][9]])
 
 		if self.currentWeaponTree not in ["light-bowgun", "heavy-bowgun", "bow"]:
-			# TODO i think we want to do the insert method but actually destroy the widget and note hide it,
-			# unless we can get the sizer to act like its not there
 			if not self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Show()
 				self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND|wx.TOP, 5)
