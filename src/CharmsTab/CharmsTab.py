@@ -40,7 +40,7 @@ class CharmsTab:
 		
 		self.charmDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		self.charmImage = wx.Bitmap("images/charms/Artillery Charm I.png", wx.BITMAP_TYPE_ANY)
-		self.charmImageLabel = wx.StaticBitmap(self.charmPanel, bitmap=self.charmImage, size=(160, 160))
+		self.charmImageLabel = wx.StaticBitmap(self.charmPanel, bitmap=self.charmImage, size=(230, 230))
 		self.charmImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.charmDetailsNotebook = wx.Notebook(self.charmPanel)
@@ -201,6 +201,7 @@ class CharmsTab:
 		self.charmSkillList.ClearAll()
 		self.materialList.ClearAll()
 
+		self.charmImageLabel.SetBitmap(wx.Bitmap(f"images/charms/{self.currentCharmName}.png"))
 		self.charmNameLabel.SetLabelText(f"\n{self.currentCharmName}")
 
 		info = wx.ListItem()
@@ -292,6 +293,10 @@ class CharmsTab:
 			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, img)
 			self.materialList.SetItem(index, 1, f"{mat.quantity}")
 			self.materialList.SetItem(index, 2, f"{mat.id},{mat.category}")
+
+		width, height = self.charmPanel.GetSize()
+		self.charmPanel.SetSize(width + 1, height)
+		self.charmPanel.SetSize(width, height)
 
 
 	def onCharmSelected(self, event):
