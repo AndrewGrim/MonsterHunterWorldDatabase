@@ -12,7 +12,7 @@ from typing import Dict
 from typing import NewType
 
 import Utilities as util
-from Utilities import debug
+
 import Links as link
 import MonstersTab as m
 

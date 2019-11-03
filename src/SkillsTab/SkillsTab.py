@@ -16,7 +16,6 @@ from typing import NewType
 
 import SkillsTab as s
 import Utilities as util
-from Utilities import debug
 import Links as link
 
 class SkillsTab:

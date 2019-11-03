@@ -15,9 +15,9 @@ import CharmsTab as c
 import LocationsTab as l
 import KinsectsTab as k
 import Utilities as util
-from Utilities import debug
 import Links as link
 import Preferences as p
+import Debug as debug
 
 class Application(wx.Frame):
 
@@ -82,9 +82,6 @@ class Application(wx.Frame):
 			print(e)
 			self.mainNotebook.SetSelection(0)
 
-		if "-debug" in cmdArgs:
-			self.debugWindow(None)
-
 		if self.windowWidth != 0:
 			self.SetSize(self.windowWidth - 1, self.windowHeight)
 		else:
@@ -97,6 +94,9 @@ class Application(wx.Frame):
 			self.SetPosition(self.pref.windowPosition)
 		else:
 			self.Center()
+
+		if "-debug" in cmdArgs:
+			self.debugWindow(None)
 
 		self.Show()
 
@@ -215,42 +215,30 @@ class Application(wx.Frame):
 
 		self.SetMenuBar(menuBar)
 
-		self.Bind(wx.EVT_MENU, self.onQuit,  exitItem)
+		self.Bind(wx.EVT_MENU, self.onClose,  exitItem)
 		self.Bind(wx.EVT_MENU, self.onAbout, aboutItem)
 		self.Bind(wx.EVT_MENU, self.preferencesWindow, prefItem)
 		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
 
 
 	def debugWindow(self, event):
-		self.log = wx.LogWindow(self, "Debug", show=True)
-		frame = self.log.GetFrame()
-		frame.SetIcon(wx.Icon("images/Nergigante.png"))
-		frame.SetSize(400, self.GetSize()[1])
-		frame.SetPosition((self.GetPosition()[0] - 385, self.GetPosition()[1]))
-		text = self.log.GetFrame().GetChildren()[0]
-
-		assert type(text) == wx.TextCtrl, "Redirect target must be a wx.TextCtrl!"
-
-		wx.Log.SetActiveTarget(self.log)
-
-		redir=util.RedirectText(text)
-		sys.stdout=redir
-		sys.stderr=redir
-
-		self.SetFocus()
+		self.debug = debug.DebugWindow(self)
 
 
 	def preferencesWindow(self, event):
 		p.PreferencesWindow(self, self.pref)
 
 
-	def onQuit(self, event):
-		self.Close(True)
-
 	def onClose(self, event):
 		self.pref.windowSize = self.GetSize()
 		self.pref.windowPosition = self.GetPosition()
 		self.pref.writePreferencesFile()
+
+		try:
+			self.debug.onClose(None)
+		except:
+			pass
+
 		sys.exit()
 
 

@@ -15,7 +15,6 @@ from typing import Dict
 from typing import NewType
 
 import DecorationsTab as d
-from Utilities import debug
 import Links as link
 
 class DecorationsTab:

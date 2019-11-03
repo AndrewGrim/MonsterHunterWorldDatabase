@@ -1,7 +1,6 @@
 import wx
 import os
-
-from Utilities import debug
+from Debug.debug import debug
 
 class Preferences:
 

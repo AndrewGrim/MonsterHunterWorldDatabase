@@ -16,7 +16,6 @@ from typing import NewType
 
 import ArmorTab as a
 import Utilities as util
-from Utilities import debug
 import Links as link
 
 wxTreeListItem = NewType('wxTreeListItem', None)

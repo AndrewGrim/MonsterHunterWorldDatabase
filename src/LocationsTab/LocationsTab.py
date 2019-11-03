@@ -15,7 +15,6 @@ from typing import Dict
 from typing import NewType
 
 import LocationsTab as l
-from Utilities import debug
 import Links as link
 
 class LocationsTab:

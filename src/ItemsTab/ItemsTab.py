@@ -19,8 +19,8 @@ import CharmsTab as c
 import ArmorTab as a
 import WeaponsTab as w
 import LocationsTab as l
-from Utilities import debug
 import Links as link
+from Debug.debug import debug
 
 class ItemsTab:
 

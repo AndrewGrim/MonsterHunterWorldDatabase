@@ -15,7 +15,6 @@ from typing import Dict
 from typing import NewType
 
 import CharmsTab as c
-from Utilities import debug
 import Links as link
 
 class CharmsTab:

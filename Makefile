@@ -1,4 +1,4 @@
 debug:
-	python src/Application.py
+	python src/Application.py -debug
 speed:
 	python tests/speedTest.py
