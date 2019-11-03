@@ -17,6 +17,7 @@ class PreferencesWindow:
 		vSizer = wx.BoxSizer(wx.VERTICAL)
 
 		tabs = ["Monsters", "Weapons", "Armor", "Charms", "Decorations", "Skills", "Items", "Locations",]
+		self.label = wx.StaticText(panel, label="Set initial tab:")
 		self.selectTab = wx.Choice(panel, choices=tabs, size=(200, 20))
 		self.selectTab.SetSelection(self.selectTab.FindString(self.pref.initialTab))
 
@@ -29,6 +30,7 @@ class PreferencesWindow:
 		self.unicodeSymbols = wx.CheckBox(panel, label="Use unicode symbols", size=(200, 20))
 		self.unicodeSymbols.SetValue(self.pref.unicodeSymbols)
 
+		vSizer.Add(self.label, 1, wx.LEFT)
 		vSizer.Add(self.selectTab, 1, wx.CENTER)
 		vSizer.Add((0, 20))
 		vSizer.Add(self.rememberSize, 1, wx.CENTER)
