@@ -216,8 +216,12 @@ class SkillsTab:
 			skills.append(s.SkillDetail(row))
 	
 		for skill in skills:
-			lvl = skill.skillLevel * "◈"
-			maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
+			if self.root.pref.unicodeSymbols:
+				lvl = skill.skillLevel * "◈"
+				maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
+			else:
+				lvl = f"{skill.skillLevel}/"
+				maxLvl = skill.skillMaxLevel
 			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
 			index = self.skillDetailList.InsertItem(self.skillDetailList.GetItemCount(), f"{lvl}{maxLvl}", img)
 			self.skillDetailList.SetItem(index, 1, skill.skillLevelDescription)
@@ -290,8 +294,12 @@ class SkillsTab:
 			decorations.append(s.SkillDecoration(row))
 	
 		for deco in decorations:
-			lvl = deco.skillLevel * "◈"
-			maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
+			if self.root.pref.unicodeSymbols:
+				lvl = deco.skillLevel * "◈"
+				maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
+			else:
+				lvl = f"{deco.skillLevel}/"
+				maxLvl = deco.skillMaxLevel
 			img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.decorationIconColor}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
@@ -323,8 +331,12 @@ class SkillsTab:
 			charms.append(s.SkillCharm(row))
 	
 		for charm in charms:
-			lvl = charm.skillLevel * "◈"
-			maxLvl = (charm.skillMaxLevel - charm.skillLevel) * "◇"
+			if self.root.pref.unicodeSymbols:
+				lvl = charm.skillLevel * "◈"
+				maxLvl = (charm.skillMaxLevel - charm.skillLevel) * "◇"
+			else:
+				lvl = f"{charm.skillLevel}/"
+				maxLvl = charm.skillMaxLevel
 			img = self.il.Add(wx.Bitmap(f"images/charms-24/{charm.rarity}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), charm.name, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
@@ -357,8 +369,12 @@ class SkillsTab:
 			armor.append(s.SkillArmor(row))
 	
 		for arm in armor:
-			lvl = arm.skillLevel * "◈"
-			maxLvl = (arm.skillMaxLevel - arm.skillLevel) * "◇"
+			if self.root.pref.unicodeSymbols:
+				lvl = arm.skillLevel * "◈"
+				maxLvl = (arm.skillMaxLevel - arm.skillLevel) * "◇"
+			else:
+				lvl = f"{arm.skillLevel}/"
+				maxLvl = arm.skillMaxLevel
 			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.armorRarity}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), arm.armorName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")

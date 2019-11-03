@@ -243,9 +243,14 @@ class CharmsTab:
 		skills = []
 		for row in data:
 			skills.append(c.CharmSkill(row))
+
 		for skill in skills:
-			lvl = skill.level * "◈"
-			maxLvl = (skill.maxLevel - skill.level) * "◇"
+			if self.root.pref.unicodeSymbols:
+				lvl = skill.level * "◈"
+				maxLvl = (skill.maxLevel - skill.level) * "◇"
+			else:
+				lvl = f"{skill.level}/"
+				maxLvl = skill.maxLevel
 			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
 			index = self.charmSkillList.InsertItem(self.charmSkillList.GetItemCount(), skill.name, img)
 			self.charmSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")

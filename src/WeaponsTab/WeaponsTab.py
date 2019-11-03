@@ -700,18 +700,32 @@ class WeaponsTab:
 		poison = ""
 		sleep = ""
 		blast = ""
-		if wep.coating_close == 1:
-			close = "✓"
-		if wep.coating_power == 1:
-			power = "✓"
-		if wep.coating_poison == 1:
-			paralysis = "✓"
-		if wep.coating_paralysis == 1:
-			poison = "✓"
-		if wep.coating_sleep == 1:
-			sleep = "✓"
-		if wep.coating_blast == 1:
-			blast = "✓"
+		if self.root.pref.unicodeSymbols:
+			if wep.coating_close == 1:
+				close = "✓"
+			if wep.coating_power == 1:
+				power = "✓"
+			if wep.coating_poison == 1:
+				paralysis = "✓"
+			if wep.coating_paralysis == 1:
+				poison = "✓"
+			if wep.coating_sleep == 1:
+				sleep = "✓"
+			if wep.coating_blast == 1:
+				blast = "✓"
+		else:
+			if wep.coating_close == 1:
+				close = "Yes"
+			if wep.coating_power == 1:
+				power = "Yes"
+			if wep.coating_poison == 1:
+				paralysis = "Yes"
+			if wep.coating_paralysis == 1:
+				poison = "Yes"
+			if wep.coating_sleep == 1:
+				sleep = "Yes"
+			if wep.coating_blast == 1:
+				blast = "Yes"
 
 		weaponDetail = {
 			"Name": (wep.name, self.rarityIcons[wep.rarity]),

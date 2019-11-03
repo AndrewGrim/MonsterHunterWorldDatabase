@@ -241,8 +241,12 @@ class DecorationsTab:
 		data = data.fetchone()
 
 		deco = d.DecorationDetail(data)
-		lvl = deco.skillLevel * "◈"
-		maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
+		if self.root.pref.unicodeSymbols:
+			lvl = deco.skillLevel * "◈"
+			maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
+		else:
+			lvl = f"{deco.skillLevel}/"
+			maxLvl = deco.skillMaxLevel
 		self.decorationImageLabel.SetBitmap(wx.Bitmap(f"images/materials-160/Feystone{deco.iconColor}.png"))
 		self.decorationNameLabel.SetLabelText(f"\n{deco.name}\n")
 		if deco.iconColor != None:

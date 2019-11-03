@@ -188,11 +188,15 @@ class Application(wx.Frame):
 
 	def reloadUnicode(self):
 		self.monsters.loadMonsterSummary()
-		# TODO more need to be added as I add support for them
+		self.weapons.loadWeaponDetails()
+		self.armor.loadArmorTree()
+		self.armor.loadArmorDetails()
+		self.armor.loadArmorSetDetails()
+		self.charms.loadCharmDetail()
+		self.decos.loadDecorationDetail()
+		self.skills.loadSkillDetail()
 
 
-
-	# TODO make a preferences page
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
 		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")

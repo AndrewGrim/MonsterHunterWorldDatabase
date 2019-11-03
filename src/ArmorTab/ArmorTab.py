@@ -77,8 +77,6 @@ class ArmorTab:
 
 		self.initArmorTab()
 
-		self.init = True
-
 
 	def initArmorTab(self):
 		self.armorPanel = wx.Panel(self.mainNotebook)
@@ -125,6 +123,7 @@ class ArmorTab:
 		self.loadArmorTree()
 		self.initArmorDetailTab()
 		self.initArmorSetDetails()
+		
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
 		self.armorDetailPanel.SetScrollRate(20, 20)
@@ -170,7 +169,6 @@ class ArmorTab:
 		self.armorTree.EnableDragRowSize(False)
 		self.armorTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onArmorSelection)
 		self.armorTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
-		self.init = False
 
 		armorTreeColumns = {
 			"Name": [324, wx.Bitmap("images/noImage24.png")],
@@ -255,6 +253,11 @@ class ArmorTab:
 
 		armorSet = "" 
 		row = 0
+		if self.root.pref.unicodeSymbols:
+			piecePadding = "┗━━━            "
+		else:
+			piecePadding = "                    "
+		setPadding = "        "
 		for a in armorList:
 			self.armorTree.AppendRows()
 			if a.armorSetName != armorSet:
@@ -262,10 +265,10 @@ class ArmorTab:
 				if a.armorSetName[0:11] == "King Beetle":
 					name = a.name.replace("King", "King / Queen")
 					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"        {name}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+						img, f"{setPadding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
 				else:
 					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"        {a.armorSetName}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+						img, f"{setPadding}{a.armorSetName}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
 				self.armorTree.AppendRows()
 				row += 1
 			armorSet = a.armorSetName
@@ -273,10 +276,10 @@ class ArmorTab:
 			if a.name[0:11] == "King Beetle":
 				name = a.name.replace("King", "King / Queen")
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"┗ ━━━           {name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
+					img, f"{piecePadding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
 			else:
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"┗ ━━━           {a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
+					img, f"{piecePadding}{a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
 			self.armorTree.SetCellValue(row, 4, str(a.defenseBase))
 			self.armorTree.SetCellValue(row, 5, str(a.defenseMax))
 			self.armorTree.SetCellValue(row, 6, str(a.defenseAugmentedMax))
@@ -339,207 +342,216 @@ class ArmorTab:
 
 
 	def loadArmorDetails(self):
-		if int(self.currentlySelectedArmorID) > 0:
-			self.armorDetailList.DeleteRows(0, self.armorDetailList.GetNumberRows())
-			self.armorDetailList.AppendRows(13)
+		self.armorDetailList.DeleteRows(0, self.armorDetailList.GetNumberRows())
+		self.armorDetailList.AppendRows(13)
 
-			sql = """
-				SELECT a.*, at.name, ast.name armorset_name
-				FROM armor a
-					JOIN armor_text at USING (id)
-					JOIN armorset_text ast
-						ON ast.id = a.armorset_id
-						AND ast.lang_id = at.lang_id
-				WHERE at.lang_id = :langId
-				AND a.id = :armorId
-			"""
+		sql = """
+			SELECT a.*, at.name, ast.name armorset_name
+			FROM armor a
+				JOIN armor_text at USING (id)
+				JOIN armorset_text ast
+					ON ast.id = a.armorset_id
+					AND ast.lang_id = at.lang_id
+			WHERE at.lang_id = :langId
+			AND a.id = :armorId
+		"""
 
-			conn = sqlite3.Connection("mhw.db")
-			data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
-			data = data.fetchone()
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+		data = data.fetchone()
 
-			armor = a.Armor(data)
+		armor = a.Armor(data)
 
-			noLog = wx.LogNull()
-			try:
-				self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.png"))
-			except:
-				self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
-			try:
-				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{armor.name}.png"))
-			except:
-				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
-			del noLog
-			wi, he = self.root.GetSize()
-			self.root.SetSize(wi + 1, he)
-			self.root.SetSize(wi, he)
-			
-			armorDetail = {
-				0:  str(armor.name),
-				1:  str(armor.rarity),
-				2:  str(armor.defenseBase),
-				3:  str(armor.defenseMax),
-				4:  str(armor.defenseAugmentedMax),
-				5:  str(armor.slot1),
-				6:  str(armor.slot2),
-				7:  str(armor.slot3),
-				8:  str(armor.fire),
-				9:  str(armor.water),
-				10:  str(armor.ice),
-				11: str(armor.thunder),
-				12: str(armor.dragon),
-			}
+		noLog = wx.LogNull()
+		try:
+			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.png"))
+		except:
+			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
+		try:
+			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{armor.name}.png"))
+		except:
+			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
+		del noLog
+		wi, he = self.root.GetSize()
+		self.root.SetSize(wi + 1, he)
+		self.root.SetSize(wi, he)
+		
+		armorDetail = {
+			0:  str(armor.name),
+			1:  str(armor.rarity),
+			2:  str(armor.defenseBase),
+			3:  str(armor.defenseMax),
+			4:  str(armor.defenseAugmentedMax),
+			5:  str(armor.slot1),
+			6:  str(armor.slot2),
+			7:  str(armor.slot3),
+			8:  str(armor.fire),
+			9:  str(armor.water),
+			10:  str(armor.ice),
+			11: str(armor.thunder),
+			12: str(armor.dragon),
+		}
 
-			imageOffset = 85
-			rarityIcon = self.il.il.GetBitmap(self.il.armorIcons[armor.armorType][armor.rarity])
+		imageOffset = 85
+		rarityIcon = self.il.il.GetBitmap(self.il.armorIcons[armor.armorType][armor.rarity])
 
-			self.armorDetailList.SetCellValue(0, 0, "Name")
-			self.armorDetailList.SetCellValue(0, 1, armor.name)
-			for num in range(1, 13):
-				if num == 1:
-					self.armorDetailList.SetCellRenderer(num, 0,
+		self.armorDetailList.SetCellValue(0, 0, "Name")
+		self.armorDetailList.SetCellValue(0, 1, armor.name)
+		for num in range(1, 13):
+			if num == 1:
+				self.armorDetailList.SetCellRenderer(num, 0,
+									cgr.ImageTextCellRenderer(
+																rarityIcon,
+																self.armorDetail[num][1],
+																imageOffset=imageOffset,
+															))
+			else:
+				self.armorDetailList.SetCellRenderer(num, 0,
+									cgr.ImageTextCellRenderer(
+										wx.Bitmap(self.armorDetail[num][0]), 
+										self.armorDetail[num][1], 
+										imageOffset=imageOffset
+										))
+			if num not in [5, 6, 7]:
+				self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
+			else:
+				if armorDetail[num] != "0":
+					self.armorDetailList.SetCellRenderer(num, 1,
 										cgr.ImageTextCellRenderer(
-																	rarityIcon,
-																	self.armorDetail[num][1],
-																	imageOffset=imageOffset,
-																))
-				else:
-					self.armorDetailList.SetCellRenderer(num, 0,
-										cgr.ImageTextCellRenderer(
-											wx.Bitmap(self.armorDetail[num][0]), 
-											self.armorDetail[num][1], 
-											imageOffset=imageOffset
+											self.il.decorationSize[int(armorDetail[num])], 
+											armorDetail[num], 
+											imageOffset=30
 											))
-				if num not in [5, 6, 7]:
-					self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
 				else:
-					if armorDetail[num] != "0":
-						self.armorDetailList.SetCellRenderer(num, 1,
-											cgr.ImageTextCellRenderer(
-												self.il.decorationSize[int(armorDetail[num])], 
-												armorDetail[num], 
-												imageOffset=30
-												))
-					else:
-						self.armorDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
-						self.armorDetailList.SetCellValue(num, 1, "-")
+					self.armorDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
+					self.armorDetailList.SetCellValue(num, 1, "-")
+
+		self.loadArmorSkills()
 
 
 	def loadArmorSkills(self):
-		if int(self.currentlySelectedArmorID) > 0:
-			self.ilSkills.RemoveAll()
+		self.armorSkillList.ClearAll()
+		self.ilSkills.RemoveAll()
 
-			sql = """
-				SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level, s.icon_color skill_icon_color,
-					askill.level level
-				FROM armor_skill askill
-					JOIN armor a
-						ON askill.armor_id = a.id
-					JOIN skilltree s
-						ON askill.skilltree_id = s.id
-					JOIN skilltree_text stt
-						ON askill.skilltree_id = stt.id
-					WHERE stt.lang_id = :langId
-						AND askill.armor_id = :armorId
-					ORDER BY askill.skilltree_id ASC
-			"""
+		sql = """
+			SELECT s.id skill_id, stt.name skill_name, s.max_level skill_max_level, s.icon_color skill_icon_color,
+				askill.level level
+			FROM armor_skill askill
+				JOIN armor a
+					ON askill.armor_id = a.id
+				JOIN skilltree s
+					ON askill.skilltree_id = s.id
+				JOIN skilltree_text stt
+					ON askill.skilltree_id = stt.id
+				WHERE stt.lang_id = :langId
+					AND askill.armor_id = :armorId
+				ORDER BY askill.skilltree_id ASC
+		"""
 
-			conn = sqlite3.Connection("mhw.db")
-			data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
-			data = data.fetchall()
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+		data = data.fetchall()
 
-			if data != None:
-				armorSkills = []
-				for row in data:
-					armorSkills.append(a.ArmorSkill(row))
+		if data != None:
+			armorSkills = []
+			for row in data:
+				armorSkills.append(a.ArmorSkill(row))
 
-				info = wx.ListItem()
-				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-				info.Image = -1
-				info.Align = wx.LIST_FORMAT_LEFT
-				info.Text = "Skills"
-				self.armorSkillList.InsertColumn(0, info)
-				self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_LEFT
+			info.Text = "Skills"
+			self.armorSkillList.InsertColumn(0, info)
+			self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 
-				info = wx.ListItem()
-				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-				info.Image = -1
-				info.Align = wx.LIST_FORMAT_CENTER
-				info.Text = ""
-				self.armorSkillList.InsertColumn(1, info)
-				self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_CENTER
+			info.Text = ""
+			self.armorSkillList.InsertColumn(1, info)
+			self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 
-				self.armorSkillList.InsertColumn(2, info)
-				self.armorSkillList.SetColumnWidth(2, 0)
+			self.armorSkillList.InsertColumn(2, info)
+			self.armorSkillList.SetColumnWidth(2, 0)
 
-				for skill in armorSkills:
+			for skill in armorSkills:
+				if self.root.pref.unicodeSymbols:
 					lvl = skill.skillLevel * "◈"
 					maxLvl = (skill.skillMaxLevel - skill.skillLevel) * "◇"
-					if skill.iconColor is not None:
-						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
-						index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, img)
-						self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
-						self.armorSkillList.SetItem(index, 2, f"{skill.id}")
+				else:
+					lvl = f"{skill.skillLevel}/"
+					maxLvl = skill.skillMaxLevel
+				if skill.iconColor is not None:
+					img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/Skill{skill.iconColor}.png"))
+					index = self.armorSkillList.InsertItem(self.armorSkillList.GetItemCount(), skill.name, img)
+					self.armorSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+					self.armorSkillList.SetItem(index, 2, f"{skill.id}")
+
+		self.loadArmorMaterials()
 
 
 	def loadArmorMaterials(self):
-		if int(self.currentlySelectedArmorID) > 0:
-			self.ilMats.RemoveAll()
+		self.armorMaterialsList.ClearAll()
+		self.ilMats.RemoveAll()
 
-			sql = """
-				SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
-					i.category item_category, i.icon_color item_icon_color, a.quantity
-				FROM armor_recipe a
-					JOIN item i
-						ON a.item_id = i.id
-					JOIN item_text it
-						ON it.id = i.id
-						AND it.lang_id = :langId
-				WHERE it.lang_id = :langId
-				AND a.armor_id= :armorId
-				ORDER BY i.id
-			"""
+		sql = """
+			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
+				i.category item_category, i.icon_color item_icon_color, a.quantity
+			FROM armor_recipe a
+				JOIN item i
+					ON a.item_id = i.id
+				JOIN item_text it
+					ON it.id = i.id
+					AND it.lang_id = :langId
+			WHERE it.lang_id = :langId
+			AND a.armor_id= :armorId
+			ORDER BY i.id
+		"""
 
-			conn = sqlite3.Connection("mhw.db")
-			data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
-			data = data.fetchall()
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+		data = data.fetchall()
 
-			if data != None:
-				armorMaterials = []
-				for row in data:
-					armorMaterials.append(a.ArmorMaterial(row))
+		if data != None:
+			armorMaterials = []
+			for row in data:
+				armorMaterials.append(a.ArmorMaterial(row))
 
-				info = wx.ListItem()
-				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-				info.Image = -1
-				info.Align = wx.LIST_FORMAT_LEFT
-				info.Text = "Req. Materials"
-				self.armorMaterialsList.InsertColumn(0, info)
-				self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_LEFT
+			info.Text = "Req. Materials"
+			self.armorMaterialsList.InsertColumn(0, info)
+			self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 
-				info = wx.ListItem()
-				info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-				info.Image = -1
-				info.Align = wx.LIST_FORMAT_CENTER
-				info.Text = ""
-				self.armorMaterialsList.InsertColumn(1, info)
-				self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			info = wx.ListItem()
+			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+			info.Image = -1
+			info.Align = wx.LIST_FORMAT_CENTER
+			info.Text = ""
+			self.armorMaterialsList.InsertColumn(1, info)
+			self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 
-				self.armorMaterialsList.InsertColumn(2, info)
-				self.armorMaterialsList.SetColumnWidth(2, 0)
+			self.armorMaterialsList.InsertColumn(2, info)
+			self.armorMaterialsList.SetColumnWidth(2, 0)
 
-				for material in armorMaterials:
-					try:
-						img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{material.iconName}{material.iconColor}.png"))
-					except:
-						img = self.ilMats.Add(wx.Bitmap(f"images/unknown.png"))
-					index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
-					self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
-					self.armorMaterialsList.SetItem(index, 2, f"{material.id},{material.category}")
+			for material in armorMaterials:
+				try:
+					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{material.iconName}{material.iconColor}.png"))
+				except:
+					img = self.ilMats.Add(wx.Bitmap(f"images/unknown.png"))
+				index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
+				self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
+				self.armorMaterialsList.SetItem(index, 2, f"{material.id},{material.category}")
 
 
 	def initArmorSetDetails(self):
 		self.armorSetDetailList = cgr.HeaderBitmapGrid(self.armorSetPanel)
+		self.armorSetDetailList.EnableEditing(False)
+		self.armorSetDetailList.EnableDragRowSize(False)
 		self.armorSetDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onSetScroll)
 		self.armorSetSizer.Add(self.armorSetDetailList, 1, wx.EXPAND)
 
@@ -571,6 +583,12 @@ class ArmorTab:
 
 
 	def loadArmorSetDetails(self):
+		try:
+			self.armorSetSkillList.ClearAll()
+			self.armorSetMaterialList.ClearAll()
+		except:
+			pass
+
 		sql = """
 			SELECT a.*, at.name, ast.name armorset_name
 			FROM armor a
@@ -720,127 +738,131 @@ class ArmorTab:
 					else:
 						armorSetMaterials[k] = v
 
-		if int(self.currentlySelectedArmorID) > 0:
-			self.armorSetDetailList.DeleteRows(0, self.armorSetDetailList.GetNumberRows())
-			self.armorSetDetailList.AppendRows(13)
-			
-			armorDetail = {
-				0:  str(armor.name),
-				1:  str(armor.rarity),
-				2:  str(defenseBase),
-				3:  str(defenseMax),
-				4:  str(defenseAugmentedMax),
-				5:  str(lvl1Slots),
-				6:  str(lvl2Slots),
-				7:  str(lvl3Slots),
-				8:  str(fire),
-				9:  str(water),
-				10: str(ice),
-				11: str(thunder),
-				12: str(dragon),
-			}
+		self.armorSetDetailList.DeleteRows(0, self.armorSetDetailList.GetNumberRows())
+		self.armorSetDetailList.AppendRows(13)
+		
+		armorDetail = {
+			0:  str(armor.name),
+			1:  str(armor.rarity),
+			2:  str(defenseBase),
+			3:  str(defenseMax),
+			4:  str(defenseAugmentedMax),
+			5:  str(lvl1Slots),
+			6:  str(lvl2Slots),
+			7:  str(lvl3Slots),
+			8:  str(fire),
+			9:  str(water),
+			10: str(ice),
+			11: str(thunder),
+			12: str(dragon),
+		}
 
-			imageOffset = 85
-			rarityIcon = self.il.il.GetBitmap(self.il.armorIcons["armorset"][armor.rarity])
+		imageOffset = 85
+		rarityIcon = self.il.il.GetBitmap(self.il.armorIcons["armorset"][armor.rarity])
 
-			self.armorSetDetailList.SetCellValue(0, 0, "Name")
-			self.armorSetDetailList.SetCellValue(0, 1, armor.armorSetName)
-			for num in range(1, 13):
-				if num == 1:
-					self.armorSetDetailList.SetCellRenderer(num, 0,
-										cgr.ImageTextCellRenderer(
-																	rarityIcon,
-																	self.armorSetDetail[num][1],
-																	imageOffset=imageOffset,
-																))
-				else:
-					self.armorSetDetailList.SetCellRenderer(num, 0,
-										cgr.ImageTextCellRenderer(
-											wx.Bitmap(self.armorSetDetail[num][0]), 
-											self.armorSetDetail[num][1], 
-											imageOffset=imageOffset
-											))
-				if num not in [5, 6, 7]:
+		self.armorSetDetailList.SetCellValue(0, 0, "Name")
+		self.armorSetDetailList.SetCellValue(0, 1, armor.armorSetName)
+		for num in range(1, 13):
+			if num == 1:
+				self.armorSetDetailList.SetCellRenderer(num, 0,
+									cgr.ImageTextCellRenderer(
+																rarityIcon,
+																self.armorSetDetail[num][1],
+																imageOffset=imageOffset,
+															))
+			else:
+				self.armorSetDetailList.SetCellRenderer(num, 0,
+									cgr.ImageTextCellRenderer(
+										wx.Bitmap(self.armorSetDetail[num][0]), 
+										self.armorSetDetail[num][1], 
+										imageOffset=imageOffset
+										))
+			if num not in [5, 6, 7]:
+				self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
+			else:
+				if armorDetail[num] != "0":
+					self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
 					self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
 				else:
-					if armorDetail[num] != "0":
-						self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
-						self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
-					else:
-						self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
-						self.armorSetDetailList.SetCellValue(num, 1, "-")
+					self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
+					self.armorSetDetailList.SetCellValue(num, 1, "-")
 
-			info = wx.ListItem()
-			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-			info.Image = -1
-			info.Align = wx.LIST_FORMAT_LEFT
-			info.Text = "Skills"
-			self.armorSetSkillList.InsertColumn(0, info)
-			self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.64)
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Skills"
+		self.armorSetSkillList.InsertColumn(0, info)
+		self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.64)
 
-			info = wx.ListItem()
-			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-			info.Image = -1
-			info.Align = wx.LIST_FORMAT_CENTER
-			info.Text = ""
-			self.armorSetSkillList.InsertColumn(1, info)
-			self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.armorSetSkillList.InsertColumn(1, info)
+		self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
 
-			self.armorSetSkillList.InsertColumn(2, info)
-			self.armorSetSkillList.SetColumnWidth(2, 0)
+		self.armorSetSkillList.InsertColumn(2, info)
+		self.armorSetSkillList.SetColumnWidth(2, 0)
 
-			for k, v in armorSetSkills.items():
+		for k, v in armorSetSkills.items():
+			if self.root.pref.unicodeSymbols:
 				lvl = v[0] * "◈"
 				maxLvl = (v[1] - v[0]) * "◇"
-				img = self.ilSkills.Add(wx.Bitmap(skillIcons[k]))
-				index = self.armorSetSkillList.InsertItem(self.armorSetSkillList.GetItemCount(), k, img)
-				self.armorSetSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
+			else:
+				lvl = f"{v[0]}/"
+				maxLvl = v[1]
+			
+			img = self.ilSkills.Add(wx.Bitmap(skillIcons[k]))
+			index = self.armorSetSkillList.InsertItem(self.armorSetSkillList.GetItemCount(), k, img)
+			self.armorSetSkillList.SetItem(index, 1, f"{lvl}{maxLvl}")
 
-				sql = f"""
-					SELECT st.id
-					FROM skilltree st
+			sql = f"""
+				SELECT st.id
+				FROM skilltree st
+				JOIN skilltree_text stt
+					ON st.id = stt.id
+				WHERE stt.name LIKE :skillName
+				AND stt.lang_id = :langId
+			"""
+
+			data = conn.execute(sql, (k, "en"))
+			data = data.fetchone()
+
+			self.armorSetSkillList.SetItem(index, 2, f"{data[0]}")
+
+		if armorSetBonus:
+			sql = """
+				SELECT st.id as skilltree_id, stt.name as skilltree_name, st.max_level skilltree_max_level,
+					st.icon_color as skilltree_icon_color,
+					abs.setbonus_id as id, abt.name, abs.required
+				FROM armorset_bonus_skill abs
+					JOIN armorset_bonus_text abt
+						ON abt.id = abs.setbonus_id
+					JOIN skilltree st
+						ON abs.skilltree_id = st.id
 					JOIN skilltree_text stt
-						ON st.id = stt.id
-					WHERE stt.name LIKE :skillName
-					AND stt.lang_id = :langId
-				"""
+						ON abs.skilltree_id = stt.id
+						AND abt.lang_id = stt.lang_id
+				WHERE abt.lang_id = :langId
+				AND abs.setbonus_id= :setBonusId
+			"""
 
-				data = conn.execute(sql, (k, "en"))
-				data = data.fetchone()
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, ("en", armorSetBonusID))
+			data = data.fetchall()
 
-				self.armorSetSkillList.SetItem(index, 2, f"{data[0]}")
-
-			if armorSetBonus:
-				sql = """
-					SELECT st.id as skilltree_id, stt.name as skilltree_name, st.max_level skilltree_max_level,
-						st.icon_color as skilltree_icon_color,
-						abs.setbonus_id as id, abt.name, abs.required
-					FROM armorset_bonus_skill abs
-						JOIN armorset_bonus_text abt
-							ON abt.id = abs.setbonus_id
-						JOIN skilltree st
-							ON abs.skilltree_id = st.id
-						JOIN skilltree_text stt
-							ON abs.skilltree_id = stt.id
-							AND abt.lang_id = stt.lang_id
-					WHERE abt.lang_id = :langId
-					AND abs.setbonus_id= :setBonusId
-				"""
-
-				conn = sqlite3.Connection("mhw.db")
-				data = conn.execute(sql, ("en", armorSetBonusID))
-				data = data.fetchall()
-
-				setBonuses = []
-				if data != None:
-					for row in data:
-						setBonuses.append(a.ArmorSetBonus(row))
-					for b in setBonuses:
-						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{util.setBonusColors[b.setBonusName]}"))
-						index = self.armorSetSkillList.InsertItem(
-							self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
-							img)
-						self.armorSetSkillList.SetItem(index, 1, "Req. " + str(b.setBonusAmtRequired))
+			setBonuses = []
+			if data != None:
+				for row in data:
+					setBonuses.append(a.ArmorSetBonus(row))
+				for b in setBonuses:
+					img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{util.setBonusColors[b.setBonusName]}"))
+					index = self.armorSetSkillList.InsertItem(
+						self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
+						img)
+					self.armorSetSkillList.SetItem(index, 1, "Req. " + str(b.setBonusAmtRequired))
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -897,28 +919,17 @@ class ArmorTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		if self.init:
+		if self.armorTree.GetCellValue(event.GetRow(), 12) != "":
 			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 12)
 			self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
-
-			if self.currentlySelectedArmorID != "":
-				self.armorDetailList.ClearGrid()
-				self.armorSkillList.ClearAll()
-				self.armorMaterialsList.ClearAll()
-				self.armorSetDetailList.ClearGrid()
-				self.armorSetSkillList.ClearAll()
-				self.armorSetMaterialList.ClearAll()
-			
-				self.loadArmorDetails()
-				self.loadArmorSkills()
-				self.loadArmorMaterials()
-				self.loadArmorSetDetails()
-				width, height = self.armorDetailPanel.GetSize()
-				self.armorDetailPanel.SetSize(width + 1, height + 1)
-				self.armorDetailPanel.SetSize(width, height)
-				width, height = self.armorSetPanel.GetSize()
-				self.armorSetPanel.SetSize(width + 1, height + 1)
-				self.armorSetPanel.SetSize(width, height)
+			self.loadArmorDetails()
+			self.loadArmorSetDetails()
+			width, height = self.armorDetailPanel.GetSize()
+			self.armorDetailPanel.SetSize(width + 1, height + 1)
+			self.armorDetailPanel.SetSize(width, height)
+			width, height = self.armorSetPanel.GetSize()
+			self.armorSetPanel.SetSize(width + 1, height + 1)
+			self.armorSetPanel.SetSize(width, height)
 
 
 	def onSkillDoubleClick(self, event):
