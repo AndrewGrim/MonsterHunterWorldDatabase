@@ -1352,6 +1352,7 @@ class WeaponsTab:
 		"""
 		When the application window is resized some columns's width gets readjusted.
 		"""
+
 		self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
 		self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.materialsRequiredList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)

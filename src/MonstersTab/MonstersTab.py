@@ -87,7 +87,7 @@ class MonstersTab:
 		self.monsterMaterialsSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.monsterDetailsNotebook.AddPage(self.materialsPanel, "Materials")
 		# add the right side detailed view to the main size of the monsters notebook tab
-		self.monstersSizer.Add(self.monstersDetailedSizer, 2, wx.EXPAND)
+		self.monstersSizer.Add(self.monstersDetailedSizer, 1, wx.EXPAND)
 		# add widgets within to their parent sizer
 		self.monstersDetailedSizer.Add(self.monsterImageLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
 		self.monstersDetailedSizer.Add(self.monsterDetailsNotebook, 5, wx.EXPAND)
@@ -114,7 +114,7 @@ class MonstersTab:
 		self.search = wx.TextCtrl(self.monstersPanel)
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
-		self.monsterSizeButtonsSizer.Add(180, 0, 0)
+		self.monsterSizeButtonsSizer.Add(420, 0, 0)
 		self.monsterSizeButtonsSizer.Add(self.search, 0, wx.TOP, 4)
 
 
@@ -152,7 +152,7 @@ class MonstersTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.monsterList.InsertColumn(0, info)
-		self.monsterList.SetColumnWidth(0, 443)
+		self.monsterList.SetColumnWidth(0, 670)
 		self.monsterList.InsertColumn(1, info)
 		self.monsterList.SetColumnWidth(1, 0)
 
@@ -200,7 +200,6 @@ class MonstersTab:
 		self.summaryTree = wx.lib.agw.hypertreelist.HyperTreeList(self.summaryPanel, -1, style=0, 
 																	agwStyle=
 																	gizmos.TR_DEFAULT_STYLE
-																	| gizmos.TR_TWIST_BUTTONS
 																	| gizmos.TR_ROW_LINES
 																	| gizmos.TR_COLUMN_LINES
 																	| gizmos.TR_NO_LINES
@@ -213,8 +212,8 @@ class MonstersTab:
 		self.summaryTree.AddColumn("")
 		self.summaryTree.AddColumn("")
 		self.summaryTree.SetMainColumn(0)
-		self.summaryTree.SetColumnWidth(0, (self.root.GetSize().width * 0.80) * 0.37)
-		self.summaryTree.SetColumnWidth(1, (self.root.GetSize().width * 0.80) * 0.20)
+		self.summaryTree.SetColumnWidth(0, 400)
+		self.summaryTree.SetColumnWidth(1, 200)
 		self.summaryTree.SetColumnAlignment(1, wx.ALIGN_CENTER)
 
 		self.summaryTree.SetImageList(self.il)
@@ -591,7 +590,7 @@ class MonstersTab:
 			self.breakDamageTable.SetCellValue(index, 4, f"{b.extract.capitalize()}")
 
 		w, h = self.root.GetSize()
-		self.root.SetSize(w - 1, h)
+		self.root.SetSize(w - 1, h - 1)
 		self.root.SetSize(w, h)
 
 	
@@ -611,8 +610,8 @@ class MonstersTab:
 		self.materialsTree.AddColumn("")
 		self.materialsTree.AddColumn("id")
 		self.materialsTree.SetMainColumn(0)
-		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
-		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.22)
+		self.materialsTree.SetColumnWidth(0, 400)
+		self.materialsTree.SetColumnWidth(1, 200)
 		self.materialsTree.SetColumnAlignment(1, wx.ALIGN_CENTER)
 		self.materialsTree.SetColumnWidth(2, 0)
 
@@ -690,7 +689,10 @@ class MonstersTab:
 			#		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
 			#		initMR = True
 			#	self.populateTree(r, categoriesMR, self.masterRankNode)
-			self.materialsTree.Expand(self.rewardCondition)
+			if not self.root.pref.autoExpand:
+				self.materialsTree.Expand(self.rewardCondition)
+		if self.root.pref.autoExpand:
+			self.materialsTree.ExpandAll()
 
 
 	def populateTree(self, r, catergories, rankNode):

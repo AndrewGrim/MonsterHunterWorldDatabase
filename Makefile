@@ -1,4 +1,4 @@
 debug:
-	python src/Application.py -size 1420 850
+	python src/Application.py
 speed:
 	python tests/speedTest.py

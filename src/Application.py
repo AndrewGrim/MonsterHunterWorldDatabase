@@ -25,8 +25,8 @@ class Application(wx.Frame):
 		super(Application, self).__init__(*args, **kw)
 
 		cmdArgs = sys.argv
-		self.windowWidth = 1420 
-		self.windowHeight = 900
+		self.windowWidth = 0 
+		self.windowHeight = 0
 		if "-size" in cmdArgs:
 			index = cmdArgs.index("-size")
 			self.windowWidth = int(cmdArgs[index + 1])
@@ -34,8 +34,9 @@ class Application(wx.Frame):
 
 		root = self
 		self.SetIcon(wx.Icon("images/Nergigante.png"))
-		self.SetSize(1200, 1000)
 		self.SetTitle("Database")
+		self.Bind(wx.EVT_CLOSE, self.onClose)
+		self.pref = p.Preferences(root)
 
 		self.link = link.Link()
 
@@ -59,7 +60,7 @@ class Application(wx.Frame):
 		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		self.locations = l.LocationsTab(root, self.mainNotebook, self.link)
-		#self.kinsects = k.KinsectsTab(root, self.mainNotebook)
+		#self.kinsects = k.KinsectsTab(root, self.mainNotebook) # TODO need images
 
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, wep)
@@ -75,19 +76,32 @@ class Application(wx.Frame):
 
 		self.SetStatusText("Copyright © AndrewGrim https://github.com/AndrewGrim")
 
-		self.SetSize(self.windowWidth, self.windowHeight)
-		self.Center()
-
-		pref = p.Preferences(root)
 		try:
-			self.mainNotebook.SetSelection(pref.getTabIndex(pref.initialTab))
+			self.mainNotebook.SetSelection(self.pref.getTabIndex(self.pref.initialTab))
 		except Exception as e:
 			print(e)
 			self.mainNotebook.SetSelection(0)
 
-		self.Show()
 		if "-debug" in cmdArgs:
 			self.debugWindow(None)
+
+		if self.windowWidth != 0:
+			self.SetSize(self.windowWidth - 1, self.windowHeight)
+		else:
+			if self.pref.rememberSize:
+				self.SetSize(self.pref.windowSize[0] - 1, self.pref.windowSize[1])
+			else:
+				self.SetSize(1419, 850)
+
+		if self.pref.rememberPosition:
+			self.SetPosition(self.pref.windowPosition)
+		else:
+			self.Center()
+
+		self.Show()
+
+		wi, he = self.GetSize()
+		self.SetSize(wi + 1, he)
 
 
 	def initMainNotebook(self):
@@ -182,6 +196,7 @@ class Application(wx.Frame):
 		aboutItem = helpMenu.Append(-1, "About", "Shows a dialog with information about the application.")
 
 		optionsMenu = wx.Menu()
+		prefItem = optionsMenu.Append(-1, "&Preferences\tCtrl-P", "A window used to set preferences.")
 		debugItem = optionsMenu.Append(-1, "&Debug\tCtrl-D", "A debug window that redirects the wx errors and stdout/sterr to itself.")
 
 		menuBar = wx.MenuBar()
@@ -191,8 +206,9 @@ class Application(wx.Frame):
 
 		self.SetMenuBar(menuBar)
 
-		self.Bind(wx.EVT_MENU, self.OnExit,  exitItem)
-		self.Bind(wx.EVT_MENU, self.OnAbout, aboutItem)
+		self.Bind(wx.EVT_MENU, self.onQuit,  exitItem)
+		self.Bind(wx.EVT_MENU, self.onAbout, aboutItem)
+		self.Bind(wx.EVT_MENU, self.preferencesWindow, prefItem)
 		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
 
 
@@ -215,11 +231,21 @@ class Application(wx.Frame):
 		self.SetFocus()
 
 
-	def OnExit(self, event):
+	def preferencesWindow(self, event):
+		p.PreferencesWindow(self, self.pref)
+
+
+	def onQuit(self, event):
 		self.Close(True)
 
+	def onClose(self, event):
+		self.pref.windowSize = self.GetSize()
+		self.pref.windowPosition = self.GetPosition()
+		self.pref.writePreferencesFile()
+		sys.exit()
 
-	def OnAbout(self, event):
+
+	def onAbout(self, event):
 		# TODO make a custom messagebox with links to github profiles
 		#https://wxpython.org/Phoenix/docs/html/wx.MessageDialog.html
 		#https://wxpython.org/Phoenix/docs/html/wx.lib.agw.hyperlink.HyperLinkCtrl.html
