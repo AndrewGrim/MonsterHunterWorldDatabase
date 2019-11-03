@@ -112,6 +112,7 @@ class LocationsTab:
 
 	def initLocationDetail(self):
 		self.locationNameLabel = wx.StaticText(self.locationDetailPanel, label = "placeholder")
+		self.locationNameLabel.SetFont(self.locationNameLabel.GetFont().Bold())
 		self.locationDetailSizer.Add(self.locationNameLabel, 1, wx.EXPAND)
 
 		self.baseCampList = wx.ListCtrl(self.locationDetailPanel, style=wx.LC_REPORT

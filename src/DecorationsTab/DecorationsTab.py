@@ -176,6 +176,10 @@ class DecorationsTab:
 
 
 	def initDecorationDetail(self):
+		self.decorationNameLabel = wx.StaticText(self.decorationDetailPanel, label = "placeholder")
+		self.decorationNameLabel.SetFont(self.decorationNameLabel.GetFont().Bold())
+		self.decorationDetailSizer.Add(self.decorationNameLabel, 1, wx.EXPAND)
+
 		self.skillList = wx.ListCtrl(self.decorationDetailPanel, style=wx.LC_REPORT
 														| wx.LC_VRULES
 														| wx.LC_HRULES
@@ -240,6 +244,7 @@ class DecorationsTab:
 		lvl = deco.skillLevel * "◈"
 		maxLvl = (deco.skillMaxLevel - deco.skillLevel) * "◇"
 		self.decorationImageLabel.SetBitmap(wx.Bitmap(f"images/materials-160/Feystone{deco.iconColor}.png"))
+		self.decorationNameLabel.SetLabelText(f"\n{deco.name}\n")
 		if deco.iconColor != None:
 			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{deco.skillIconColor}.png"))
 		else:

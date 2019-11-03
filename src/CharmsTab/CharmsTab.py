@@ -178,6 +178,7 @@ class CharmsTab:
 
 	def initCharmDetail(self):
 		self.charmNameLabel = wx.StaticText(self.charmDetailPanel, label = "placeholder")
+		self.charmNameLabel.SetFont(self.charmNameLabel.GetFont().Bold())
 		self.charmDetailSizer.Add(self.charmNameLabel, 1, wx.EXPAND)
 
 		self.charmSkillList = wx.ListCtrl(self.charmDetailPanel, style=wx.LC_REPORT

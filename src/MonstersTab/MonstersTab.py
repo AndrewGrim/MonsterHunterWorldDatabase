@@ -194,8 +194,11 @@ class MonstersTab:
 
 
 	def initMonsterSummary(self):
-		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Name:\nDescription")
-		self.monsterSummarySizer.Add(self.monsterSummaryNameLabel, 1, wx.EXPAND)
+		self.monsterSummaryNameLabel = wx.StaticText(self.summaryPanel, label="Name:")
+		self.monsterSummaryNameLabel.SetFont(self.monsterSummaryNameLabel.GetFont().Bold())
+		self.monsterSummarySizer.Add(self.monsterSummaryNameLabel, 0.2, wx.EXPAND)
+		self.monsterSummaryDescriptionLabel = wx.StaticText(self.summaryPanel, label="Description", style=wx.ALIGN_LEFT)
+		self.monsterSummarySizer.Add(self.monsterSummaryDescriptionLabel, 0.5, wx.EXPAND)
 		
 		self.summaryTree = wx.lib.agw.hypertreelist.HyperTreeList(self.summaryPanel, -1, style=0, 
 																	agwStyle=
@@ -304,8 +307,9 @@ class MonstersTab:
 		self.monsterImageLabel.SetBitmap(self.monsterImage)
 		
 		monsterName = data[38]
-		self.monsterSummaryNameLabel.SetLabelText(f"\n{monsterName}:\n{data[40]}") 
-		self.monsterSummaryNameLabel.Wrap(700)
+		self.monsterSummaryNameLabel.SetLabelText(f"\n{monsterName}:") 
+		self.monsterSummaryDescriptionLabel.SetLabelText(f"{data[40]}\n") 
+		self.monsterSummaryDescriptionLabel.Wrap(600)
 
 		weaknessElements = {
 			"Fire": [6, 16],

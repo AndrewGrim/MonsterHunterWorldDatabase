@@ -150,8 +150,11 @@ class SkillsTab:
 
 
 	def initSkillDetail(self):
-		self.skillDescriptionLabel = wx.StaticText(self.skillDetailPanel, label = "placeholder")
-		self.skillDetailSizer.Add(self.skillDescriptionLabel, 1, wx.EXPAND)
+		self.skillNameLabel = wx.StaticText(self.skillDetailPanel, label = "placeholder")
+		self.skillNameLabel.SetFont(self.skillNameLabel.GetFont().Bold())
+		self.skillDetailSizer.Add(self.skillNameLabel, 0.2, wx.EXPAND)
+		self.skillDescriptionLabel = wx.StaticText(self.skillDetailPanel, label="Description", style=wx.ALIGN_LEFT)
+		self.skillDetailSizer.Add(self.skillDescriptionLabel, 0.5, wx.EXPAND)
 
 		self.skillDetailList = wx.ListCtrl(self.skillDetailPanel, style=wx.LC_REPORT
 														| wx.LC_VRULES
@@ -220,9 +223,11 @@ class SkillsTab:
 			self.skillDetailList.SetItem(index, 1, skill.skillLevelDescription)
 		self.skillImageLabel.SetBitmap(wx.Bitmap(f"images/skills-160/Skill{skill.iconColor}.png"))
 		if skills[0].skillMaxLevel == 1:
-			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].name}:\n{skills[0].skillLevelDescription}")
+			self.skillNameLabel.SetLabelText(f"\n{skills[0].name}:")
+			self.skillDescriptionLabel.SetLabelText(f"{skills[0].skillLevelDescription}\n")
 		else:
-			self.skillDescriptionLabel.SetLabelText(f"\n{skills[0].name}:\n{skills[0].description}")
+			self.skillNameLabel.SetLabelText(f"\n{skills[0].name}:")
+			self.skillDescriptionLabel.SetLabelText(f"{skills[0].description}\n")
 
 		self.loadSkillFound()
 

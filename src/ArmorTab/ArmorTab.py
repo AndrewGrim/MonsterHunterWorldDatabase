@@ -46,33 +46,33 @@ class ArmorTab:
 		}
 
 		self.armorDetail = {
-			0: ["images/unknown.png", "Rarity"],
-			1: ["images/weapon-detail-24/defense.png", "Defense"],
-			2: ["images/weapon-detail-24/defense.png", "Defense Max"],
-			3: ["images/weapon-detail-24/defense.png", "Defense Augmented Max"],
-			4: ["images/weapon-detail-24/slots.png", "Slot I"],
-			5: ["images/weapon-detail-24/slots.png", "Slot II"],
-			6: ["images/weapon-detail-24/slots.png", "Slot III"],
-			7: ["images/damage-types-24/fire.png", "Fire"],
-			8: ["images/damage-types-24/water.png", "Water"],
-			9: ["images/damage-types-24/ice.png", "Ice"],
-			10: [ "images/damage-types-24/thunder.png", "Thunder"],
-			11: [ "images/damage-types-24/dragon.png", "Dragon"],
+			1: ["images/unknown.png", "Rarity"],
+			2: ["images/weapon-detail-24/defense.png", "Defense"],
+			3: ["images/weapon-detail-24/defense.png", "Defense Max"],
+			4: ["images/weapon-detail-24/defense.png", "Defense Augmented Max"],
+			5: ["images/weapon-detail-24/slots.png", "Slot I"],
+			6: ["images/weapon-detail-24/slots.png", "Slot II"],
+			7: ["images/weapon-detail-24/slots.png", "Slot III"],
+			8: ["images/damage-types-24/fire.png", "Fire"],
+			9: ["images/damage-types-24/water.png", "Water"],
+			10: ["images/damage-types-24/ice.png", "Ice"],
+			11: [ "images/damage-types-24/thunder.png", "Thunder"],
+			12: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
 		self.armorSetDetail = {
-			0: ["images/unknown.png", "Rarity"],
-			1: ["images/weapon-detail-24/defense.png", "Defense"],
-			2: ["images/weapon-detail-24/defense.png", "Defense Max"],
-			3: ["images/weapon-detail-24/defense.png", "Defense Augmented Max"],
-			4: ["images/decoration-slots-24/1.png", "Slots"],
-			5: ["images/decoration-slots-24/2.png", "Slots"],
-			6: ["images/decoration-slots-24/3.png", "Slots"],
-			7: ["images/damage-types-24/fire.png", "Fire"],
-			8: ["images/damage-types-24/water.png", "Water"],
-			9: ["images/damage-types-24/ice.png", "Ice"],
-			10: [ "images/damage-types-24/thunder.png", "Thunder"],
-			11: [ "images/damage-types-24/dragon.png", "Dragon"],
+			1: ["images/unknown.png", "Rarity"],
+			2: ["images/weapon-detail-24/defense.png", "Defense"],
+			3: ["images/weapon-detail-24/defense.png", "Defense Max"],
+			4: ["images/weapon-detail-24/defense.png", "Defense Augmented Max"],
+			5: ["images/decoration-slots-24/1.png", "Slots"],
+			6: ["images/decoration-slots-24/2.png", "Slots"],
+			7: ["images/decoration-slots-24/3.png", "Slots"],
+			8: ["images/damage-types-24/fire.png", "Fire"],
+			9: ["images/damage-types-24/water.png", "Water"],
+			10: ["images/damage-types-24/ice.png", "Ice"],
+			11: [ "images/damage-types-24/thunder.png", "Thunder"],
+			12: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
 		self.initArmorTab()
@@ -307,7 +307,7 @@ class ArmorTab:
 		self.armorDetailList.EnableDragRowSize(False)
 		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
 
-		self.armorDetailList.CreateGrid(12, 2)
+		self.armorDetailList.CreateGrid(13, 2)
 		self.armorDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
 		self.armorDetailList.SetColSize(0, 302)
 		self.armorDetailList.SetColSize(1, 155 - 20)
@@ -341,7 +341,7 @@ class ArmorTab:
 	def loadArmorDetails(self):
 		if int(self.currentlySelectedArmorID) > 0:
 			self.armorDetailList.DeleteRows(0, self.armorDetailList.GetNumberRows())
-			self.armorDetailList.AppendRows(12)
+			self.armorDetailList.AppendRows(13)
 
 			sql = """
 				SELECT a.*, at.name, ast.name armorset_name
@@ -370,29 +370,33 @@ class ArmorTab:
 			except:
 				self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 			del noLog
-			self.root.SetSize(self.root.windowWidth + 1, self.root.windowHeight)
-			self.root.SetSize(self.root.windowWidth, self.root.windowHeight)
+			wi, he = self.root.GetSize()
+			self.root.SetSize(wi + 1, he)
+			self.root.SetSize(wi, he)
 			
 			armorDetail = {
-				0:  str(armor.rarity),
-				1:  str(armor.defenseBase),
-				2:  str(armor.defenseMax),
-				3:  str(armor.defenseAugmentedMax),
-				4:  str(armor.slot1),
-				5:  str(armor.slot2),
-				6:  str(armor.slot3),
-				7:  str(armor.fire),
-				8:  str(armor.water),
-				9:  str(armor.ice),
-				10: str(armor.thunder),
-				11: str(armor.dragon),
+				0:  str(armor.name),
+				1:  str(armor.rarity),
+				2:  str(armor.defenseBase),
+				3:  str(armor.defenseMax),
+				4:  str(armor.defenseAugmentedMax),
+				5:  str(armor.slot1),
+				6:  str(armor.slot2),
+				7:  str(armor.slot3),
+				8:  str(armor.fire),
+				9:  str(armor.water),
+				10:  str(armor.ice),
+				11: str(armor.thunder),
+				12: str(armor.dragon),
 			}
 
 			imageOffset = 85
 			rarityIcon = self.il.il.GetBitmap(self.il.armorIcons[armor.armorType][armor.rarity])
 
-			for num in range(12):
-				if num == 0:
+			self.armorDetailList.SetCellValue(0, 0, "Name")
+			self.armorDetailList.SetCellValue(0, 1, armor.name)
+			for num in range(1, 13):
+				if num == 1:
 					self.armorDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
 																	rarityIcon,
@@ -406,7 +410,7 @@ class ArmorTab:
 											self.armorDetail[num][1], 
 											imageOffset=imageOffset
 											))
-				if num not in [4, 5, 6]:
+				if num not in [5, 6, 7]:
 					self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
 				else:
 					if armorDetail[num] != "0":
@@ -718,28 +722,31 @@ class ArmorTab:
 
 		if int(self.currentlySelectedArmorID) > 0:
 			self.armorSetDetailList.DeleteRows(0, self.armorSetDetailList.GetNumberRows())
-			self.armorSetDetailList.AppendRows(12)
+			self.armorSetDetailList.AppendRows(13)
 			
 			armorDetail = {
-				0:  str(armor.rarity),
-				1:  str(defenseBase),
-				2:  str(defenseMax),
-				3:  str(defenseAugmentedMax),
-				4:  str(lvl1Slots),
-				5:  str(lvl2Slots),
-				6:  str(lvl3Slots),
-				7:  str(fire),
-				8:  str(water),
-				9:  str(ice),
-				10: str(thunder),
-				11: str(dragon),
+				0:  str(armor.name),
+				1:  str(armor.rarity),
+				2:  str(defenseBase),
+				3:  str(defenseMax),
+				4:  str(defenseAugmentedMax),
+				5:  str(lvl1Slots),
+				6:  str(lvl2Slots),
+				7:  str(lvl3Slots),
+				8:  str(fire),
+				9:  str(water),
+				10: str(ice),
+				11: str(thunder),
+				12: str(dragon),
 			}
 
 			imageOffset = 85
 			rarityIcon = self.il.il.GetBitmap(self.il.armorIcons["armorset"][armor.rarity])
 
-			for num in range(12):
-				if num == 0:
+			self.armorSetDetailList.SetCellValue(0, 0, "Name")
+			self.armorSetDetailList.SetCellValue(0, 1, armor.armorSetName)
+			for num in range(1, 13):
+				if num == 1:
 					self.armorSetDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
 																	rarityIcon,
@@ -753,7 +760,7 @@ class ArmorTab:
 											self.armorSetDetail[num][1], 
 											imageOffset=imageOffset
 											))
-				if num not in [4, 5, 6]:
+				if num not in [5, 6, 7]:
 					self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
 				else:
 					if armorDetail[num] != "0":

@@ -561,7 +561,7 @@ class WeaponsTab:
 		self.weaponDetailList.EnableDragRowSize(False)
 		self.weaponDetailSizer.Add(self.weaponDetailList, 1, wx.EXPAND)
 
-		self.weaponDetailList.CreateGrid(17, 2)
+		self.weaponDetailList.CreateGrid(18, 2)
 		self.weaponDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
 		self.weaponDetailList.SetColSize(0, 302)
 		self.weaponDetailList.SetColSize(1, 155 - 20)

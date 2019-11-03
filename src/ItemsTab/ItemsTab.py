@@ -325,6 +325,7 @@ class ItemsTab:
 
 	def initItemDetail(self):
 		self.itemNameLabel = wx.StaticText(self.itemDetailPanel, label="Name:", style=wx.ALIGN_LEFT)
+		self.itemNameLabel.SetFont(self.itemNameLabel.GetFont().Bold())
 		self.itemDetailSizer.Add(self.itemNameLabel, 0.2, wx.EXPAND)
 		self.itemDescriptionLabel = wx.StaticText(self.itemDetailPanel, label="Description", style=wx.ALIGN_LEFT)
 		self.itemDetailSizer.Add(self.itemDescriptionLabel, 0.5, wx.EXPAND)
@@ -381,7 +382,7 @@ class ItemsTab:
 			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/coatings-160/{item.iconName}{item.iconColor}.png"))
 		
 		self.itemNameLabel.SetLabelText(f"\n{item.name}:")
-		self.itemDescriptionLabel.SetLabelText(item.description)
+		self.itemDescriptionLabel.SetLabelText(f"{item.description}\n")
 		self.itemDescriptionLabel.Wrap(650)
 
 		img = self.il.Add(wx.Bitmap(f"images/item-rarity-24/{item.rarity}.png"))
@@ -775,6 +776,7 @@ class ItemsTab:
 		"""
 		When a specific item is selected in the list, the detail view gets populated with the information from the database.
 		"""
+
 		self.currentlySelectedItemID = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if self.currentlySelectedItemID != "":
 			if self.currentItemCategory == "crafting":
@@ -809,6 +811,7 @@ class ItemsTab:
 		"""
 		When the application window is resized some columns's width gets readjusted.
 		"""
+
 		self.itemDetailList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 		self.itemDetailList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.itemUsageList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
