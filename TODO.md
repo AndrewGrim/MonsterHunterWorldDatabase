@@ -19,13 +19,9 @@
 - [ ] wishlist support
 - [ ] write documentation - which might force me to change sql strings??
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
-- [ ] remove unnecessary import
-- [ ] change some TODO tags to ICEBORNE
+- [ ] remove unnecessary imports
 - [ ] Linux: in monstersTab materialTab is fucked
 - [ ] add colors to ele res cells in armor tab
-- [ ] next to summary in monster tab maybe put in-game charts for breaks
-- [ ] preferences
 - [ ] implement sorting
-- [ ] add name to weapon detail since the wep link problem causes a select and its not obvious anymore
 - [ ] make names bold/bigger
   

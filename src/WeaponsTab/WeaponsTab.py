@@ -64,20 +64,20 @@ class WeaponsTab:
 		}
 
 		self.weaponRowNumbers = {
-			"great-sword": 11,
-			"long-sword": 11,
-			"sword-and-shield": 11,
-			"dual-blades": 11,
-			"hammer": 11,
-			"hunting-horn": 14,
-			"lance": 11,
-			"gunlance": 12,
-			"switch-axe": 12,
-			"charge-blade": 12,
-			"insect-glaive": 12,
-			"light-bowgun": 13,
-			"heavy-bowgun": 13,
-			"bow": 17,
+			"great-sword": 12,
+			"long-sword": 12,
+			"sword-and-shield": 12,
+			"dual-blades": 12,
+			"hammer": 12,
+			"hunting-horn": 15,
+			"lance": 12,
+			"gunlance": 13,
+			"switch-axe": 13,
+			"charge-blade": 13,
+			"insect-glaive": 13,
+			"light-bowgun": 14,
+			"heavy-bowgun": 14,
+			"bow": 18,
 		}
 
 		self.elementColors = {
@@ -714,6 +714,7 @@ class WeaponsTab:
 			blast = "✓"
 
 		weaponDetail = {
+			"Name": (wep.name, self.rarityIcons[wep.rarity]),
 			"Rarity": (wep.rarity, self.rarityIcons[wep.rarity]),
 			"Attack": (wep.attack, self.attack),
 			"Attack (True)": (wep.attack_true, self.attack),
@@ -854,7 +855,9 @@ class WeaponsTab:
 				else:
 					self.weaponDetailList.SetCellValue(row, 1, str(value[0]))
 			try:
-				if key == "Rarity":
+				if key == "Name":
+					self.weaponDetailList.SetCellValue(row, 0, key)
+				elif key == "Rarity":
 					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 						wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/rarity-24/{value[0]}.png"), key))
 				else:
@@ -1353,8 +1356,8 @@ class WeaponsTab:
 		When the application window is resized some columns's width gets readjusted.
 		"""
 
-		self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
-		self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.56)
+		self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.44 - 20)
 		self.materialsRequiredList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
 		self.materialsRequiredList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
 
