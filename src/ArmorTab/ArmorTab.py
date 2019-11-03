@@ -831,77 +831,77 @@ class ArmorTab:
 
 			self.armorSetSkillList.SetItem(index, 2, f"{data[0]}")
 
-		if armorSetBonus:
-			sql = """
-				SELECT st.id as skilltree_id, stt.name as skilltree_name, st.max_level skilltree_max_level,
-					st.icon_color as skilltree_icon_color,
-					abs.setbonus_id as id, abt.name, abs.required
-				FROM armorset_bonus_skill abs
-					JOIN armorset_bonus_text abt
-						ON abt.id = abs.setbonus_id
-					JOIN skilltree st
-						ON abs.skilltree_id = st.id
-					JOIN skilltree_text stt
-						ON abs.skilltree_id = stt.id
-						AND abt.lang_id = stt.lang_id
-				WHERE abt.lang_id = :langId
-				AND abs.setbonus_id= :setBonusId
-			"""
-
-			conn = sqlite3.Connection("mhw.db")
-			data = conn.execute(sql, ("en", armorSetBonusID))
-			data = data.fetchall()
-
-			setBonuses = []
-			if data != None:
-				for row in data:
-					setBonuses.append(a.ArmorSetBonus(row))
-				for b in setBonuses:
-					img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{util.setBonusColors[b.setBonusName]}"))
-					index = self.armorSetSkillList.InsertItem(
-						self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
-						img)
-					self.armorSetSkillList.SetItem(index, 1, "Req. " + str(b.setBonusAmtRequired))
-
-			info = wx.ListItem()
-			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-			info.Image = -1
-			info.Align = wx.LIST_FORMAT_LEFT
-			info.Text = "Req. Materials"
-			self.armorSetMaterialList.InsertColumn(0, info)
-			self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-
-			info = wx.ListItem()
-			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-			info.Image = -1
-			info.Align = wx.LIST_FORMAT_CENTER
-			info.Text = ""
-			self.armorSetMaterialList.InsertColumn(1, info)
-			self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
-
-			self.armorSetMaterialList.InsertColumn(2, info)
-			self.armorSetMaterialList.SetColumnWidth(2, 0)
-
-			for k, v in armorSetMaterials.items():
-				try:
-					img = self.ilMats.Add(wx.Bitmap(materialIcons[k]))
-				except:
-					img = self.ilMats.Add(wx.Bitmap("images/unknown.png"))
-				index = self.armorSetMaterialList.InsertItem(self.armorSetMaterialList.GetItemCount(), k, img)
-				self.armorSetMaterialList.SetItem(index, 1, str(v))
-
-				sql = f"""
-					SELECT i.id, i.category
-					FROM item i
-					JOIN item_text it
-					ON it.id = i.id
-					WHERE it.name LIKE :matName
-					AND it.lang_id = :langId
+			if armorSetBonus:
+				sql = """
+					SELECT st.id as skilltree_id, stt.name as skilltree_name, st.max_level skilltree_max_level,
+						st.icon_color as skilltree_icon_color,
+						abs.setbonus_id as id, abt.name, abs.required
+					FROM armorset_bonus_skill abs
+						JOIN armorset_bonus_text abt
+							ON abt.id = abs.setbonus_id
+						JOIN skilltree st
+							ON abs.skilltree_id = st.id
+						JOIN skilltree_text stt
+							ON abs.skilltree_id = stt.id
+							AND abt.lang_id = stt.lang_id
+					WHERE abt.lang_id = :langId
+					AND abs.setbonus_id= :setBonusId
 				"""
 
-				data = conn.execute(sql, (k, "en"))
-				data = data.fetchone()
-				self.armorSetMaterialList.SetItem(index, 2, f"{data[0]},{data[1]}")
+				conn = sqlite3.Connection("mhw.db")
+				data = conn.execute(sql, ("en", armorSetBonusID))
+				data = data.fetchall()
+
+				setBonuses = []
+				if data != None:
+					for row in data:
+						setBonuses.append(a.ArmorSetBonus(row))
+					for b in setBonuses:
+						img = self.ilSkills.Add(wx.Bitmap(f"images/skills-24/{util.setBonusColors[b.setBonusName]}"))
+						index = self.armorSetSkillList.InsertItem(
+							self.armorSetSkillList.GetItemCount(), f"{b.name} / {b.setBonusName}",
+							img)
+						self.armorSetSkillList.SetItem(index, 1, "Req. " + str(b.setBonusAmtRequired))
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Req. Materials"
+		self.armorSetMaterialList.InsertColumn(0, info)
+		self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.armorSetMaterialList.InsertColumn(1, info)
+		self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
+
+		self.armorSetMaterialList.InsertColumn(2, info)
+		self.armorSetMaterialList.SetColumnWidth(2, 0)
+
+		for k, v in armorSetMaterials.items():
+			try:
+				img = self.ilMats.Add(wx.Bitmap(materialIcons[k]))
+			except:
+				img = self.ilMats.Add(wx.Bitmap("images/unknown.png"))
+			index = self.armorSetMaterialList.InsertItem(self.armorSetMaterialList.GetItemCount(), k, img)
+			self.armorSetMaterialList.SetItem(index, 1, str(v))
+
+			sql = f"""
+				SELECT i.id, i.category
+				FROM item i
+				JOIN item_text it
+				ON it.id = i.id
+				WHERE it.name LIKE :matName
+				AND it.lang_id = :langId
+			"""
+
+			data = conn.execute(sql, (k, "en"))
+			data = data.fetchone()
+			self.armorSetMaterialList.SetItem(index, 2, f"{data[0]},{data[1]}")
 
 
 	def onArmorTypeSelection(self, event):
