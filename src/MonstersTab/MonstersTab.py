@@ -31,7 +31,7 @@ class MonstersTab:
 		self.currentMonsterName = "Great Jagras"
 		self.currentMonsterMaterialID = 212
 		self.currentMonsterSize = "large"
-		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
+		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 		self.ilMats = wx.ImageList(24, 24)
 		self.ilMats.Add(self.testIcon) # to prevent crash on linux, gtk wants at least one image in image list before you set it
 
@@ -40,18 +40,14 @@ class MonstersTab:
 		self.initSearch()
 		self.initMonsterList()
 		self.loadMonsterList()
-		self.initMonsterSummary() # TODO sort weaknesses from highest to low/none
+		self.initMonsterSummary()
 		self.initMonsterDamage()
 		self.initMonsterMaterials()
 
-		# TEST defaults to materials tab
-		# PREFERENCES make this customizable
 		self.monsterDetailsNotebook.SetSelection(0)
 
 
 	def initMonstersTab(self):
-		# TODO sort columns on header click
-
 		# the outermost panel for the monsters tab
 		self.monstersPanel = wx.Panel(self.mainNotebook)
 		# add page to notebook
@@ -349,18 +345,18 @@ class MonstersTab:
 				if bool(data[5]):
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
 					self.summaryTree.Expand(self.monsterWeaknessNode)
 				else:
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
 					self.summaryTree.Expand(self.monsterWeaknessNode)
 
 			for weakness, col in weaknessStatus.items():
 				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 				self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
-				self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal) # TODIMAGESO proper icons
+				self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
 				self.summaryTree.Expand(self.monsterWeaknessNode)
 
 			ailments = {
@@ -394,7 +390,7 @@ class MonstersTab:
 						pass
 					else:
 						self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.test, which = wx.TreeItemIcon_Normal) # IMAGES proper icons
+					self.summaryTree.SetItemImage(genericSummaryNode, self.test, which = wx.TreeItemIcon_Normal)
 			if self.summaryTree.GetChildrenCount(self.monsterAilmentsNode) == 0:
 				genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, "None")
 			self.summaryTree.ExpandAll()
@@ -603,7 +599,6 @@ class MonstersTab:
 		self.materialsTree = wx.lib.agw.hypertreelist.HyperTreeList(self.materialsPanel, -1, style=0,
 												agwStyle=
 												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_TWIST_BUTTONS
 												| gizmos.TR_ROW_LINES
 												| gizmos.TR_COLUMN_LINES
 												| gizmos.TR_NO_LINES
@@ -632,24 +627,7 @@ class MonstersTab:
 	def loadMonsterMaterials(self):
 		self.materialsTree.DeleteAllItems()
 
-		root = self.materialsTree.AddRoot("Materials")
-		
-		# TODO only make the node if the monster exists in that rank
-
-		# master rank
-		#self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
-		#masterRankColour = util.hexToRGB("#FFEB3B")
-		#self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
-		
-		# high rank
-		self.highRankNode = self.materialsTree.AppendItem(root, "High Rank")
-		highRankColour = util.hexToRGB("#FB8C00")
-		self.materialsTree.SetItemBackgroundColour(self.highRankNode, highRankColour)
-		
-		# low rank
-		self.lowRankNode = self.materialsTree.AppendItem(root, "Low Rank")
-		lowRankColour = util.hexToRGB("#4DD0E1")
-		self.materialsTree.SetItemBackgroundColour(self.lowRankNode, lowRankColour)
+		root = self.materialsTree.AddRoot("Materials")	
 
 		sql = """
 			SELECT r.rank, ct.name condition_name, r.stack, r.percentage,
@@ -675,108 +653,60 @@ class MonstersTab:
 		for row in data:
 			rewards.append(m.Reward(row))
 
-		rewardCondition = 0
-		monsterMaterial = 0
+		self.rewardCondition = 0
+		self.monsterMaterial = 0
 		categoriesLR = []
 		categoriesHR = []
 		categoriesMR = []
-		rankNodes = {
-			"LR": self.lowRankNode,
-			"HR": self.highRankNode,
-			#"MR": self.masterRankNode,
-			}
 
 		self.ilMats.RemoveAll()
 		test = self.ilMats.Add(self.testIcon)
-		#noLog = wx.LogNull()
 	
-		# TODO refactor into function
+		initLR = False
+		initHR = False
+		initMR = False
 		for index, r in enumerate(rewards):
 			if index == 0:
 				self.currentMonsterMaterialID = r.itemID
-			currentCategory = str(r.conditionName)
 			if r.rank == "LR":
-				if currentCategory in categoriesLR:
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
-				else:
-					rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
-				self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, str(r), 2)
-				try:
-					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
-					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
-				except:
-					self.materialsTree.SetItemImage(monsterMaterial, test, which=wx.TreeItemIcon_Normal)
-				categoriesLR.append(currentCategory)
-
+				if not initLR:
+					self.lowRankNode = self.materialsTree.AppendItem(root, "Low Rank")
+					lowRankColour = util.hexToRGB("#4DD0E1")
+					self.materialsTree.SetItemBackgroundColour(self.lowRankNode, lowRankColour)
+					initLR = True
+				self.populateTree(r, categoriesLR, self.lowRankNode)
 			elif r.rank == "HR":
-				if currentCategory in categoriesHR:
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
-				else:
-					rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
-					monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
-				self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
-				self.materialsTree.SetItemText(monsterMaterial, f"{r.itemID},{r.category}", 2)
-				try:
-					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
-					self.materialsTree.SetItemImage(monsterMaterial, img, which=wx.TreeItemIcon_Normal)
-				except:
-					self.materialsTree.SetItemImage(monsterMaterial, test, which=wx.TreeItemIcon_Normal)
-				categoriesHR.append(currentCategory)
-
+				if not initHR:
+					self.highRankNode = self.materialsTree.AppendItem(root, "High Rank")
+					highRankColour = util.hexToRGB("#FB8C00")
+					self.materialsTree.SetItemBackgroundColour(self.highRankNode, highRankColour)
+					initHR = True
+				self.populateTree(r, categoriesHR, self.highRankNode)
 			#elif r.rank == "MR":
-			#	if currentCategory in categoriesMR:
-			#		monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
-			#	else:
-			#		rewardCondition = self.materialsTree.AppendItem(rankNodes[r.rank], str(r.conditionName))
-			#		monsterMaterial = self.materialsTree.AppendItem(rewardCondition,  str(r.itemName))
-			#		self.materialsTree.SetItemBackgroundColour(rewardCondition, masterRankColour)
-			#	self.materialsTree.SetItemBackgroundColour(monsterMaterial, masterRankColour)
-			#	self.materialsTree.SetItemText(monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
-			#	self.materialsTree.SetItemText(monsterMaterial, str(r.itemID), 2)
-			#	self.materialsTree.SetItemImage(monsterMaterial, self.test, which = wx.TreeItemIcon_Normal)
-			#		
-			#	categoriesMR.append(currentCategory)
-
-		self.materialsTree.ExpandAll() 
-
-		#del noLog
-
-		# TODO maybe make this an option to auto expand a particular option or all of them
-		#self.materialsTree.ExpandAllChildren()
-		#self.materialsTree.Expand(self.masterRankNode)
-		#
-		#self.materialsTree.Expand(self.lowRankNode)
+			#	if not initMR:
+			#		self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
+			#		masterRankColour = util.hexToRGB("#FFEB3B")
+			#		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
+			#		initMR = True
+			#	self.populateTree(r, categoriesMR, self.masterRankNode) # ICEBORNE material rewards
+			self.materialsTree.Expand(self.rewardCondition)
 
 
-	def populateTree(self):
-		pass
-		# TODO just rewrite it
-
-
-	def onSize(self, event):
-		# TODO if monsterstab is selected then resize else dont
-		width, height = self.root.GetSize()
-		numOfColumns = 4
-		numOfColumnsDamage = 14
-		halfOfWindow = 3
-
-		self.monstersTable.SetColSize(1, ((width / halfOfWindow) / numOfColumns + 30))
-		self.monstersTable.SetColSize(2, ((width / halfOfWindow) / numOfColumns))
-		self.monstersTable.SetColSize(3, ((width / halfOfWindow) / numOfColumns))
-		self.monstersTable.SetColSize(4, ((width / halfOfWindow) / numOfColumns))
-
-		# TODO adjust cols for summary tree
-			
-		# TODO adjust columns here and account for there being three tables now
-		#for col in range(numOfColumnsDamage):
-		#	self.damageTable.SetColSize(col, ((width * 0.66) / numOfColumnsDamage - 13))
-		#	self.damageTable.SetColSize(0, ((width * 0.66) / numOfColumnsDamage + 80))
-
-		self.materialsTree.SetColumnWidth(0, (self.root.GetSize().width * 0.44) * 0.65)
-		self.materialsTree.SetColumnWidth(1, (self.root.GetSize().width * 0.44) * 0.11)
-		self.materialsTree.SetColumnWidth(2, (self.root.GetSize().width * 0.44) * 0.11)
+	def populateTree(self, r, catergories, rankNode):
+		currentCategory = str(r.conditionName)
+		if currentCategory in catergories:
+			self.monsterMaterial = self.materialsTree.AppendItem(self.rewardCondition,  str(r.itemName))
+		else:
+			self.rewardCondition = self.materialsTree.AppendItem(rankNode, str(r.conditionName))
+			self.monsterMaterial = self.materialsTree.AppendItem(self.rewardCondition,  str(r.itemName))
+		self.materialsTree.SetItemText(self.monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
+		self.materialsTree.SetItemText(self.monsterMaterial, f"{r.itemID},{r.category}", 2)
+		try:
+			img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
+			self.materialsTree.SetItemImage(self.monsterMaterial, img, which=wx.TreeItemIcon_Normal)
+		except:
+			self.materialsTree.SetItemImage(self.monsterMaterial, test, which=wx.TreeItemIcon_Normal)
+		catergories.append(currentCategory)
 
 
 	def onMaterialDoubleClick(self, event):
