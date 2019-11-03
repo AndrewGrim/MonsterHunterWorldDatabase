@@ -52,15 +52,21 @@ class PreferencesWindow:
 
 	def onClose(self, event):
 		r = False
+		a = False
 		self.pref.initialTab = self.selectTab.GetString(self.selectTab.GetSelection())
 		self.pref.rememberSize = self.rememberSize.GetValue()
 		self.pref.rememberPosition = self.rememberPosition.GetValue()
+		if self.pref.autoExpand != self.autoExpand.GetValue():
+			a = True
 		self.pref.autoExpand = self.autoExpand.GetValue()
 		if self.pref.unicodeSymbols != self.unicodeSymbols.GetValue():
 			r = True
 		self.pref.unicodeSymbols = self.unicodeSymbols.GetValue()
 		if r:
 			self.root.reloadUnicode()
+		if a:
+			self.root.reloadMaterials()
+			
 		self.pref.writePreferencesFile()
 		
 		self.win.Destroy()

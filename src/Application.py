@@ -197,6 +197,10 @@ class Application(wx.Frame):
 		self.skills.loadSkillDetail()
 
 
+	def reloadMaterials(self):
+		self.monsters.loadMonsterMaterials()
+
+
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
 		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")
