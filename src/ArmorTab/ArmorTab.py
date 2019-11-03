@@ -32,7 +32,7 @@ class ArmorTab:
 		self.currentArmorTree = "HR"
 		self.currentlySelectedArmorID = 159
 		self.currentlySelectedArmorSetID = 39
-		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY) # REMOVE since youll be using specific icons
+		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.rarityColors = {
 			1: "C2BFBF",

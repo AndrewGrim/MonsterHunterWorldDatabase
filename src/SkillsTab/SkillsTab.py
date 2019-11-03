@@ -357,7 +357,6 @@ class SkillsTab:
 			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.armorRarity}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), arm.armorName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
-			# TODO need armorSetID as well!
 			self.foundList.SetItem(index, 2, f"armor,{arm.armorID}")
 
 

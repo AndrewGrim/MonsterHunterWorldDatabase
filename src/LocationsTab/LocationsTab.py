@@ -211,7 +211,6 @@ class LocationsTab:
 			AND it.lang_id = :langId
 			ORDER BY item_name
 		"""
-		# TODO implement sort for this list so you can sort by area or name
 
 		conn = sqlite3.Connection("mhw.db")
 		data = conn.execute(sql, (self.currentLocationID, "en"))

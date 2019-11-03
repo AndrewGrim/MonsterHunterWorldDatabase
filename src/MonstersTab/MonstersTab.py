@@ -682,13 +682,14 @@ class MonstersTab:
 					self.materialsTree.SetItemBackgroundColour(self.highRankNode, highRankColour)
 					initHR = True
 				self.populateTree(r, categoriesHR, self.highRankNode)
+			# ICEBORNE material rewards
 			#elif r.rank == "MR":
 			#	if not initMR:
 			#		self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
 			#		masterRankColour = util.hexToRGB("#FFEB3B")
 			#		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
 			#		initMR = True
-			#	self.populateTree(r, categoriesMR, self.masterRankNode) # ICEBORNE material rewards
+			#	self.populateTree(r, categoriesMR, self.masterRankNode)
 			self.materialsTree.Expand(self.rewardCondition)
 
 

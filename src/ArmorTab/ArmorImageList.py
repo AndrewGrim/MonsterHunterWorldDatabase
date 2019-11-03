@@ -8,7 +8,6 @@ class ArmorImageList:
 
 		self.test = self.il.Add(wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY))
 
-		# TODO make this into a dict?? and have one for each of the armor pieces and the armor set icons, but also make them
 		self.armorSet0 = self.il.Add(wx.Bitmap("images/armor/armorset/rarity-24/0.png", wx.BITMAP_TYPE_ANY))
 		self.armorSet1 = self.il.Add(wx.Bitmap("images/armor/armorset/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
 		self.armorSet2 = self.il.Add(wx.Bitmap("images/armor/armorset/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
@@ -143,12 +142,6 @@ class ArmorImageList:
 						],
 		}
 		
-		# TODO iceborne
-		#self.rarity9 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/9.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
-
 		self.slots = self.il.Add(wx.Bitmap("images/weapon-detail-24/slots.png", wx.BITMAP_TYPE_ANY))
 		self.slots1 = self.il.Add(wx.Bitmap("images/decoration-slots-24/1.png", wx.BITMAP_TYPE_ANY))
 		self.slots2 = self.il.Add(wx.Bitmap("images/decoration-slots-24/2.png", wx.BITMAP_TYPE_ANY))
