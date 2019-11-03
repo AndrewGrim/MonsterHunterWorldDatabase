@@ -225,7 +225,7 @@ class Application(wx.Frame):
 		self.log = wx.LogWindow(self, "Debug", show=True)
 		frame = self.log.GetFrame()
 		frame.SetIcon(wx.Icon("images/Nergigante.png"))
-		frame.SetSize(400, self.windowHeight)
+		frame.SetSize(400, self.GetSize()[1])
 		frame.SetPosition((self.GetPosition()[0] - 385, self.GetPosition()[1]))
 		text = self.log.GetFrame().GetChildren()[0]
 
