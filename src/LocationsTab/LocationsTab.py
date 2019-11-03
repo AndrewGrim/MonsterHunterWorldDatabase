@@ -58,9 +58,8 @@ class LocationsTab:
 		self.locationPanel.SetSizer(self.locationSizer)
 
 		self.initLocationList()
-		self.loadLocationList()
-
 		self.initLocationDetail()
+		self.loadLocationList()
 		self.loadLocationDetail()
 
 
@@ -69,6 +68,7 @@ class LocationsTab:
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
+		self.locationList.Bind(wx.EVT_SIZE, self.onSize)
 		self.locationListSizer.Add(self.locationList, 1, wx.EXPAND)
 		self.locationList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onLocationSelected)
 
@@ -143,15 +143,15 @@ class LocationsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Base Camps"
 		self.baseCampList.InsertColumn(0, info)
-		self.baseCampList.SetColumnWidth(0, 580)
+		self.baseCampList.SetColumnWidth(0, self.locationDetailPanel.GetSize()[0] * 0.66)
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
-		info.Align = wx.LIST_FORMAT_LEFT
+		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.baseCampList.InsertColumn(1, info)
-		self.baseCampList.SetColumnWidth(1, 100)
+		self.baseCampList.SetColumnWidth(1, self.locationDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		sql = """
 			SELECT lct.name, lct.area
@@ -179,22 +179,22 @@ class LocationsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Gathering" # maybe "Materials"
 		self.materialList.InsertColumn(0, info)
-		self.materialList.SetColumnWidth(0, 515)
+		self.materialList.SetColumnWidth(0, self.locationDetailPanel.GetSize()[0] * 0.66)
 		info = wx.ListItem()
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
-		info.Align = wx.LIST_FORMAT_LEFT
+		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.materialList.InsertColumn(1, info)
-		self.materialList.SetColumnWidth(1, 100)
+		self.materialList.SetColumnWidth(1, self.locationDetailPanel.GetSize()[0] * 0.22)
 
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
-		info.Align = wx.LIST_FORMAT_LEFT
+		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.materialList.InsertColumn(2, info)
-		self.materialList.SetColumnWidth(2, 55)
+		self.materialList.SetColumnWidth(2, self.locationDetailPanel.GetSize()[0] * 0.12 - 20)
 
 		self.materialList.InsertColumn(3, info)
 		self.materialList.SetColumnWidth(3, 0)
@@ -242,3 +242,11 @@ class LocationsTab:
 		self.currentLocationID = self.locationList.GetItemText(event.GetEventObject().GetFirstSelected(), 1)
 		if int(self.currentLocationID) > 0:
 			self.loadLocationDetail()
+
+		
+	def onSize(self, event):
+		self.baseCampList.SetColumnWidth(0, self.locationDetailPanel.GetSize()[0] * 0.66)
+		self.baseCampList.SetColumnWidth(1, self.locationDetailPanel.GetSize()[0] * 0.34 - 20)
+		self.materialList.SetColumnWidth(0, self.locationDetailPanel.GetSize()[0] * 0.66)
+		self.materialList.SetColumnWidth(1, self.locationDetailPanel.GetSize()[0] * 0.22)
+		self.materialList.SetColumnWidth(2, self.locationDetailPanel.GetSize()[0] * 0.12 - 20)
