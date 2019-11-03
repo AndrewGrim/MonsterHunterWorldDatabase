@@ -23,5 +23,4 @@
 - [ ] Linux: in monstersTab materialTab is fucked
 - [ ] add colors to ele res cells in armor tab
 - [ ] implement sorting
-- [ ] make names bold/bigger
   

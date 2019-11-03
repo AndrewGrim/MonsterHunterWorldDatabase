@@ -347,53 +347,62 @@ class MonstersTab:
 			for weakness, col in weaknessElements.items():
 				if bool(data[5]):
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
-					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
+					if self.root.pref.unicodeSymbols:
+						self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
+					else:
+						self.summaryTree.SetItemText(genericSummaryNode, f"{data[col[0]]}/3 ({data[col[1]]}/3)", 1)
 					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
 					self.summaryTree.Expand(self.monsterWeaknessNode)
 				else:
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
-					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
+					if self.root.pref.unicodeSymbols:
+						self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
+					else:
+						self.summaryTree.SetItemText(genericSummaryNode, f"{data[col[0]]}/3", 1)
 					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
 					self.summaryTree.Expand(self.monsterWeaknessNode)
 
 			for weakness, col in weaknessStatus.items():
 				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
-				self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
+				if self.root.pref.unicodeSymbols:
+					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
+				else:
+					self.summaryTree.SetItemText(genericSummaryNode, f"{data[col]}/3", 1)
 				self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
 				self.summaryTree.Expand(self.monsterWeaknessNode)
 
 			ailments = {
-				"Roar": 21,
-				"Wind": 22,
-				"Tremor": 23,
-				"Defense Down": 24,
-				"Fire Blight": 25,
-				"Water Blight":26,
-				"Thunder Blight": 27,
-				"Ice Blight": 28,
-				"Dragon Blight": 29,
-				"Blast Blight": 30,
-				"Poison": 31,
-				"Sleep": 32,
-				"Paralysis": 33,
-				"Bleed": 34,
-				"Stun": 35,
-				"Mud": 36,
-				"Effluvia": 37,
+				"Roar": [21, self.test],
+				"Wind": [22, self.test],
+				"Tremor": [23, self.test],
+				"Defense Down": [24, self.test],
+				"Fire Blight": [25, self.fire],
+				"Water Blight":[26, self.water],
+				"Thunder Blight": [27, self.thunder],
+				"Ice Blight": [28, self.ice],
+				"Dragon Blight": [29, self.dragon],
+				"Blast Blight": [30, self.blast],
+				"Poison": [31, self.poison],
+				"Sleep": [32, self.sleep],
+				"Paralysis": [33, self.paralysis],
+				"Bleed": [34, self.test],
+				"Stun": [35, self.stun],
+				"Mud": [36, self.test],
+				"Effluvia": [37, self.test],
 			}
 
 			textAilments = ["Roar", "Wind", "Tremor"]
 
 			for ailment, col in ailments.items():
-				if str(data[col]) == "None" or not bool(data[col]):
+				if str(data[col[0]]) == "None" or not bool(data[col[0]]):
 					pass
 				else:
 					genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, ailment)
 					if ailment not in textAilments:
 						pass
 					else:
-						self.summaryTree.SetItemText(genericSummaryNode, data[col], 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.test, which = wx.TreeItemIcon_Normal)
+						self.summaryTree.SetItemText(genericSummaryNode, str(data[col[0]]).capitalize(), 1)
+					self.summaryTree.SetItemImage(genericSummaryNode, col[1], which = wx.TreeItemIcon_Normal)
 			if self.summaryTree.GetChildrenCount(self.monsterAilmentsNode) == 0:
 				genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, "None")
 			self.summaryTree.ExpandAll()

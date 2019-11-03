@@ -8,7 +8,7 @@ class PreferencesWindow:
 
 		self.win = wx.Frame(self.root, title="Preferences")
 		self.win.SetIcon(wx.Icon("images/Nergigante.png"))
-		self.win.SetSize(300, 200)
+		self.win.SetSize(300, 300)
 		self.win.Center()
 		self.win.Bind(wx.EVT_CLOSE, self.onClose)
 
@@ -26,6 +26,8 @@ class PreferencesWindow:
 		self.rememberPosition.SetValue(self.pref.rememberPosition)
 		self.autoExpand = wx.CheckBox(panel, label="Auto expand monster materials", size=(200, 20))
 		self.autoExpand.SetValue(self.pref.autoExpand)
+		self.unicodeSymbols = wx.CheckBox(panel, label="Use unicode symbols", size=(200, 20))
+		self.unicodeSymbols.SetValue(self.pref.unicodeSymbols)
 
 		vSizer.Add(self.selectTab, 1, wx.CENTER)
 		vSizer.Add((0, 20))
@@ -34,6 +36,8 @@ class PreferencesWindow:
 		vSizer.Add(self.rememberPosition, 1, wx.CENTER)
 		vSizer.Add((0, 20))
 		vSizer.Add(self.autoExpand, 1, wx.CENTER)
+		vSizer.Add((0, 20))
+		vSizer.Add(self.unicodeSymbols, 1, wx.CENTER)
 
 		sizer.Add((0,0), 1, wx.EXPAND)
 		sizer.Add(vSizer, 0, wx.CENTER)
@@ -45,10 +49,16 @@ class PreferencesWindow:
 
 
 	def onClose(self, event):
+		r = False
 		self.pref.initialTab = self.selectTab.GetString(self.selectTab.GetSelection())
 		self.pref.rememberSize = self.rememberSize.GetValue()
 		self.pref.rememberPosition = self.rememberPosition.GetValue()
 		self.pref.autoExpand = self.autoExpand.GetValue()
+		if self.pref.unicodeSymbols != self.unicodeSymbols.GetValue():
+			r = True
+		self.pref.unicodeSymbols = self.unicodeSymbols.GetValue()
+		if r:
+			self.root.reloadUnicode()
 		self.pref.writePreferencesFile()
 		
 		self.win.Destroy()

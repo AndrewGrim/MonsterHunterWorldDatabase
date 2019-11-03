@@ -13,6 +13,7 @@ class Preferences:
 		self.windowSize = None
 		self.windowPosition = None
 		self.autoExpand = False
+		self.unicodeSymbols = False
 		self.readPreferencesFile()
 		self.misspelled = {
 			"weapon": "Weapons", 
@@ -45,6 +46,8 @@ class Preferences:
 				self.rememberPosition = (self.strToBool(f.readline().strip("\n")))
 			elif line == "[AUTO EXPAND MONSTER MATERIALS]":
 				self.autoExpand = (self.strToBool(f.readline().strip("\n")))
+			elif line == "[USE UNICODE SYMBOLS]":
+				self.unicodeSymbols = (self.strToBool(f.readline().strip("\n")))
 
 	def writePreferencesFile(self):
 		f = open("preferences.config", "w")
@@ -62,6 +65,8 @@ class Preferences:
 		f.write(str(self.rememberPosition) + "\n")
 		f.write("[AUTO EXPAND MONSTER MATERIALS]\n")
 		f.write(str(self.autoExpand) + "\n")
+		f.write("[USE UNICODE SYMBOLS]\n")
+		f.write(str(self.unicodeSymbols) + "\n")
 
 	def writeDefaultPreferencesFile(self):
 		f = open("preferences.config", "w")
@@ -79,6 +84,8 @@ class Preferences:
 		f.write("False" + "\n")
 		f.write("[AUTO EXPAND MONSTER MATERIALS]\n")
 		f.write("False" + "\n")
+		f.write("[USE UNICODE SYMBOLS]\n")
+		f.write("True" + "\n")
 
 
 	def strToBool(self, text: str) -> bool:

@@ -186,6 +186,11 @@ class Application(wx.Frame):
 		self.mainNotebook.SetSelection(index) 
 
 
+	def reloadUnicode(self):
+		self.monsters.loadMonsterSummary()
+		# TODO more need to be added as I add support for them
+
+
 
 	# TODO make a preferences page
 	def makeMenuBar(self):
