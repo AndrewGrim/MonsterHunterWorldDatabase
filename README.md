@@ -1,21 +1,28 @@
 # Monster Hunter World Database
+<p align=center>
+	<img src="images/mhw-title.png" alt="Title image">
+</p>
 
 This is a database program for Monster Hunter World.
 
-Most of the information is searchable and linked. Meaning you can double click on a list item to go to that item's page and load the information about it.
+It has been developed and tested on Windows. However since it's using wxPython it should be able to run on Linux and MacOS without too many modifications.
 
-It contains pages with the following information:
+Most of the information is linked. Meaning you can double click on a list item to go to that item's page and load the information about it.
 
-* Monsters:
-  * List of monsters small and large.
-  * Summary of weaknesses, ailments and areas the monster moves between.
-  * Hitzone information for physical and elemental damage as well as break/sever/kinsect extract information
-  * Materials that come from the monster and under which conditions.
-* Weapons:
-  * Each weapon tree visualised with attack, affinity, defense, elderseal, sharpness info and more.
-  * Includes Kulve Taroth weapons.
-* Armor:
-  * All armor pieces grouped by the armor set with defense values **for** inital, max and max augmented, elemental resistances, skills etc.
+It contains the tabs with the following information:
+
+* Monsters
+* Weapons
+* Armor
+* Charms
+* Decorations
+* Skills
+* Items
+* Locations
+  
+In the near future I have plans to include a tab for kinsects as well. In addition to that I'm thinking of putting in the work to have a tab for quests and one for hunter tools(mantles/boosters).
+
+<img src="images/screenshots.gif" alt="Screenshots GIF" width="900" height="600">
 
 ## Args
 
