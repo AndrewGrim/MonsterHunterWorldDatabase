@@ -22,7 +22,9 @@ It contains the tabs with the following information:
   
 In the near future I have plans to include a tab for kinsects as well. In addition to that I'm thinking of putting in the work to have a tab for quests and one for hunter tools(mantles/boosters).
 
-<img src="images/screenshots.gif" alt="Screenshots GIF" width="900" height="600">
+<p align=center>
+	<img src="images/screenshots.gif" alt="Screenshots GIF" width="800" height="500">
+</p>
 
 ## Args
 
