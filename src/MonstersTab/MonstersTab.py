@@ -43,6 +43,7 @@ class MonstersTab:
 		self.initMonsterSummary()
 		self.initMonsterDamage()
 		self.initMonsterMaterials()
+		self.loadMonsterDetail()
 
 		self.monsterDetailsNotebook.SetSelection(0)
 
@@ -108,6 +109,16 @@ class MonstersTab:
 
 		self.smallMonstersButton.Bind(wx.EVT_BUTTON, self.onMonsterSizeSelect)
 		self.largeMonstersButton.Bind(wx.EVT_BUTTON, self.onMonsterSizeSelect)
+
+	def loadMonsterDetail(self):
+		self.root.Freeze()
+		self.loadMonsterSummary()
+		self.loadMonsterDamage()
+		self.loadMonsterMaterials()
+		w, h = self.damagePanel.GetSize()
+		self.damagePanel.SetSize(w, h - 1)
+		self.damagePanel.SetSize(w, h)
+		self.root.Thaw()
 
 
 	def initSearch(self):
@@ -261,8 +272,6 @@ class MonstersTab:
 		}
 
 		self.summaryPanel.SetSizer(self.monsterSummarySizer)
-
-		self.loadMonsterSummary()
 
 	
 	def loadMonsterSummary(self):
@@ -494,8 +503,6 @@ class MonstersTab:
 		self.breakDamageTable.SetRowLabelSize(0)
 		self.breakDamageTable.SetColSize(0, 200)
 		self.breakDamageTable.SetDefaultCellAlignment( wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		
-		self.loadMonsterDamage()
 
 
 	def loadMonsterDamage(self):
@@ -602,10 +609,6 @@ class MonstersTab:
 			self.breakDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.extractColors[b.extract]))
 			self.breakDamageTable.SetCellValue(index, 4, f"{b.extract.capitalize()}")
 
-		w, h = self.root.GetSize()
-		self.root.SetSize(w - 1, h - 1)
-		self.root.SetSize(w, h)
-
 	
 	def initMonsterMaterials(self):
 		self.materialsTree = wx.lib.agw.hypertreelist.HyperTreeList(self.materialsPanel, -1, style=0,
@@ -632,8 +635,6 @@ class MonstersTab:
 
 		self.monsterMaterialsSizer.Add(self.materialsTree, 1, wx.EXPAND)
 		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
-
-		self.loadMonsterMaterials()
 	
 
 	def loadMonsterMaterials(self):
@@ -738,9 +739,7 @@ class MonstersTab:
 	def onMonsterSelected(self, event):
 		self.currentMonsterID = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
 		self.currentMonsterName = str(self.monsterList.GetItemText(event.GetEventObject().GetFirstSelected(), 0))	
-		self.loadMonsterSummary()
-		self.loadMonsterDamage()
-		self.loadMonsterMaterials()
+		self.loadMonsterDetail()
 
 	
 	def onMonsterSizeSelect(self, event):

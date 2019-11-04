@@ -162,9 +162,7 @@ class Application(wx.Frame):
 			elif self.link.eventType == "monster":
 				self.monsters.currentMonsterID = self.link.info.id
 				self.monsters.currentMonsterName = self.link.info.category
-				self.monsters.loadMonsterSummary()
-				self.monsters.loadMonsterDamage()
-				self.monsters.loadMonsterMaterials()
+				self.monsters.loadMonsterDetail()
 				self.selectTab("Monsters")
 
 			elif self.link.eventType == "location":
