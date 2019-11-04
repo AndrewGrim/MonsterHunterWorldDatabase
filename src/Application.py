@@ -18,6 +18,7 @@ import Utilities as util
 import Links as link
 import Preferences as p
 import Debug as debug
+import AboutWindow as about
 
 class Application(wx.Frame):
 
@@ -224,15 +225,7 @@ class Application(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
 		self.Bind(wx.EVT_MENU, self.onAbout, aboutItem)
 
-
-	def debugWindow(self, event):
-		self.debug = debug.DebugWindow(self)
-
-
-	def preferencesWindow(self, event):
-		p.PreferencesWindow(self, self.pref)
-
-
+	
 	def onClose(self, event):
 		self.pref.windowSize = self.GetSize()
 		self.pref.windowPosition = self.GetPosition()
@@ -246,17 +239,16 @@ class Application(wx.Frame):
 		sys.exit()
 
 
+	def debugWindow(self, event):
+		self.debug = debug.DebugWindow(self)
+
+
+	def preferencesWindow(self, event):
+		p.PreferencesWindow(self, self.pref)
+
+
 	def onAbout(self, event):
-		# TODO make a custom messagebox with links to github profiles
-		#https://wxpython.org/Phoenix/docs/html/wx.MessageDialog.html
-		#https://wxpython.org/Phoenix/docs/html/wx.lib.agw.hyperlink.HyperLinkCtrl.html
-		wx.MessageBox("Created by github.com/AndrewGrim.\n" + 
-						"This application uses the database and images from github.com/gatheringhallstudios\n" +
-						"as well as some of their SQL queries and their sharpness adjust function.\n" +
-						"https://github.com/gatheringhallstudios/MHWorldDatabase\n" +
-						"https://github.com/gatheringhallstudios/MHWorldData",
-						"About",
-						wx.OK|wx.ICON_INFORMATION)
+		self.about = about.AboutWindow(self)
 
 
 if __name__ == '__main__':
