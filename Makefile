@@ -1,4 +1,4 @@
 debug:
-	python src/Application.py
+	pipenv run python src/Application.py
 speed:
-	python tests/speedTest.py
+	pipenv run python tests/speedTest.py

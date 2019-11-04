@@ -38,9 +38,9 @@ The project supports some command line arguments:
 
 ## Build
 
-The only dependancy of the project is wxPython. (add python-ver , wx-ver)
+You need `Python 3.7` and `pipenv` installed. Then run `pipenv install` in the project directory. Afterwards use `pipenv run python src/Application.py` to run the application.
 
 ## Credit
 
-Thanks to @gatheringhallstudios for making the projects open source and with a permissive license.
+Thanks to https://github.com/gatheringhallstudios for making the projects open source and with a permissive license.
 Without their database I probably would never attempt to make this.
