@@ -620,7 +620,7 @@ class WeaponsTab:
 		self.weaponAmmoList.SetImageList(self.ilAmmo, wx.IMAGE_LIST_SMALL)
 		self.weaponAmmoSizer.Add(self.weaponAmmoList, 1, wx.EXPAND)
 
-		self.loadWeaponDetailsAll()
+		self.loadWeaponDetailAll()
 
 		if self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Hide()
@@ -631,16 +631,16 @@ class WeaponsTab:
 			self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
 
-	def loadWeaponDetailsAll(self):
+	def loadWeaponDetailAll(self):
 		self.root.Freeze()
-		self.loadWeaponDetails()
+		self.loadWeaponDetail()
 		width, height = self.weaponPanel.GetSize()
 		self.weaponPanel.SetSize(width + 5, height + 20)
 		self.weaponPanel.SetSize(width, height)
 		self.root.Thaw()
 
 
-	def loadWeaponDetails(self):
+	def loadWeaponDetail(self):
 		self.weaponDetailList.DeleteRows(0, self.weaponDetailList.GetNumberRows())
 		self.weaponDetailList.AppendRows(self.weaponRowNumbers[self.currentWeaponTree])
 
@@ -1345,7 +1345,7 @@ class WeaponsTab:
 			except:
 				pass
 			self.materialsRequiredList.ClearAll()
-			self.loadWeaponDetailsAll()
+			self.loadWeaponDetailAll()
 
 		
 	def onWeaponTypeSelection(self, event):

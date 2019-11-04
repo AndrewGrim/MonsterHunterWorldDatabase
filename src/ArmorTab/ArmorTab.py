@@ -122,6 +122,7 @@ class ArmorTab:
 		self.loadArmorTree()
 		self.initArmorDetailTab()
 		self.initArmorSetDetails()
+		self.loadArmorDetailAll()
 		
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
@@ -335,12 +336,18 @@ class ArmorTab:
 		self.armorMaterialsList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.armorDetailSizer.Add(self.armorMaterialsList, 0.9, wx.EXPAND)
 
-		self.loadArmorDetails()
-		self.loadArmorSkills()
-		self.loadArmorMaterials()
+
+	def loadArmorDetailAll(self):
+		self.root.Freeze()
+		self.loadArmorDetail()
+		self.loadArmorSetDetail()
+		width, height = self.armorPanel.GetSize()
+		self.armorPanel.SetSize(width + 1, height + 1)
+		self.armorPanel.SetSize(width, height)
+		self.root.Thaw()
 
 
-	def loadArmorDetails(self):
+	def loadArmorDetail(self):
 		self.armorDetailList.DeleteRows(0, self.armorDetailList.GetNumberRows())
 		self.armorDetailList.AppendRows(13)
 
@@ -371,9 +378,6 @@ class ArmorTab:
 		except:
 			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 		del noLog
-		wi, he = self.root.GetSize()
-		self.root.SetSize(wi + 1, he)
-		self.root.SetSize(wi, he)
 		
 		armorDetail = {
 			0:  str(armor.name),
@@ -578,10 +582,8 @@ class ArmorTab:
 		self.armorSetMaterialList.SetImageList(self.ilMats, wx.IMAGE_LIST_SMALL)
 		self.armorSetSizer.Add(self.armorSetMaterialList, 0.9, wx.EXPAND)
 
-		self.loadArmorSetDetails()
 
-
-	def loadArmorSetDetails(self):
+	def loadArmorSetDetail(self):
 		try:
 			self.armorSetSkillList.ClearAll()
 			self.armorSetMaterialList.ClearAll()
@@ -921,14 +923,7 @@ class ArmorTab:
 		if self.armorTree.GetCellValue(event.GetRow(), 12) != "":
 			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 12)
 			self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
-			self.loadArmorDetails()
-			self.loadArmorSetDetails()
-			width, height = self.armorDetailPanel.GetSize()
-			self.armorDetailPanel.SetSize(width + 1, height + 1)
-			self.armorDetailPanel.SetSize(width, height)
-			width, height = self.armorSetPanel.GetSize()
-			self.armorSetPanel.SetSize(width + 1, height + 1)
-			self.armorSetPanel.SetSize(width, height)
+			self.loadArmorDetailAll()
 
 
 	def onSkillDoubleClick(self, event):

@@ -147,7 +147,7 @@ class Application(wx.Frame):
 
 			elif self.link.eventType == "armor":
 				self.armor.currentlySelectedArmorID = self.link.info.id
-				self.armor.loadArmorDetails()
+				self.armor.loadArmorDetailAll()
 				self.selectTab("Armor")
 
 			elif self.link.eventType == "weapon":
@@ -156,7 +156,7 @@ class Application(wx.Frame):
 				if self.weapons.currentWeaponTree != self.link.info.category:
 					self.weapons.currentWeaponTree = self.link.info.category
 					self.weapons.loadWeaponTree()
-				self.weapons.loadWeaponDetailsAll()
+				self.weapons.loadWeaponDetailAll()
 				self.selectTab("Weapons")
 
 			elif self.link.eventType == "monster":
@@ -187,10 +187,9 @@ class Application(wx.Frame):
 
 	def reloadUnicode(self):
 		self.monsters.loadMonsterSummary()
-		self.weapons.loadWeaponDetails()
+		self.weapons.loadWeaponDetailAll()
 		self.armor.loadArmorTree()
-		self.armor.loadArmorDetails()
-		self.armor.loadArmorSetDetails()
+		self.armor.loadArmorDetailAll()
 		self.charms.loadCharmDetail()
 		self.decos.loadDecorationDetail()
 		self.skills.loadSkillDetail()
