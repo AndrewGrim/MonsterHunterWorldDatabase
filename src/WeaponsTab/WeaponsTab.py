@@ -285,16 +285,19 @@ class WeaponsTab:
 		for row in data:
 			weapons.append(w.Weapon(row))
 
-		self.weaponTree.AppendRows()
-		self.weaponTree.SetCellValue(0, 0, "Normal")
-		self.weaponTree.SetCellFont(0, 0, self.weaponTree.GetCellFont(0, 0).Bold())
-		for i in range(9):
-			self.weaponTree.SetCellBackgroundColour(0, i, util.hexToRGB("#C2BFBF"))
+		normal = True
 		kulve = True
 		for wep in weapons:
 			if len(searchText) != 0:
 				self.populateweaponTree(1, wep, None)
 			elif wep.category != "Kulve":
+				if normal:
+					normal = False
+					self.weaponTree.AppendRows()
+					self.weaponTree.SetCellValue(0, 0, "Normal")
+					self.weaponTree.SetCellFont(0, 0, self.weaponTree.GetCellFont(0, 0).Bold())
+					for i in range(9):
+						self.weaponTree.SetCellBackgroundColour(0, i, util.hexToRGB("#C2BFBF"))
 				if wep.previous_weapon_id == None:
 					self.populateweaponTree(1, wep, weaponNodes)
 				else:
