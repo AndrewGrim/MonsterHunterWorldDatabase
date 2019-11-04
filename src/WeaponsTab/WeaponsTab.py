@@ -17,6 +17,7 @@ from typing import NewType
 import Utilities as util
 import Links as link
 import WeaponsTab as w
+from Debug.debug import debug
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 
@@ -28,6 +29,7 @@ class WeaponsTab:
 		self.link = link
 		self.c = wx.ColourDatabase()
 		self.skip = False
+		self.init = True
 
 		self.currentlySelectedWeaponID = 1
 		self.currentWeaponTree = "great-sword"
@@ -118,6 +120,10 @@ class WeaponsTab:
 		self.weaponImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponPanel)
+		il = wx.ImageList(24, 24)
+		self.ammo = il.Add(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
+		self.notes = il.Add(wx.Bitmap("images/weapon-detail-24/notes.png"))
+		self.weaponDetailsNotebook.AssignImageList(il)
 		self.weaponDetailPanel = wx.ScrolledWindow(self.weaponDetailsNotebook)
 		self.weaponMelodiesPanel = wx.Panel(self.weaponDetailsNotebook)
 		self.weaponAmmoPanel = wx.Panel(self.weaponDetailsNotebook)
@@ -153,60 +159,24 @@ class WeaponsTab:
 
 
 	def initWeaponButtons(self):
-		self.greatSwordButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/great-sword/rarity-24/0.png"), name="great-sword")
-		self.longSwordButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/long-sword/rarity-24/0.png"), name="long-sword")
-		self.swordAndShieldButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/sword-and-shield/rarity-24/0.png"), name="sword-and-shield")
-		self.dualBladesButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/dual-blades/rarity-24/0.png"), name="dual-blades")
-		self.hammerButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/hammer/rarity-24/0.png"), name="hammer")
-		self.huntingHornButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/hunting-horn/rarity-24/0.png"), name="hunting-horn")
-		self.lanceButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/lance/rarity-24/0.png"), name="lance")
-		self.gunLanceButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/gunlance/rarity-24/0.png"), name="gunlance")
-		self.switchAxeButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/switch-axe/rarity-24/0.png"), name="switch-axe")
-		self.chargeBladeButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/charge-blade/rarity-24/0.png"), name="charge-blade")
-		self.insectGlaiveButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/insect-glaive/rarity-24/0.png"), name="insect-glaive")
-		self.lightBowGunButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/light-bowgun/rarity-24/0.png"), name="light-bowgun")
-		self.heavyBowGunButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/heavy-bowgun/rarity-24/0.png"), name="heavy-bowgun")
-		self.bowButton = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap("images/weapons/bow/rarity-24/0.png"), name="bow")
-
-		self.greatSwordButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.longSwordButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.swordAndShieldButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.dualBladesButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.hammerButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.huntingHornButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.lanceButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.gunLanceButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.switchAxeButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.chargeBladeButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.insectGlaiveButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.lightBowGunButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.heavyBowGunButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
-		self.bowButton.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
+		weapons = ["great-sword", "long-sword", "sword-and-shield", "dual-blades", "hammer",
+					"hunting-horn", "lance", "gunlance", "switch-axe", "charge-blade",
+					"insect-glaive", "light-bowgun", "heavy-bowgun", "bow"
+		]
 
 		self.weaponButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
-
-		self.weaponButtonsSizer.Add(self.greatSwordButton)
-		self.weaponButtonsSizer.Add(self.longSwordButton)
-		self.weaponButtonsSizer.Add(self.swordAndShieldButton)
-		self.weaponButtonsSizer.Add(self.dualBladesButton)
-		self.weaponButtonsSizer.Add(self.hammerButton)
-		self.weaponButtonsSizer.Add(self.huntingHornButton)
-		self.weaponButtonsSizer.Add(self.lanceButton)
-		self.weaponButtonsSizer.Add(self.gunLanceButton)
-		self.weaponButtonsSizer.Add(self.switchAxeButton)
-		self.weaponButtonsSizer.Add(self.chargeBladeButton)
-		self.weaponButtonsSizer.Add(self.insectGlaiveButton)
-		self.weaponButtonsSizer.Add(self.lightBowGunButton)
-		self.weaponButtonsSizer.Add(self.heavyBowGunButton)
-		self.weaponButtonsSizer.Add(self.bowButton)
+		for i, item in enumerate(weapons):
+			button = wx.BitmapButton(self.weaponPanel, bitmap=wx.Bitmap(f"images/weapons/{item}/rarity-24/0.png"), name=item)
+			self.weaponButtonsSizer.Add(button)
+			button.Bind(wx.EVT_BUTTON, self.onWeaponTypeSelection)
 
 		self.weaponTreeSizer.Add(self.weaponButtonsSizer)
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.weaponPanel, style=wx.TE_PROCESS_ENTER)
+		self.search = wx.TextCtrl(self.weaponPanel)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
 		self.weaponButtonsSizer.Add(372, 0, 0)
 		self.weaponButtonsSizer.Add(self.search, 0, wx.TOP, 4)
 
@@ -216,216 +186,47 @@ class WeaponsTab:
 
 
 	def initweaponTree(self):
-		self.weaponTree = wx.lib.agw.hypertreelist.HyperTreeList(self.weaponPanel, -1, style=0,
-												agwStyle=
-												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												| gizmos.TR_ELLIPSIZE_LONG_ITEMS
-												)
-		self.weaponTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onWeaponSelection)
+		self.weaponTree = cgr.HeaderBitmapGrid(self.weaponPanel)
+		self.weaponTree.EnableEditing(False)
+		self.weaponTree.EnableDragRowSize(False)
+		self.weaponTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onWeaponSelection)
 		self.weaponTreeSizer.Add(self.weaponTree, 1, wx.EXPAND)
 
-		self.il = wx.ImageList(24, 24)
-
-		self.test = self.il.Add(self.testIcon)
-
-		self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
-		self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
-		self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
-		self.rarity4 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/4.png", wx.BITMAP_TYPE_ANY))
-		self.rarity5 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/5.png", wx.BITMAP_TYPE_ANY))
-		self.rarity6 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/6.png", wx.BITMAP_TYPE_ANY))
-		self.rarity7 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/7.png", wx.BITMAP_TYPE_ANY))
-		self.rarity8 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/8.png", wx.BITMAP_TYPE_ANY))
-		# ICEBORNE rarity icons
-		#self.rarity9 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/9.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
-
-		self.affinity = self.il.Add(wx.Bitmap("images/weapon-detail-24/affinity.png", wx.BITMAP_TYPE_ANY))
-		self.attack = self.il.Add(wx.Bitmap("images/weapon-detail-24/attack.png", wx.BITMAP_TYPE_ANY))
-		self.defense = self.il.Add(wx.Bitmap("images/weapon-detail-24/defense.png", wx.BITMAP_TYPE_ANY))
-		self.elderseal = self.il.Add(wx.Bitmap("images/weapon-detail-24/elderseal.png", wx.BITMAP_TYPE_ANY))
-		self.element = self.il.Add(wx.Bitmap("images/weapon-detail-24/element.png", wx.BITMAP_TYPE_ANY))
-		self.slots = self.il.Add(wx.Bitmap("images/weapon-detail-24/slots.png", wx.BITMAP_TYPE_ANY))
-
-		self.sharpness = self.il.Add(wx.Bitmap("images/weapon-detail-24/whetstone.png", wx.BITMAP_TYPE_ANY))
-
-		self.slots1 = self.il.Add(wx.Bitmap("images/decoration-slots-24/1.png", wx.BITMAP_TYPE_ANY))
-		self.slots2 = self.il.Add(wx.Bitmap("images/decoration-slots-24/2.png", wx.BITMAP_TYPE_ANY))
-		self.slots3 = self.il.Add(wx.Bitmap("images/decoration-slots-24/3.png", wx.BITMAP_TYPE_ANY))
-
-		self.phialType = self.il.Add(wx.Bitmap("images/weapon-detail-24/phials.png", wx.BITMAP_TYPE_ANY))
-
-		self.notes = self.il.Add(wx.Bitmap("images/weapon-detail-24/notes.png", wx.BITMAP_TYPE_ANY))
-		self.note1 = self.il.Add(wx.Bitmap("images/weapon-detail-24/note1.png", wx.BITMAP_TYPE_ANY))
-		self.note2 = self.il.Add(wx.Bitmap("images/weapon-detail-24/note2.png", wx.BITMAP_TYPE_ANY))
-		self.note3 = self.il.Add(wx.Bitmap("images/weapon-detail-24/note3.png", wx.BITMAP_TYPE_ANY))
-
-		self.kinsectBonus = self.il.Add(wx.Bitmap("images/damage-types-24/kinsect.png", wx.BITMAP_TYPE_ANY))
-
-		self.specialAmmo = self.il.Add(wx.Bitmap("images/weapon-detail-24/specialammo.png", wx.BITMAP_TYPE_ANY))
-		self.deviation = self.il.Add(wx.Bitmap("images/weapon-detail-24/deviation.png"))
-		self.ammo = self.il.Add(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
-
-		self.closeCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
-		self.powerCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
-		self.paralysisCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
-		self.poisonCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
-		self.sleepCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
-		self.blastCoating = self.il.Add(wx.Bitmap("images/weapon-detail-24/coating.png"))
-
-		self.shelling = self.il.Add(wx.Bitmap("images/weapon-detail-24/shelling.png", wx.BITMAP_TYPE_ANY))
-
-		self.fire = self.il.Add(wx.Bitmap("images/damage-types-24/fire.png"))
-		self.water = self.il.Add(wx.Bitmap("images/damage-types-24/water.png"))
-		self.ice = self.il.Add(wx.Bitmap("images/damage-types-24/ice.png"))
-		self.thunder = self.il.Add(wx.Bitmap("images/damage-types-24/thunder.png"))
-		self.dragon = self.il.Add(wx.Bitmap("images/damage-types-24/dragon.png"))
-
-		self.iceAndBlast = self.il.Add(wx.Bitmap("images/damage-types-24/ice-blast.png"))
-
-		self.poison = self.il.Add(wx.Bitmap("images/damage-types-24/poison.png"))
-		self.sleep = self.il.Add(wx.Bitmap("images/damage-types-24/sleep.png"))
-		self.paralysis = self.il.Add(wx.Bitmap("images/damage-types-24/paralysis.png"))
-		self.blast = self.il.Add(wx.Bitmap("images/damage-types-24/blast.png"))
-		self.stun = self.il.Add(wx.Bitmap("images/damage-types-24/stun.png"))
-
-		self.damageTypes = {
-			"Fire": self.fire,
-			"Water": self.water,
-			"Ice": self.ice,
-			"Thunder": self.thunder,
-			"Dragon": self.dragon,
-			"Poison": self.poison,
-			"Sleep": self.sleep,
-			"Paralysis": self.paralysis,
-			"Blast": self.blast,
-			"Stun": self.stun,
+		weaponTreeColumns = {
+			"Name": [472, None],
+			"Attack": [35, wx.Bitmap("images/weapon-detail-24/attack.png")],
+			"Element": [75, wx.Bitmap("images/weapon-detail-24/element.png")],
+			"Affinity": [35, wx.Bitmap("images/weapon-detail-24/affinity.png")],
+			"Defense": [35, wx.Bitmap("images/weapon-detail-24/defense.png")],
+			"Slot I": [29, wx.Bitmap("images/weapon-detail-24/slots.png")],
+			"Slot II": [29, wx.Bitmap("images/weapon-detail-24/slots.png")],
+			"Slot III": [29, wx.Bitmap("images/weapon-detail-24/slots.png")],
+			"Sharpness": [171, None],
+			"id": [0,  wx.Bitmap("images/noImage24.png")],
 		}
 
-		self.weaponTree.SetImageList(self.il)
-		self.weaponDetailsNotebook.AssignImageList(self.il)
-
-		self.weaponTree.AddColumn("Name") # 0
-		self.weaponTree.AddColumn("") # Physical 1
-		self.weaponTree.AddColumn("") # Element/Status 2
-		self.weaponTree.AddColumn("") # Affinity 3
-		self.weaponTree.AddColumn("") # Defense 4
-		self.weaponTree.AddColumn("") # Slots 1 5
-		self.weaponTree.AddColumn("") # Slots 2 6
-		self.weaponTree.AddColumn("") # Slots 3 7
+		self.weaponTree.CreateGrid(1, 10)
+		self.weaponTree.SetDefaultRowSize(27, resizeExistingRows=True)
+		self.weaponTree.HideRowLabels()
+		self.weaponTree.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 		
-		# sharpness
-		self.weaponTree.AddColumn("") # R 8
-		self.weaponTree.AddColumn("") # O 9
-		self.weaponTree.AddColumn("") # Y 10
-		self.weaponTree.AddColumn("") # G 11 
-		self.weaponTree.AddColumn("") # B 12
-		self.weaponTree.AddColumn("") # W 13
-		self.weaponTree.AddColumn("") # P 14
-		
-		self.weaponTree.AddColumn("id") # 15
-		
-		self.weaponTree.SetMainColumn(0)
-		self.weaponTree.SetColumnWidth(0, 472)
 
-		self.weaponTreeIcons = {
-			1: self.attack,
-			2: self.element,
-			3: self.affinity,
-			4: self.defense,
-			5: self.slots,
-			6: self.slots,
-			7: self.slots,
-			8: self.sharpness,
-			9: self.sharpness,
-			10: self.sharpness,
-			11: self.sharpness,
-			12: self.sharpness,
-			13: self.sharpness,
-			14: self.sharpness,
-		}
-
-		self.decorationSlotsIcons = {
-			1: self.slots1,
-			2: self.slots2,
-			3: self.slots3,
-		}
-
-		for num in range(1, 8):
-			self.weaponTree.SetColumnImage(num, self.weaponTreeIcons[num])
-			self.weaponTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-			self.weaponTree.SetColumnWidth(num, 24)
-
-		self.weaponTree.SetColumnWidth(1, 35)
-		self.weaponTree.SetColumnWidth(2, 60)
-		self.weaponTree.SetColumnWidth(3, 35)
-		self.weaponTree.SetColumnWidth(4, 35)
-		self.weaponTree.SetColumnWidth(5, 29)
-		self.weaponTree.SetColumnWidth(6, 29)
-		self.weaponTree.SetColumnWidth(7, 29)
-
-		for num in range(8, 15):
-			self.weaponTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-			self.weaponTree.SetColumnWidth(num, 26)
-		
-		self.weaponTree.SetColumnWidth(15, 0)
+		for col, (k, v) in enumerate(weaponTreeColumns.items()):
+			if v[1] == None:
+				self.weaponTree.SetColLabelValue(col, k)
+			else:
+				self.weaponTree.SetColLabelRenderer(col, cgr.HeaderBitmapColLabelRenderer(v[1], ""))
+			self.weaponTree.SetColSize(col, v[0])
 
 		self.loadWeaponTree()
 
 
 	def loadWeaponTree(self):
+		self.init = True
 		try:
-			self.weaponTree.DeleteAllItems()
+			self.weaponTree.DeleteRows(0, self.weaponTree.GetNumberRows())
 		except:
 			pass
-
-		root = self.weaponTree.AddRoot("Weapon")
-		if len(self.search.GetValue()) == 0:
-			normalWeaponNode = self.weaponTree.AppendItem(root, "Normal")
-			kulveWeaponNode = self.weaponTree.AppendItem(root, "Kulve")
-
-		self.rarity1 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/1.png", wx.BITMAP_TYPE_ANY))
-		self.rarity2 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/2.png", wx.BITMAP_TYPE_ANY))
-		self.rarity3 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/3.png", wx.BITMAP_TYPE_ANY))
-		self.rarity4 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/4.png", wx.BITMAP_TYPE_ANY))
-		self.rarity5 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/5.png", wx.BITMAP_TYPE_ANY))
-		self.rarity6 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/6.png", wx.BITMAP_TYPE_ANY))
-		self.rarity7 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/7.png", wx.BITMAP_TYPE_ANY))
-		self.rarity8 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/8.png", wx.BITMAP_TYPE_ANY))
-		# ICEBORNE rarity icons
-		#self.rarity9 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/9.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity10 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/10.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity11 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/11.png", wx.BITMAP_TYPE_ANY))
-		#self.rarity12 = self.il.Add(wx.Bitmap("images/weapons/" + self.currentWeaponTree + "/rarity-24/12.png", wx.BITMAP_TYPE_ANY))
-
-		if self.currentWeaponTree not in ["bow", "light-bowgun", "heavy-bowgun"]:
-			folder = "images/weapons/" + self.currentWeaponTree + "/sharpness-168-24/"
-			images = os.listdir(folder)
-			self.sharpnessImages = {}
-			for img in images:
-				s = self.il.Add(wx.Bitmap(folder + img))
-				self.sharpnessImages[img] = s
-
-		self.rarityIcons = {
-			1: self.rarity1,
-			2: self.rarity2,
-			3: self.rarity3,
-			4: self.rarity4,
-			5: self.rarity5,
-			6: self.rarity6,
-			7: self.rarity7,
-			8: self.rarity8,
-			#9: self.rarity9, # iceborne icons
-			#10: self.rarity10,
-			#11: self.rarity11,
-			#12: self.rarity12,
-		}
 
 		searchText = self.search.GetValue()
 
@@ -462,32 +263,75 @@ class WeaponsTab:
 		data = data.fetchall()
 
 		weaponNodes = {}
-		weapons = []
 
+		self.offset = {
+			0: 0,
+			1: 223,
+			2: 198,
+			3: 176,
+			4: 151,
+			5: 127,
+			6: 103,
+			7: 78,
+			8: 55,
+			9: 30,
+			10: 0,
+			11: -25,
+			12: -50,
+			13: -75,
+		}
+
+		weapons = []
 		for row in data:
 			weapons.append(w.Weapon(row))
 
+		self.weaponTree.AppendRows()
+		self.weaponTree.SetCellValue(0, 0, "Normal")
+		self.weaponTree.SetCellFont(0, 0, self.weaponTree.GetCellFont(0, 0).Bold())
+		for i in range(9):
+			self.weaponTree.SetCellBackgroundColour(0, i, util.hexToRGB("#C2BFBF"))
+		kulve = True
 		for wep in weapons:
 			if len(searchText) != 0:
-				self.populateweaponTree(root, wep, None)
+				self.populateweaponTree(1, wep, None)
 			elif wep.category != "Kulve":
 				if wep.previous_weapon_id == None:
-					self.populateweaponTree(normalWeaponNode, wep, weaponNodes)
+					self.populateweaponTree(1, wep, weaponNodes)
 				else:
 					self.populateweaponTree(weaponNodes[wep.previous_weapon_id], wep, weaponNodes)
 			else:
-				self.populateweaponTree(kulveWeaponNode, wep, weaponNodes)
+				if kulve:
+					kulve = False
+					self.weaponTree.AppendRows()
+					row = self.weaponTree.GetNumberRows() - 1
+					self.weaponTree.SetCellValue(row, 0, "Kulve")
+					self.weaponTree.SetCellFont(row, 0, self.weaponTree.GetCellFont(row, 0).Bold())
+					for i in range(9):
+						self.weaponTree.SetCellBackgroundColour(row, i, util.hexToRGB("#EFCD1E"))
+				self.populateweaponTree(1, wep, weaponNodes)
 
-		self.weaponTree.ExpandAll()
+		self.init = False
 
 
-	def populateweaponTree(self, weaponNode: wxTreeListItem, wep: Tuple[str], weaponNodes: Dict[int, wxTreeListItem]) -> None:
+	def populateweaponTree(self, indent:int, wep: Tuple[str], weaponNodes: Dict[int, int]) -> None:
+		self.weaponTree.AppendRows()
+		row = self.weaponTree.GetNumberRows() - 1
+
 		if bool(wep.craftable):
-			name = str(wep.name) + " 🔨" # TODO make this clearer that it means craftable
+			if self.root.pref.unicodeSymbols:
+				name = str(wep.name) + " 🔨" 
+			else:
+				name = str(wep.name) + " (Craftable)"
 		else:
 			name = str(wep.name)
-		weapon = self.weaponTree.AppendItem(weaponNode,  name)
-		self.weaponTree.SetItemText(weapon, str(wep.attack), 1)
+
+		padding = "        " * indent
+		staticPadding = " " * 8
+		img = wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/rarity-24/{wep.rarity}.png")
+		self.weaponTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+						img, f"{padding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=self.offset[indent]))		
+		self.weaponTree.SetCellValue(row, 0, name)
+		self.weaponTree.SetCellValue(row, 1, str(wep.attack))
 
 		if wep.element_hidden == 0 and wep.element1_attack == None:
 			element = ""
@@ -496,61 +340,50 @@ class WeaponsTab:
 		else:
 			element = str(wep.element1_attack)
 		try:
-			weapon.SetImage(2, self.damageTypes[wep.element1], wx.TreeItemIcon_Normal)
+			img = wx.Bitmap(f"images/damage-types-24/{wep.element1.lower()}.png")
+			self.weaponTree.SetCellRenderer(row, 2, cgr.ImageTextCellRenderer(
+						img, f"{staticPadding}{element}", imageOffset=15))
 		except:
 			pass
 		if wep.element2_attack != None:
-			# either keep this custom icon or change back to generic element
-			weapon.SetImage(2, self.iceAndBlast, wx.TreeItemIcon_Normal)
+			img = wx.Bitmap(f"images/damage-types-24/ice-blast.png")
+			self.weaponTree.SetCellRenderer(row, 2, cgr.ImageTextCellRenderer(
+						img, f"{staticPadding}{wep.element2_attack}", imageOffset=15))
 		if wep.affinity == 0:
 			affinity = ""
 		else:
-			affinity = str(wep.affinity) + "%" # TODO maybe add a plus in here when affinity is positive
+			if wep.affinity > 0:
+				affinity = f"+{wep.affinity}%"
+			else:
+				affinity = f"{wep.affinity}%"
 		if wep.defense == 0:
 			defense = ""
 		else:
 			defense = "+" + str(wep.defense)
 
-		self.weaponTree.SetItemText(weapon, element, 2) 
-		self.weaponTree.SetItemText(weapon, affinity, 3)
-		self.weaponTree.SetItemText(weapon, defense, 4)
+		self.weaponTree.SetCellValue(row, 2, element)
+		self.weaponTree.SetCellValue(row, 3, affinity)
+		self.weaponTree.SetCellValue(row, 4, defense)
 
 		if wep.slot_1 != 0:
-			weapon.SetImage(5, self.decorationSlotsIcons[wep.slot_1], wx.TreeItemIcon_Normal)
+			img = wx.Bitmap(f"images/decoration-slots-24/{wep.slot_1}.png")
+			self.weaponTree.SetCellRenderer(row, 5, cgr.ImageCellRenderer(img))
 		if wep.slot_2 != 0:
-			weapon.SetImage(6, self.decorationSlotsIcons[wep.slot_2], wx.TreeItemIcon_Normal)
+			img = wx.Bitmap(f"images/decoration-slots-24/{wep.slot_2}.png")
+			self.weaponTree.SetCellRenderer(row, 6, cgr.ImageCellRenderer(img))
 		if wep.slot_3 != 0:
-			weapon.SetImage(7, self.decorationSlotsIcons[wep.slot_3], wx.TreeItemIcon_Normal)
+			img = wx.Bitmap(f"images/decoration-slots-24/{wep.slot_3}.png")
+			self.weaponTree.SetCellRenderer(row, 7, cgr.ImageCellRenderer(img))
 		
-		# sharpness
-		try:
-			sharpnessSplit = str(wep.sharpness).replace("(", "").replace(")", "").replace(" ", "").split(",")
+		if self.currentWeaponTree not in ["light-bowgun", "heavy-bowgun", "bow"]:
 			weaponName = wep.name.replace('"', "'") + ".png"
-			weapon.SetImage(8, self.sharpnessImages[weaponName], wx.TreeItemIcon_Normal)
-			weapon.SetImage(9, self.sharpnessImages[weaponName] + 1, wx.TreeItemIcon_Normal)
-			weapon.SetImage(10, self.sharpnessImages[weaponName] + 2, wx.TreeItemIcon_Normal)
-			weapon.SetImage(11, self.sharpnessImages[weaponName] + 3, wx.TreeItemIcon_Normal)
-			weapon.SetImage(12, self.sharpnessImages[weaponName] + 4, wx.TreeItemIcon_Normal)
-			weapon.SetImage(13, self.sharpnessImages[weaponName] + 5, wx.TreeItemIcon_Normal)
-			weapon.SetImage(14, self.sharpnessImages[weaponName] + 6, wx.TreeItemIcon_Normal)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[0], 8)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[1], 9)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[2], 10)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[3], 11)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[4], 12)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[5], 13)
-			self.weaponTree.SetItemText(weapon, sharpnessSplit[6], 14)
-		except:
-			for num in range(8, 15):
-				self.weaponTree.SetItemText(weapon, "-", num)
-
+			img = wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/sharpness-168-24/{weaponName}")
+			self.weaponTree.SetCellRenderer(row, 8, cgr.ImageCellRenderer(img))
 		
-		# id - hidden, icon
-		self.weaponTree.SetItemText(weapon, str(wep.id), 15)
+		self.weaponTree.SetCellValue(row, 9, str(wep.id))
 
-		self.weaponTree.SetItemImage(weapon, self.rarityIcons[wep.rarity], which=wx.TreeItemIcon_Normal)
 		if len(self.search.GetValue()) == 0:
-			weaponNodes[wep.id] = weapon
+			weaponNodes[wep.id] = indent + 1
 
 
 	def initWeaponDetailTab(self):
@@ -735,25 +568,25 @@ class WeaponsTab:
 				blast = "Yes"
 
 		weaponDetail = {
-			"Name": (wep.name, self.rarityIcons[wep.rarity]),
-			"Rarity": (wep.rarity, self.rarityIcons[wep.rarity]),
-			"Attack": (wep.attack, self.attack),
-			"Attack (True)": (wep.attack_true, self.attack),
-			"Affinity": (affinity, self.affinity),
-			"Element I": (element1, self.element),
-			"Element II": (element2, self.element),
-			"Slot I": (wep.slot_1, self.slots),
-			"Slot II": (wep.slot_2, self.slots),
-			"Slot III": (wep.slot_3, self.slots),
-			"Elderseal": (elderseal, self.elderseal),
-			"Defense": (defense, self.defense),
+			"Name": (wep.name, None),
+			"Rarity": (wep.rarity, wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/rarity-24/{wep.rarity}.png")),
+			"Attack": (wep.attack, wx.Bitmap(f"images/weapon-detail-24/attack.png")),
+			"Attack (True)": (wep.attack_true, wx.Bitmap(f"images/weapon-detail-24/attack.png")),
+			"Affinity": (affinity, wx.Bitmap(f"images/weapon-detail-24/affinity.png")),
+			"Element I": (element1, wx.Bitmap(f"images/weapon-detail-24/element.png")),
+			"Element II": (element2, wx.Bitmap(f"images/weapon-detail-24/element.png")),
+			"Slot I": (wep.slot_1, wx.Bitmap(f"images/weapon-detail-24/slots.png")),
+			"Slot II": (wep.slot_2, wx.Bitmap(f"images/weapon-detail-24/slots.png")),
+			"Slot III": (wep.slot_3, wx.Bitmap(f"images/weapon-detail-24/slots.png")),
+			"Elderseal": (elderseal, wx.Bitmap(f"images/weapon-detail-24/elderseal.png")),
+			"Defense": (defense, wx.Bitmap(f"images/weapon-detail-24/defense.png")),
 		}
 
 		slots = {
 			0: -1,
-			1: self.slots1,
-			2: self.slots2,
-			3: self.slots3,
+			1: wx.Bitmap(f"images/decoration-slots-24/1.png"),
+			2: wx.Bitmap(f"images/decoration-slots-24/2.png"),
+			3: wx.Bitmap(f"images/decoration-slots-24/3.png"),
 		}
 
 		# notes [32] WRB - white red blue
@@ -779,28 +612,28 @@ class WeaponsTab:
 		
 
 		additionalDetails = {
-			"switch-axe": ["Phial Type", str(wep.phial).capitalize(), self.phialType],
-			"charge-blade": ["Phial Type", str(wep.phial).capitalize(), self.phialType],
-			"gunlance": ["Shelling", shelling, self.shelling],
-			"insect-glaive": ["Kinsect Bonus", str(wep.kinsect_bonus).capitalize(), self.kinsectBonus],
+			"switch-axe": ["Phial Type", str(wep.phial).capitalize(), wx.Bitmap(f"images/weapon-detail-24/phials.png")],
+			"charge-blade": ["Phial Type", str(wep.phial).capitalize(), wx.Bitmap(f"images/weapon-detail-24/phials.png")],
+			"gunlance": ["Shelling", shelling, wx.Bitmap(f"images/weapon-detail-24/shelling.png")],
+			"insect-glaive": ["Kinsect Bonus", str(wep.kinsect_bonus).capitalize(), wx.Bitmap(f"images/damage-types-24/kinsect.png")],
 
-			"hunting-horn": ["Notes", self.notes,
-							"Note I", note1, self.note1,
-							"Note II", note2, self.note2,
-							"Note III", note3, self.note3,],
+			"hunting-horn": ["Notes", wx.Bitmap(f"images/weapon-detail-24/notes.png"),
+							"Note I", note1, wx.Bitmap(f"images/weapon-detail-24/note1.png"),
+							"Note II", note2, wx.Bitmap(f"images/weapon-detail-24/note2.png"),
+							"Note III", note3, wx.Bitmap(f"images/weapon-detail-24/note3.png"),],
 
-			"light-bowgun": ["Special Ammo", wep.special_ammo, self.specialAmmo,
-							"Deviation", wep.name, self.deviation,],
+			"light-bowgun": ["Special Ammo", wep.special_ammo, wx.Bitmap(f"images/weapon-detail-24/specialammo.png"),
+							"Deviation", wep.name, wx.Bitmap(f"images/weapon-detail-24/deviation.png"),],
 
-			"heavy-bowgun": ["Special Ammo", wep.special_ammo, self.specialAmmo,
-							"Deviation", wep.name, self.deviation],
+			"heavy-bowgun": ["Special Ammo", wep.special_ammo, wx.Bitmap(f"images/weapon-detail-24/specialammo.png"),
+							"Deviation", wep.name, wx.Bitmap(f"images/weapon-detail-24/deviation.png")],
 
-			"bow": ["Close", close, self.closeCoating,
-					"Power", power, self.powerCoating,
-					"Paralysis", paralysis, self.paralysisCoating,
-					"Poison", poison, self.poisonCoating,
-					"Sleep", sleep, self.sleepCoating,
-					"Blast", blast, self.blastCoating,],
+			"bow": ["Close", close, wx.Bitmap(f"images/coatings-24/BottleWhite.png"),
+					"Power", power, wx.Bitmap(f"images/coatings-24/BottleRed.png"),
+					"Paralysis", paralysis, wx.Bitmap(f"images/coatings-24/BottleGold.png"),
+					"Poison", poison, wx.Bitmap(f"images/coatings-24/BottleViolet.png"),
+					"Sleep", sleep, wx.Bitmap(f"images/coatings-24/BottleCyan.png"),
+					"Blast", blast, wx.Bitmap(f"images/coatings-24/BottleLime.png"),],
 		}
 
 		coatingIconColors = {
@@ -1002,6 +835,7 @@ class WeaponsTab:
 
 	def loadBowgunAmmo(self):
 		self.ilAmmo.RemoveAll()
+		self.weaponAmmoList.ClearAll()
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -1224,6 +1058,7 @@ class WeaponsTab:
 
 	def loadWeaponMaterials(self):
 		self.ilMats.RemoveAll()
+		self.materialsRequiredList.ClearAll()
 		test = self.ilMats.Add(self.testIcon)
 
 		info = wx.ListItem()
@@ -1324,28 +1159,15 @@ class WeaponsTab:
 		"""
 		When a specific weapon is selected in the tree, the detail view gets populated with the information from the database.
 		"""
-		
-		if self.skip:
-			# when you double click with the mouse over the area where the tree widget is located on the other tab 
-			# it will trigger the onWeaponSelection event
-			# i know this because i tested it with the return key, and double click 
-			# but outside of the tree area and it works as it should
-			# wtf
-			self.skip = False
-			self.weaponTree.SelectItem(event.GetItem(), False)
-			return "fuck this, three hours i'll never get back :("
 
-		self.currentlySelectedWeaponID = self.weaponTree.GetItemText(event.GetItem(), 15)
-		if self.currentlySelectedWeaponID != "":
-			self.weaponDetailList.ClearGrid()
-			self.weaponMelodiesList.ClearGrid()
-			self.weaponAmmoList.ClearAll()
-			try:
-				self.weaponSharpnessTable.ClearGrid()
-			except:
-				pass
-			self.materialsRequiredList.ClearAll()
-			self.loadWeaponDetailAll()
+		if not self.init:
+			self.currentlySelectedWeaponID = self.weaponTree.GetCellValue(event.GetRow(), 9)
+			if self.currentlySelectedWeaponID != "":
+				try:
+					self.weaponSharpnessTable.ClearGrid()
+				except:
+					pass
+				self.loadWeaponDetailAll()
 
 		
 	def onWeaponTypeSelection(self, event):
@@ -1372,10 +1194,13 @@ class WeaponsTab:
 		When the application window is resized some columns's width gets readjusted.
 		"""
 
-		self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.56)
-		self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.44 - 20)
-		self.materialsRequiredList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
-		self.materialsRequiredList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
+		try:
+			self.weaponDetailList.SetColSize(0, self.weaponDetailPanel.GetSize()[0] * 0.56)
+			self.weaponDetailList.SetColSize(1, self.weaponDetailPanel.GetSize()[0] * 0.44 - 20)
+			self.materialsRequiredList.SetColumnWidth(0, self.weaponDetailPanel.GetSize()[0] * 0.66)
+			self.materialsRequiredList.SetColumnWidth(1, self.weaponDetailPanel.GetSize()[0] * 0.34 - 20)
+		except:
+			pass
 
 
 	def onScroll(self, event):

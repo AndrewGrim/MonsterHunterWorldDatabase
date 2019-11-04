@@ -185,6 +185,7 @@ class Application(wx.Frame):
 
 	def reloadUnicode(self):
 		self.monsters.loadMonsterSummary()
+		self.weapons.loadWeaponTree()
 		self.weapons.loadWeaponDetailAll()
 		self.armor.loadArmorTree()
 		self.armor.loadArmorDetailAll()

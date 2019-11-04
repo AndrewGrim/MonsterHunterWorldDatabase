@@ -204,7 +204,6 @@ class ArmorTab:
 
 	def loadArmorTree(self):
 		try:
-			pass
 			self.armorTree.DeleteRows(0, self.armorTree.GetNumberRows())
 		except:
 			pass
