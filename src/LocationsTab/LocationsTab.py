@@ -131,6 +131,8 @@ class LocationsTab:
 
 
 	def loadLocationDetail(self):
+		self.root.Freeze()
+
 		self.baseCampList.ClearAll()
 		self.materialList.ClearAll()
 
@@ -225,6 +227,8 @@ class LocationsTab:
 			self.materialList.SetItem(index, 1, f"{mat.stack} x {mat.percentage}%")
 			self.materialList.SetItem(index, 2, f"Area {mat.area}")
 			self.materialList.SetItem(index, 3, f"{mat.id},{mat.category}")
+
+		self.root.Thaw()
 
 
 	def onMaterialDoubleClick(self, event):

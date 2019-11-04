@@ -198,6 +198,8 @@ class CharmsTab:
 
 
 	def loadCharmDetail(self):
+		self.root.Freeze()
+
 		self.charmSkillList.ClearAll()
 		self.materialList.ClearAll()
 
@@ -302,6 +304,7 @@ class CharmsTab:
 		width, height = self.charmPanel.GetSize()
 		self.charmPanel.SetSize(width + 1, height)
 		self.charmPanel.SetSize(width, height)
+		self.root.Thaw()
 
 
 	def onCharmSelected(self, event):

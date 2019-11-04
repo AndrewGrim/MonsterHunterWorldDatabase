@@ -196,6 +196,8 @@ class DecorationsTab:
 
 
 	def loadDecorationDetail(self):
+		self.root.Freeze()
+
 		self.skillList.ClearAll()
 		
 		info = wx.ListItem()
@@ -293,6 +295,8 @@ class DecorationsTab:
 		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneRed.png"))
 		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Warped Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.warpedFeystonePercent}%")
+
+		self.root.Thaw()
 
 
 	def onDecorationSelected(self, event):

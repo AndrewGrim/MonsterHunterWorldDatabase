@@ -72,12 +72,17 @@ class ItemsTab:
 		self.initItemUsage()
 		self.initItemObtaining()
 		self.loadItemList()
-		self.loadItemUsage()
-		self.loadItemObtaining()
+		self.loadItemDetailAll()
 
 		self.itemList.Bind(wx.EVT_SIZE, self.onSize)
 
 		self.itemDetailPanel.SetScrollRate(20, 20)
+
+	
+	def loadItemDetailAll(self):
+		self.root.Freeze()
+		self.loadItemDetail()
+		self.root.Thaw()
 
 
 	def initItemButtons(self):
@@ -416,6 +421,9 @@ class ItemsTab:
 		else:
 			self.itemDetailList.SetItem(index, 1, "-")
 
+		self.loadItemUsage()
+
+
 	def initItemUsage(self):
 		self.itemUsageList = wx.ListCtrl(self.itemDetailPanel, style=wx.LC_REPORT
 																| wx.LC_VRULES
@@ -452,6 +460,8 @@ class ItemsTab:
 		self.loadUsageCharms()
 		self.loadUsageArmor()
 		self.loadUsageWeapons()
+
+		self.loadItemObtaining()
 
 
 	def loadUsageCombinations(self):
@@ -784,9 +794,7 @@ class ItemsTab:
 				self.currentItemName = name[:name.find(" =")]
 			else:
 				self.currentItemName = self.itemList.GetItemText(event.GetEventObject().GetFirstSelected(), 0)
-			self.loadItemDetail()
-			self.loadItemUsage()
-			self.loadItemObtaining()
+			self.loadItemDetailAll()
 
 
 	def onUsageOrObtainingDoubleClick(self, event):

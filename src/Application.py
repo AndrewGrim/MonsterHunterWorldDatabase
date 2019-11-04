@@ -125,9 +125,7 @@ class Application(wx.Frame):
 				#self.items.currentItemCategory = self.link.info.category
 				#self.items.loadItemList()
 				self.items.currentlySelectedItemID = self.link.info.id
-				self.items.loadItemDetail()
-				self.items.loadItemUsage()
-				self.items.loadItemObtaining()
+				self.items.loadItemDetailAll()
 				self.selectTab("Items")
 
 			elif self.link.eventType == "skill":

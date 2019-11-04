@@ -172,6 +172,8 @@ class SkillsTab:
 
 
 	def loadSkillDetail(self):
+		self.root.Freeze()
+
 		try:
 			self.skillDetailList.ClearAll()
 		except:
@@ -264,6 +266,9 @@ class SkillsTab:
 		self.loadSkillCharms()
 		self.loadSkillArmor()
 		self.loadSkillArmorSetBonuses()
+
+		self.root.Thaw()
+		
 
 	def loadSkillDecorations(self):
 		sql = """
