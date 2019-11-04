@@ -9,7 +9,12 @@ class DebugWindow:
 		self.win = wx.Frame(root, title="Debug", style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 		self.win.SetIcon(wx.Icon("images/Nergigante.png"))
 		self.win.SetSize(400, root.GetSize()[1])
-		self.win.SetPosition((root.GetPosition()[0] - 385, root.GetPosition()[1]))
+		dis = wx.Display()
+		if dis.GetCount() == 1:
+			if dis.GetGeometry()[0] < 2560:
+				self.win.Center()
+		else:
+			self.win.SetPosition((root.GetPosition()[0] - 385, root.GetPosition()[1]))
 		self.win.Bind(wx.EVT_CLOSE, self.onClose)
 
 		panel = wx.Panel(self.win)
