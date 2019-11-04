@@ -93,15 +93,15 @@ class Application(wx.Frame):
 		if self.pref.rememberPosition:
 			self.SetPosition(self.pref.windowPosition)
 		else:
-			self.Center()
+			self.Center()	
+
+		wi, he = self.GetSize()
+		self.SetSize(wi + 1, he)
 
 		if "-debug" in cmdArgs:
 			self.debugWindow(None)
 
 		self.Show()
-
-		wi, he = self.GetSize()
-		self.SetSize(wi + 1, he)
 
 
 	def initMainNotebook(self):
@@ -205,24 +205,24 @@ class Application(wx.Frame):
 		fileMenu = wx.Menu()
 		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")
 
-		helpMenu = wx.Menu()
-		aboutItem = helpMenu.Append(-1, "About", "Shows a dialog with information about the application.")
-
 		optionsMenu = wx.Menu()
 		prefItem = optionsMenu.Append(-1, "&Preferences\tCtrl-P", "A window used to set preferences.")
 		debugItem = optionsMenu.Append(-1, "&Debug\tCtrl-D", "A debug window that redirects the wx errors and stdout/sterr to itself.")
 
+		helpMenu = wx.Menu()
+		aboutItem = helpMenu.Append(-1, "About", "Shows a dialog with information about the application.")
+
 		menuBar = wx.MenuBar()
 		menuBar.Append(fileMenu, "&File")
-		menuBar.Append(helpMenu, "&Help")
 		menuBar.Append(optionsMenu, "&Options")
+		menuBar.Append(helpMenu, "&Help")
 
 		self.SetMenuBar(menuBar)
 
 		self.Bind(wx.EVT_MENU, self.onClose,  exitItem)
-		self.Bind(wx.EVT_MENU, self.onAbout, aboutItem)
 		self.Bind(wx.EVT_MENU, self.preferencesWindow, prefItem)
 		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
+		self.Bind(wx.EVT_MENU, self.onAbout, aboutItem)
 
 
 	def debugWindow(self, event):

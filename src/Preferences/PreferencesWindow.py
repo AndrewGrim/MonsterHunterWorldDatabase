@@ -47,7 +47,21 @@ class PreferencesWindow:
 
 		panel.SetSizer(sizer)
 
+		self.makeMenuBar()
+
 		self.win.Show()
+
+
+	def makeMenuBar(self):
+		fileMenu = wx.Menu()
+		closeItem = fileMenu.Append(-1, "&Close\tCtrl-P", "Closes the preferences window.")
+		
+		menuBar = wx.MenuBar()
+		menuBar.Append(fileMenu, "&File")
+
+		self.win.SetMenuBar(menuBar)
+
+		self.win.Bind(wx.EVT_MENU, self.onClose, closeItem)
 
 
 	def onClose(self, event):
