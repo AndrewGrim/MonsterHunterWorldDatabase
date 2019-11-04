@@ -620,8 +620,7 @@ class WeaponsTab:
 		self.weaponAmmoList.SetImageList(self.ilAmmo, wx.IMAGE_LIST_SMALL)
 		self.weaponAmmoSizer.Add(self.weaponAmmoList, 1, wx.EXPAND)
 
-		self.loadWeaponDetails()
-		self.loadWeaponMaterials()
+		self.loadWeaponDetailsAll()
 
 		if self.weaponSharpnessTable.IsShown():
 				self.weaponSharpnessTable.Hide()
@@ -629,7 +628,16 @@ class WeaponsTab:
 		if not self.weaponSharpnessTable.IsShown():
 			self.weaponSharpnessTable.Show()
 			self.weaponDetailSizer.Insert(1, self.weaponSharpnessTable, 0.5, wx.EXPAND|wx.TOP, 5)
-			self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())		
+			self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
+
+
+	def loadWeaponDetailsAll(self):
+		self.root.Freeze()
+		self.loadWeaponDetails()
+		width, height = self.weaponPanel.GetSize()
+		self.weaponPanel.SetSize(width + 5, height + 20)
+		self.weaponPanel.SetSize(width, height)
+		self.root.Thaw()
 
 
 	def loadWeaponDetails(self):
@@ -990,9 +998,7 @@ class WeaponsTab:
 				self.weaponDetailSizer.Remove(1)
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
-		wi, h = self.root.GetSize()
-		self.root.SetSize(wi - 1, h)
-		self.root.SetSize(wi, h)
+		self.loadWeaponMaterials()
 
 	def loadBowgunAmmo(self):
 		self.ilAmmo.RemoveAll()
@@ -1339,17 +1345,14 @@ class WeaponsTab:
 			except:
 				pass
 			self.materialsRequiredList.ClearAll()
-			self.loadWeaponDetails()
-			self.loadWeaponMaterials()
-			width, height = self.weaponDetailPanel.GetSize()
-			self.weaponDetailPanel.SetSize(width + 1, height)
-			self.weaponDetailPanel.SetSize(width, height)
+			self.loadWeaponDetailsAll()
 
 		
 	def onWeaponTypeSelection(self, event):
 		"""
 		When a weapon button at the top of the screen is pressed the weapon tree is reloaded with the new weapon type information.
 		"""
+
 		self.currentWeaponTree = event.GetEventObject().GetName()
 		self.loadWeaponTree()
 

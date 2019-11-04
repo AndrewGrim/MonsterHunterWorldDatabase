@@ -156,7 +156,7 @@ class Application(wx.Frame):
 				if self.weapons.currentWeaponTree != self.link.info.category:
 					self.weapons.currentWeaponTree = self.link.info.category
 					self.weapons.loadWeaponTree()
-				self.weapons.loadWeaponDetails()
+				self.weapons.loadWeaponDetailsAll()
 				self.selectTab("Weapons")
 
 			elif self.link.eventType == "monster":
