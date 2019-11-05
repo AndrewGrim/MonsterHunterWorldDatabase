@@ -19,6 +19,7 @@ import Links as link
 import Preferences as p
 import Debug as debug
 import AboutWindow as about
+import SearchWindow as search
 
 class Application(wx.Frame):
 
@@ -200,6 +201,7 @@ class Application(wx.Frame):
 
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
+		searchItem = fileMenu.Append(-1, "&Search...\tCtrl-F", "Searches for the given phrase globally.")
 		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")
 
 		optionsMenu = wx.Menu()
@@ -216,10 +218,15 @@ class Application(wx.Frame):
 
 		self.SetMenuBar(menuBar)
 
-		self.Bind(wx.EVT_MENU, self.onClose,  exitItem)
+		self.Bind(wx.EVT_MENU, self.onSearch, searchItem)
+		self.Bind(wx.EVT_MENU, self.onClose, exitItem)
 		self.Bind(wx.EVT_MENU, self.preferencesWindow, prefItem)
 		self.Bind(wx.EVT_MENU, self.debugWindow, debugItem)
 		self.Bind(wx.EVT_MENU, self.onAbout, aboutItem)
+
+
+	def onSearch(self, event):
+		self.search = search.SearchWindow(self)
 
 	
 	def onClose(self, event):
