@@ -44,11 +44,10 @@ class WeaponsTab:
 			6: "#6764d7",
 			7: "#895edc",
 			8: "#c47c5e",
-			# ICEBORNE rarity colors
-			#9: "#cb7793",
-			#10: "#4fd1f5",
-			#11: "#f5d569",
-			#12: "#d5edfa",
+			9: "#cb7793",
+			10: "#4fd1f5",
+			11: "#f5d569",
+			12: "#d5edfa",
 		}
 
 		self.weaponDetailIcons = {

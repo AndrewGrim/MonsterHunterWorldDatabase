@@ -15,9 +15,9 @@
   - [ ] descriptions for small monsters that i added
   - [x] rewards
 - [ ] write tests
-- [ ] update with iceborne info - prob make a separate version
+- [ ] update with iceborne info
 - [ ] wishlist support
-- [ ] write documentation - which might force me to change sql strings??
+- [ ] write documentation
 - [ ] implement __add__ for ArmorSkill and ArmorMaterial classes to simplify code and make it more readable
 - [ ] remove unnecessary imports
 - [ ] Linux: in monstersTab materialTab is fucked
