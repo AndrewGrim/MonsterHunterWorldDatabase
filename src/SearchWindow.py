@@ -2,6 +2,7 @@ import wx
 import sqlite3
 
 import CustomGridRenderer as cgr
+from Debug.debug import debug
 
 class SearchWindow:
 
@@ -17,9 +18,9 @@ class SearchWindow:
 
 		panel = wx.Panel(self.win)
 		sizer = wx.BoxSizer(wx.VERTICAL)
-		self.search = wx.TextCtrl(panel)
+		self.search = wx.TextCtrl(panel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		sizer.Add(self.search, 1, wx.EXPAND)
 
 		self.results = cgr.HeaderBitmapGrid(panel)
@@ -47,11 +48,33 @@ class SearchWindow:
 
 	def onSearchTextEnter(self, event):
 		searchText = self.search.GetValue()
+		padding = " " * 8
 
 		try:
 			self.results.DeleteRows(0, self.results.GetNumberRows())
 		except:
 			pass
+
+		sql = f"""
+			SELECT m.id, mt.name
+			FROM monster m
+			JOIN monster_text mt
+				ON m.id = mt.id
+			WHERE mt.name LIKE '%{searchText}%'
+				AND mt.lang_id = :langId
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, ("en",))
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/monsters/24/{row[1]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
 
 		sql = f"""
 			SELECT w.id, w.weapon_type, w.rarity, wt.name
@@ -62,16 +85,136 @@ class SearchWindow:
 			ORDER BY w.id ASC
 		"""
 
-		conn = sqlite3.connect("mhw.db")
-		data = conn.execute(sql, )
+		data = conn.execute(sql,)
 		data = data.fetchall()
 		
-		padding = " " * 8
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/weapons/{row[1]}/rarity-24/{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[3]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		# TODO prob add sets to search as well
+		sql = f"""
+			SELECT a.id, at.name, a.armor_type, a.rarity
+			FROM armor a
+				JOIN armor_text at USING (id)
+			WHERE at.lang_id = 'en'
+				AND at.name LIKE '%{searchText}%'
+		"""
+
+		data = conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
+			SELECT c.id, ct.name, c.rarity
+			FROM charm c
+				JOIN charm_text ct
+					ON ct.id = c.id
+					AND ct.lang_id = 'en'
+					AND ct.name LIKE '%{searchText}%'
+		"""
+
+		data = conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/charms-24/{row[2]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
+			SELECT d.id, dt.name, d.icon_color
+			FROM decoration d
+				JOIN decoration_text dt
+					ON dt.id = d.id
+					AND dt.lang_id = 'en'
+				WHERE dt.name LIKE '%{searchText}%'
+		"""
+
+		data = conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/materials-24/Feystone{row[2]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
+			SELECT id, name, icon_color
+			FROM skilltree s join skilltree_text st USING (id)
+			WHERE lang_id = 'en'
+			AND name LIKE '%{searchText}%'
+		"""
+
+		data = conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/skills-24/Skill{row[2]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		# TODO move coating into ammo or even put all items ie materials, ammo, coatings into items img folder
+		sql = f"""
+			SELECT i.id, it.name, i.category, i.icon_name, i.icon_color
+			FROM item i
+				JOIN item_text it
+					ON it.id = i.id
+					AND it.lang_id = 'en'
+			WHERE i.category != 'hidden'
+				AND it.name LIKE '%{searchText}%'
+		"""
+
+		data = conn.execute(sql,)
+		data = data.fetchall()
+
+		# TODO consolidate item icons
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			if row[2] in ["material", "item", "misc"]:
+				img = wx.Bitmap(f"images/materials-24/{row[3]}{row[4]}.png")
+			elif row[2] == "ammo":
+				if row[3] == "Bottle":
+					img = wx.Bitmap(f"images/coatings-24/{row[3]}{row[4]}.png")
+				else:
+					img = wx.Bitmap(f"images/ammo-24/{row[3]}{row[4]}.png")
+			else:
+				img = wx.Bitmap(f"images/noImage24.png")
+				debug(row)
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
+			SELECT id, name
+			FROM location_text t
+			WHERE t.lang_id = 'en'
+				AND name LIKE '%{searchText}%'
+		"""
+
+		data = conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/locations-24/{row[1]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"{row[0]}")
 
 	
