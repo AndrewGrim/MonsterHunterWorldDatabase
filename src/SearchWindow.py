@@ -76,6 +76,36 @@ class SearchWindow:
 			pass
 
 		sql = f"""
+			SELECT DISTINCT abs.setbonus_id, at.name, abt.name, stt.name, a.rarity, st.icon_color
+			FROM armorset_bonus_skill abs
+				JOIN armorset_bonus_text abt
+					ON abt.id = abs.setbonus_id
+				JOIN skilltree st
+					ON abs.skilltree_id = st.id
+				JOIN skilltree_text stt
+					ON abs.skilltree_id = stt.id
+				JOIN armor a
+					ON a.armorset_bonus_id = abs.setbonus_id
+				JOIN armorset_text at
+					ON a.armorset_id = at.id
+			WHERE abt.lang_id = 'en'
+				AND stt.lang_id = 'en'
+				AND at.lang_id = 'en'
+				AND a.armor_type = 'head'
+				AND stt.name LIKE '%{self.searchText}%'
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[4]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
 			SELECT a.id, at.name, a.armor_type, a.rarity
 			FROM armor_skill askill
 				JOIN armor a
@@ -98,37 +128,6 @@ class SearchWindow:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
-			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
-
-		sql = f"""
-			SELECT DISTINCT abs.setbonus_id, at.name, abt.name, stt.name, a.rarity, st.icon_color
-			FROM armorset_bonus_skill abs
-				JOIN armorset_bonus_text abt
-					ON abt.id = abs.setbonus_id
-				JOIN skilltree st
-					ON abs.skilltree_id = st.id
-				JOIN skilltree_text stt
-					ON abs.skilltree_id = stt.id
-				JOIN armor a
-					ON a.armorset_bonus_id = abs.setbonus_id
-				JOIN armorset_text at
-					ON a.armorset_id = at.id
-			WHERE abt.lang_id = 'en'
-				AND stt.lang_id = 'en'
-				AND at.lang_id = 'en'
-				AND a.armor_type = 'head'
-				AND stt.name LIKE '%{self.searchText}%'
-			ORDER BY abt.name
-		"""
-
-		data = self.conn.execute(sql,)
-		data = data.fetchall()
-
-		for row in data:
-			self.results.AppendRows()
-			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[4]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"{row[0]}")
 
@@ -245,7 +244,6 @@ class SearchWindow:
 				AND at.lang_id = 'en'
 				AND a.armor_type = 'head'
 				AND at.name LIKE '%{self.searchText}%'
-			ORDER BY abt.name
 		"""
 
 		data = self.conn.execute(sql,)
