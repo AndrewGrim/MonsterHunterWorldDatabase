@@ -11,3 +11,4 @@
 /util
 src/TestTab.py
 run.bat
+tests/sqlTest.py

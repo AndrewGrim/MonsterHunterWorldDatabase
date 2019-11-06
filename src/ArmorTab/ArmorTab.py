@@ -208,7 +208,7 @@ class ArmorTab:
 		except:
 			pass
 
-		searchText = self.search.GetValue()
+		searchText = self.search.GetValue().replace("'", "''").replace("'", "''")
 
 		if len(searchText) == 0 or searchText == " ":
 			sql = """

@@ -160,7 +160,7 @@ class ItemsTab:
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
 		
-		searchText = self.search.GetValue()
+		searchText = self.search.GetValue().replace("'", "''")
 
 		if len(searchText) == 0 or searchText == " ":
 			sql = """
@@ -221,7 +221,7 @@ class ItemsTab:
 		self.itemList.InsertColumn(1, info)
 		self.itemList.SetColumnWidth(1, 0)
 
-		searchText = self.search.GetValue()
+		searchText = self.search.GetValue().replace("'", "''")
 
 		if len(searchText) == 0 or searchText == " ":
 			sql = """

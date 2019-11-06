@@ -155,7 +155,7 @@ class MonstersTab:
 		except:
 			pass
 
-		searchText = self.search.GetValue()
+		searchText = self.search.GetValue().replace("'", "''")
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
