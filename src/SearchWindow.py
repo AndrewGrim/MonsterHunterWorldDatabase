@@ -10,6 +10,7 @@ class SearchWindow:
 		self.root = root
 		self.init = True
 		self.conn = sqlite3.connect("mhw.db")
+		self.padding = " " * 8
 
 		self.win = wx.Frame(root, title="Debug", style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 		self.win.SetIcon(wx.Icon("images/Nergigante.png"))
@@ -19,10 +20,15 @@ class SearchWindow:
 
 		panel = wx.Panel(self.win)
 		sizer = wx.BoxSizer(wx.VERTICAL)
-		self.search = wx.TextCtrl(panel, style=wx.TE_PROCESS_ENTER)
-		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		sizer.Add(self.search, 1, wx.EXPAND)
+		self.searchName = wx.TextCtrl(panel, style=wx.TE_PROCESS_ENTER)
+		self.searchName.SetHint("  search by name")
+		self.searchName.Bind(wx.EVT_TEXT_ENTER, self.searchByName)
+		sizer.Add(self.searchName, 1, wx.EXPAND)
+
+		self.searchSkill = wx.TextCtrl(panel, style=wx.TE_PROCESS_ENTER)
+		self.searchSkill.SetHint("  search by skill")
+		self.searchSkill.Bind(wx.EVT_TEXT_ENTER, self.searchBySkill)
+		sizer.Add(self.searchSkill, 1, wx.EXPAND)
 
 		self.results = cgr.HeaderBitmapGrid(panel)
 		self.results.EnableEditing(False)
@@ -38,18 +44,13 @@ class SearchWindow:
 		sizer.Add(self.results, 120, wx.EXPAND)
 
 		panel.SetSizer(sizer)
-
-
 		self.makeMenuBar()
-
 		self.win.Show()
-
 		self.init = False
 
 
-	def onSearchTextEnter(self, event):
-		self.searchText = self.search.GetValue()
-		self.padding = " " * 8
+	def searchByName(self, event):
+		self.searchText = self.searchName.GetValue()
 
 		try:
 			self.results.DeleteRows(0, self.results.GetNumberRows())
@@ -65,6 +66,92 @@ class SearchWindow:
 		self.loadItems()
 		self.loadLocations()
 
+
+	def searchBySkill(self, event):
+		self.searchText = self.searchSkill.GetValue()
+
+		try:
+			self.results.DeleteRows(0, self.results.GetNumberRows())
+		except:
+			pass
+
+		sql = f"""
+			SELECT a.id, at.name, a.armor_type, a.rarity
+			FROM armor_skill askill
+				JOIN armor a
+					ON askill.armor_id = a.id
+				JOIN skilltree s
+					ON askill.skilltree_id = s.id
+				JOIN skilltree_text stt
+					ON askill.skilltree_id = stt.id
+				JOIN armor_text at
+					ON a.id = at.id
+			WHERE at.lang_id = 'en'
+				AND stt.lang_id = 'en'
+				AND stt.name LIKE '%{self.searchText}%'
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			print(row)
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
+			SELECT c.id, ct.name, c.rarity, stt.name 
+			FROM charm c
+				JOIN charm_text ct
+					ON ct.id = c.id
+					AND ct.lang_id = 'en'
+				JOIN charm_skill cs
+					ON cs.charm_id = c.id
+				JOIN skilltree_text stt
+					ON stt.id = cs.skilltree_id
+					AND stt.lang_id = 'en'
+				WHERE stt.name LIKE '%{self.searchText}%'
+			ORDER BY ct.name
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/charms-24/{row[2]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		sql = f"""
+			SELECT d.id, dt.name, d.icon_color, stt.name
+			FROM decoration d
+				JOIN decoration_text dt
+					ON dt.id = d.id
+					AND dt.lang_id = 'en'
+				JOIN skilltree_text stt
+					ON stt.id = d.skilltree_id
+					AND stt.lang_id = 'en'
+				WHERE stt.name LIKE '%{self.searchText}%'
+			ORDER BY dt.name
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/items-24/Feystone{row[2]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"{row[0]}")
+
+		self.loadSkills()
+
 		
 	def loadMonsters(self):
 		sql = f"""
@@ -73,10 +160,10 @@ class SearchWindow:
 			JOIN monster_text mt
 				ON m.id = mt.id
 			WHERE mt.name LIKE '%{self.searchText}%'
-				AND mt.lang_id = :langId
+				AND mt.lang_id = 'en'
 		"""
 
-		data = self.conn.execute(sql, ("en",))
+		data = self.conn.execute(sql,)
 		data = data.fetchall()
 
 		for row in data:
