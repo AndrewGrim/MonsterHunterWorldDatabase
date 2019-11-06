@@ -47,7 +47,7 @@ class ItemsTab:
 		self.itemListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.itemDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.itemImage = wx.Bitmap("images/materials-160/LiquidGreen.png", wx.BITMAP_TYPE_ANY)
+		self.itemImage = wx.Bitmap("images/items-160/LiquidGreen.png", wx.BITMAP_TYPE_ANY)
 		self.itemImageLabel = wx.StaticBitmap(self.itemPanel, bitmap=self.itemImage, size=(160, 160))
 
 		self.itemDetailsNotebook = wx.Notebook(self.itemPanel)
@@ -87,15 +87,15 @@ class ItemsTab:
 
 	def initItemButtons(self):
 		self.itemsButton = wx.Button(self.itemPanel, label="Items", name="item")
-		self.itemsButton.SetBitmap(wx.Bitmap("images/materials-24/LiquidGreen.png"))
+		self.itemsButton.SetBitmap(wx.Bitmap("images/items-24/LiquidGreen.png"))
 		self.materialsButton = wx.Button(self.itemPanel, label="Materials", name="material")
-		self.materialsButton.SetBitmap(wx.Bitmap("images/materials-24/BoneYellow.png"))
+		self.materialsButton.SetBitmap(wx.Bitmap("images/items-24/BoneYellow.png"))
 		self.ammoButton = wx.Button(self.itemPanel, label="Ammo", name="ammo")
-		self.ammoButton.SetBitmap(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
+		self.ammoButton.SetBitmap(wx.Bitmap("images/items-24/AmmoWhite.png"))
 		self.miscButton = wx.Button(self.itemPanel, label="Misc.", name="misc")
-		self.miscButton.SetBitmap(wx.Bitmap("images/materials-24/SmokeRed.png"))
+		self.miscButton.SetBitmap(wx.Bitmap("images/items-24/SmokeRed.png"))
 		self.craftingButton = wx.Button(self.itemPanel, label="Crafting", name="crafting")
-		self.craftingButton.SetBitmap(wx.Bitmap("images/materials-24/CraftingLightBeige.png"))
+		self.craftingButton.SetBitmap(wx.Bitmap("images/items-24/CraftingLightBeige.png"))
 
 		self.itemsButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
 		self.materialsButton.Bind(wx.EVT_BUTTON, self.onItemTypeSelection)
@@ -196,15 +196,7 @@ class ItemsTab:
 			self.il.RemoveAll()
 
 		for item in items:
-			if item.category in ["item", "material", "misc"]:
-				img = self.il.Add(wx.Bitmap(f"images/materials-24/{item.iconName}{item.iconColor}.png"))
-			elif item.category == "ammo":
-				if item.iconName == "Ammo":
-					img = self.il.Add(wx.Bitmap(f"images/ammo-24/{item.iconName}{item.iconColor}.png"))
-				elif item.iconName == "Bottle":
-					img = self.il.Add(wx.Bitmap(f"images/coatings-24/{item.iconName}{item.iconColor}.png"))	
-			else:
-				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+			img = self.il.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
 			index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{item.name}", img)
 			self.itemList.SetItem(index, 1, f"{item.id}")
 
@@ -301,26 +293,10 @@ class ItemsTab:
 
 		for com in combinations:
 			if com.secondName != None:
-				if com.resultCategory in ["item", "material", "misc"]:
-					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
-				elif com.resultCategory == "ammo":
-					if com.resultIconName == "Ammo":
-						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
-					elif com.resultIconName == "Bottle":
-						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
-				else:
-					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{com.resultIconName}{com.resultIconColor}.png"))
 				index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{com.resultName} = {com.firstName} + {com.secondName}", img)
 			else:
-				if com.resultCategory in ["item", "material", "misc"]:
-					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
-				elif com.resultCategory == "ammo":
-					if com.resultIconName == "Ammo":
-						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
-					elif com.resultIconName == "Bottle":
-						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
-				else:
-					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{com.resultIconName}{com.resultIconColor}.png"))
 				index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemList.SetItem(index, 1, f"{com.resultID}")
 		
@@ -379,12 +355,7 @@ class ItemsTab:
 
 		item = i.Item(data)
 
-		if item.category in ["item", "material", "misc"]:
-			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/materials-160/{item.iconName}{item.iconColor}.png"))
-		elif item.iconName == "Ammo":
-			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/ammo-160/{item.iconName}{item.iconColor}.png"))
-		elif item.iconName == "Bottle":
-			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/coatings-160/{item.iconName}{item.iconColor}.png"))
+		self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/items-160/{item.iconName}{item.iconColor}.png"))
 		
 		self.itemNameLabel.SetLabelText(f"\n{item.name}:")
 		self.itemDescriptionLabel.SetLabelText(f"{item.description}\n")
@@ -504,26 +475,10 @@ class ItemsTab:
 
 		for com in combinations:
 			if com.secondName != None:
-				if com.resultCategory in ["item", "material", "misc"]:
-					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
-				elif com.resultCategory == "ammo":
-					if com.resultIconName == "Ammo":
-						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
-					elif com.resultIconName == "Bottle":
-						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
-				else:
-					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{com.resultIconName}{com.resultIconColor}.png"))
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName} + {com.secondName}", img)
 			else:
-				if com.resultCategory in ["item", "material", "misc"]:
-					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
-				elif com.resultCategory == "ammo":
-					if com.resultIconName == "Ammo":
-						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
-					elif com.resultIconName == "Bottle":
-						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
-				else:
-					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{com.resultIconName}{com.resultIconColor}.png"))
 				index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemUsageList.SetItem(index, 1, f"x {com.quantity}")
 			self.itemUsageList.SetItem(index, 2, f"item,{com.resultID},{com.resultCategory},{com.resultName}")
@@ -684,26 +639,10 @@ class ItemsTab:
 
 		for com in combinations:
 			if com.secondName != None:
-				if com.resultCategory in ["item", "material", "misc"]:
-					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
-				elif com.resultCategory == "ammo":
-					if com.resultIconName == "Ammo":
-						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
-					elif com.resultIconName == "Bottle":
-						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
-				else:
-					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{com.resultIconName}{com.resultIconColor}.png"))
 				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(), f"{com.resultName} = {com.firstName} + {com.secondName}", img)
 			else:
-				if com.resultCategory in ["item", "material", "misc"]:
-					img = self.il.Add(wx.Bitmap(f"images/materials-24/{com.resultIconName}{com.resultIconColor}.png"))
-				elif com.resultCategory == "ammo":
-					if com.resultIconName == "Ammo":
-						img = self.il.Add(wx.Bitmap(f"images/ammo-24/{com.resultIconName}{com.resultIconColor}.png"))
-					elif com.resultIconName == "Bottle":
-						img = self.il.Add(wx.Bitmap(f"images/coatings-24/{com.resultIconName}{com.resultIconColor}.png"))	
-				else:
-					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{com.resultIconName}{com.resultIconColor}.png"))
 				index = self.itemObtainingList.InsertItem(self.itemObtainingList.GetItemCount(), f"{com.resultName} = {com.firstName}", img)
 			self.itemObtainingList.SetItem(index, 1, f"x {com.quantity}")
 			self.itemObtainingList.SetItem(index, 2, f"item,{com.resultID}")

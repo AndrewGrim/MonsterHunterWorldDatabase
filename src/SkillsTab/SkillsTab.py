@@ -304,7 +304,7 @@ class SkillsTab:
 			else:
 				lvl = f"{deco.skillLevel}/"
 				maxLvl = deco.skillMaxLevel
-			img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.decorationIconColor}.png"))
+			img = self.il.Add(wx.Bitmap(f"images/items-24/Feystone{deco.decorationIconColor}.png"))
 			index = self.foundList.InsertItem(self.foundList.GetItemCount(), deco.decorationName, img)
 			self.foundList.SetItem(index, 1, f"{lvl}{maxLvl}")
 			self.foundList.SetItem(index, 2, f"decoration,{deco.decorationID}")

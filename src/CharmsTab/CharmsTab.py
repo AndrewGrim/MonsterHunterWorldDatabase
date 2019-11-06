@@ -296,7 +296,7 @@ class CharmsTab:
 		for row in data:
 			materials.append(c.CharmMaterial(row))
 		for mat in materials:
-			img = self.il.Add(wx.Bitmap(f"images/materials-24/{mat.iconName}{mat.iconColor}.png"))
+			img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
 			index = self.materialList.InsertItem(self.materialList.GetItemCount(), mat.name, img)
 			self.materialList.SetItem(index, 1, f"{mat.quantity}")
 			self.materialList.SetItem(index, 2, f"{mat.id},{mat.category}")

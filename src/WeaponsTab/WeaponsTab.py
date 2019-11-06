@@ -120,7 +120,7 @@ class WeaponsTab:
 
 		self.weaponDetailsNotebook = wx.Notebook(self.weaponPanel)
 		il = wx.ImageList(24, 24)
-		self.ammo = il.Add(wx.Bitmap("images/ammo-24/AmmoWhite.png"))
+		self.ammo = il.Add(wx.Bitmap("images/items-24/AmmoWhite.png"))
 		self.notes = il.Add(wx.Bitmap("images/weapon-detail-24/notes.png"))
 		self.weaponDetailsNotebook.AssignImageList(il)
 		self.weaponDetailPanel = wx.ScrolledWindow(self.weaponDetailsNotebook)
@@ -630,12 +630,12 @@ class WeaponsTab:
 			"heavy-bowgun": ["Special Ammo", wep.special_ammo, wx.Bitmap(f"images/weapon-detail-24/specialammo.png"),
 							"Deviation", wep.name, wx.Bitmap(f"images/weapon-detail-24/deviation.png")],
 
-			"bow": ["Close", close, wx.Bitmap(f"images/coatings-24/BottleWhite.png"),
-					"Power", power, wx.Bitmap(f"images/coatings-24/BottleRed.png"),
-					"Paralysis", paralysis, wx.Bitmap(f"images/coatings-24/BottleGold.png"),
-					"Poison", poison, wx.Bitmap(f"images/coatings-24/BottleViolet.png"),
-					"Sleep", sleep, wx.Bitmap(f"images/coatings-24/BottleCyan.png"),
-					"Blast", blast, wx.Bitmap(f"images/coatings-24/BottleLime.png"),],
+			"bow": ["Close", close, wx.Bitmap(f"images/items-24/BottleWhite.png"),
+					"Power", power, wx.Bitmap(f"images/items-24/BottleRed.png"),
+					"Paralysis", paralysis, wx.Bitmap(f"images/items-24/BottleGold.png"),
+					"Poison", poison, wx.Bitmap(f"images/items-24/BottleViolet.png"),
+					"Sleep", sleep, wx.Bitmap(f"images/items-24/BottleCyan.png"),
+					"Blast", blast, wx.Bitmap(f"images/items-24/BottleLime.png"),],
 		}
 
 		coatingIconColors = {
@@ -761,7 +761,7 @@ class WeaponsTab:
 		elif self.currentWeaponTree == "bow":
 			for num in range(0, 17, 3):
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
-							f"images/coatings-24/Bottle{coatingIconColors[num]}.png") 
+							f"images/items-24/Bottle{coatingIconColors[num]}.png") 
 							, additionalDetails[self.currentWeaponTree][num]))
 				self.weaponDetailList.SetCellValue(row, 0, additionalDetails[self.currentWeaponTree][num])
 				self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][num + 1]))
@@ -961,7 +961,7 @@ class WeaponsTab:
 		col = 3
 		# different checks are used avoid going out of bounds since not all ammo types have the same amount of columns
 		for item in ammoTypes:
-			img = self.ilAmmo.Add(wx.Bitmap(f"images/ammo-24/{ammoIcons[item]}"))
+			img = self.ilAmmo.Add(wx.Bitmap(f"images/items-24/{ammoIcons[item]}"))
 			if col == 127:
 				if data[col] != 0 and data[col] != None:
 					index = self.weaponAmmoList.InsertItem(self.weaponAmmoList.GetItemCount(), item, img)
@@ -1107,7 +1107,7 @@ class WeaponsTab:
 			materials.append(w.WeaponMaterial(row))
 
 		for item in materials:
-			img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{item.iconName}{item.iconColor}.png"))
+			img = self.ilMats.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
 			if item.recipeType == "Create":
 				try:
 					index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(),

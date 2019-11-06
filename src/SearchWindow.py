@@ -148,7 +148,7 @@ class SearchWindow:
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/materials-24/Feystone{row[2]}.png")
+			img = wx.Bitmap(f"images/items-24/Feystone{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"{row[0]}")
 
@@ -183,20 +183,10 @@ class SearchWindow:
 		data = conn.execute(sql,)
 		data = data.fetchall()
 
-		# TODO consolidate item icons
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			if row[2] in ["material", "item", "misc"]:
-				img = wx.Bitmap(f"images/materials-24/{row[3]}{row[4]}.png")
-			elif row[2] == "ammo":
-				if row[3] == "Bottle":
-					img = wx.Bitmap(f"images/coatings-24/{row[3]}{row[4]}.png")
-				else:
-					img = wx.Bitmap(f"images/ammo-24/{row[3]}{row[4]}.png")
-			else:
-				img = wx.Bitmap(f"images/noImage24.png")
-				debug(row)
+			img = wx.Bitmap(f"images/items-24/{row[3]}{row[4]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"{row[0]}")
 

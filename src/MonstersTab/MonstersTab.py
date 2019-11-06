@@ -719,7 +719,7 @@ class MonstersTab:
 		self.materialsTree.SetItemText(self.monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
 		self.materialsTree.SetItemText(self.monsterMaterial, f"{r.itemID},{r.category}", 2)
 		try:
-			img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{r.iconName}{r.iconColor}.png"))
+			img = self.ilMats.Add(wx.Bitmap(f"images/items-24/{r.iconName}{r.iconColor}.png"))
 			self.materialsTree.SetItemImage(self.monsterMaterial, img, which=wx.TreeItemIcon_Normal)
 		except:
 			self.materialsTree.SetItemImage(self.monsterMaterial, test, which=wx.TreeItemIcon_Normal)

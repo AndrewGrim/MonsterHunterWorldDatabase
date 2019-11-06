@@ -542,7 +542,7 @@ class ArmorTab:
 
 			for material in armorMaterials:
 				try:
-					img = self.ilMats.Add(wx.Bitmap(f"images/materials-24/{material.iconName}{material.iconColor}.png"))
+					img = self.ilMats.Add(wx.Bitmap(f"images/items-24/{material.iconName}{material.iconColor}.png"))
 				except:
 					img = self.ilMats.Add(wx.Bitmap(f"images/unknown.png"))
 				index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
@@ -727,7 +727,7 @@ class ArmorTab:
 
 				for mat in armorMaterials:
 					armorPieceMaterials[mat.name] = 0
-					materialIcons[mat.name] = f"images/materials-24/{mat.iconName}{mat.iconColor}.png"
+					materialIcons[mat.name] = f"images/items-24/{mat.iconName}{mat.iconColor}.png"
 
 				for mat in armorMaterials:
 					armorPieceMaterials[mat.name] += mat.quantity

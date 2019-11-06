@@ -37,7 +37,7 @@ class DecorationsTab:
 		self.decorationListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.decorationDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.decorationImage = wx.Bitmap("images/materials-160/FeystoneViolet.png", wx.BITMAP_TYPE_ANY)
+		self.decorationImage = wx.Bitmap("images/items-160/FeystoneViolet.png", wx.BITMAP_TYPE_ANY)
 		self.decorationImageLabel = wx.StaticBitmap(self.decorationPanel, bitmap=self.decorationImage, size=(160, 160))
 
 		self.decorationDetailsNotebook = wx.Notebook(self.decorationPanel)
@@ -164,7 +164,7 @@ class DecorationsTab:
 
 		for deco in decorations:
 			if deco.iconColor != None:
-				img = self.il.Add(wx.Bitmap(f"images/materials-24/Feystone{deco.iconColor}.png"))
+				img = self.il.Add(wx.Bitmap(f"images/items-24/Feystone{deco.iconColor}.png"))
 			else:
 				img = self.test
 			index = self.decorationList.InsertItem(self.decorationList.GetItemCount(), deco.name, img)
@@ -248,7 +248,7 @@ class DecorationsTab:
 		else:
 			lvl = f"{deco.skillLevel}/"
 			maxLvl = deco.skillMaxLevel
-		self.decorationImageLabel.SetBitmap(wx.Bitmap(f"images/materials-160/Feystone{deco.iconColor}.png"))
+		self.decorationImageLabel.SetBitmap(wx.Bitmap(f"images/items-160/Feystone{deco.iconColor}.png"))
 		self.decorationNameLabel.SetLabelText(f"\n{deco.name}\n")
 		if deco.iconColor != None:
 			img = self.il.Add(wx.Bitmap(f"images/skills-24/Skill{deco.skillIconColor}.png"))
@@ -283,16 +283,16 @@ class DecorationsTab:
 		self.dropList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
 
 		
-		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneGray.png"))
+		img = self.il.Add(wx.Bitmap(f"images/items-24/FeystoneGray.png"))
 		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Mysterious Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.mysteriousFeystonePercent}%")
-		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneBlue.png"))
+		img = self.il.Add(wx.Bitmap(f"images/items-24/FeystoneBlue.png"))
 		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Glowing Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.glowingFeystonePercent}%")
-		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneBeige.png"))
+		img = self.il.Add(wx.Bitmap(f"images/items-24/FeystoneBeige.png"))
 		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Worn Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.wornFeystonePercent}%")
-		img = self.il.Add(wx.Bitmap(f"images/materials-24/FeystoneRed.png"))
+		img = self.il.Add(wx.Bitmap(f"images/items-24/FeystoneRed.png"))
 		index = self.dropList.InsertItem(self.dropList.GetItemCount(), "Warped Feystone", img)
 		self.dropList.SetItem(index, 1, f"{deco.warpedFeystonePercent}%")
 

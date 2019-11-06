@@ -48,9 +48,9 @@ class Application(wx.Frame):
 		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/5.png"))
 		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
 		charm = il.Add(wx.Bitmap("images/charms-24/7.png"))
-		deco = il.Add(wx.Bitmap("images/materials-24/FeystoneGold.png"))
+		deco = il.Add(wx.Bitmap("images/items-24/FeystoneGold.png"))
 		skill = il.Add(wx.Bitmap("images/skills-24/SkillBlue.png"))
-		item = il.Add(wx.Bitmap("images/materials-24/TrapGreen.png"))
+		item = il.Add(wx.Bitmap("images/items-24/TrapGreen.png"))
 		local = il.Add(wx.Bitmap("images/locations-24/Elder's Recess.png"))
 		self.mainNotebook.AssignImageList(il)
 
