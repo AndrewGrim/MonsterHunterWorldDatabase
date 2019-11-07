@@ -77,6 +77,8 @@ class SearchWindow:
 			debug(materialInfo, "materialInfo", "materialInfo length is other than accounted for!")
 		self.root.followLink()
 		self.link.reset()
+		if not self.root.pref.keepSearchOpen:
+			self.onClose(None)
 
 
 	def searchByName(self, event):

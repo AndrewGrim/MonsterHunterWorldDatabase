@@ -8,7 +8,7 @@ class PreferencesWindow:
 
 		self.win = wx.Frame(self.root, title="Preferences")
 		self.win.SetIcon(wx.Icon("images/Nergigante.png"))
-		self.win.SetSize(300, 300)
+		self.win.SetSize(300, 350)
 		self.win.Center()
 		self.win.Bind(wx.EVT_CLOSE, self.onClose)
 
@@ -29,6 +29,8 @@ class PreferencesWindow:
 		self.autoExpand.SetValue(self.pref.autoExpand)
 		self.unicodeSymbols = wx.CheckBox(panel, label="Use unicode symbols", size=(200, 20))
 		self.unicodeSymbols.SetValue(self.pref.unicodeSymbols)
+		self.keepSearchOpen = wx.CheckBox(panel, label="Keep search window open", size=(200, 20))
+		self.keepSearchOpen.SetValue(self.pref.keepSearchOpen)
 
 		vSizer.Add(self.label, 1, wx.LEFT)
 		vSizer.Add(self.selectTab, 1, wx.CENTER)
@@ -40,6 +42,8 @@ class PreferencesWindow:
 		vSizer.Add(self.autoExpand, 1, wx.CENTER)
 		vSizer.Add((0, 20))
 		vSizer.Add(self.unicodeSymbols, 1, wx.CENTER)
+		vSizer.Add((0, 20))
+		vSizer.Add(self.keepSearchOpen, 1, wx.CENTER)
 
 		sizer.Add((0,0), 1, wx.EXPAND)
 		sizer.Add(vSizer, 0, wx.CENTER)
@@ -80,6 +84,7 @@ class PreferencesWindow:
 			self.root.reloadUnicode()
 		if a:
 			self.root.reloadMaterials()
+		self.pref.keepSearchOpen = self.keepSearchOpen.GetValue()
 			
 		self.pref.writePreferencesFile()
 		

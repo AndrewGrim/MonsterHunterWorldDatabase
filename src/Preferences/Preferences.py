@@ -13,6 +13,7 @@ class Preferences:
 		self.windowPosition = None
 		self.autoExpand = False
 		self.unicodeSymbols = False
+		self.keepSearchOpen = False
 		self.readPreferencesFile()
 		self.misspelled = {
 			"weapon": "Weapons", 
@@ -47,44 +48,59 @@ class Preferences:
 				self.autoExpand = (self.strToBool(f.readline().strip("\n")))
 			elif line == "[USE UNICODE SYMBOLS]":
 				self.unicodeSymbols = (self.strToBool(f.readline().strip("\n")))
+			elif line == "[KEEP SEARCH WINDOW OPEN]":
+				self.keepSearchOpen = (self.strToBool(f.readline().strip("\n")))
 
 	def writePreferencesFile(self):
+		settings = f"""
+[INITIAL TAB]
+{self.initialTab}
+[WINDOW SIZE]
+{self.windowSize[0]}
+{self.windowSize[1]}
+[WINDOW POSITION]
+{self.windowPosition[0]}
+{self.windowPosition[1]}
+[REMEMBER SIZE]
+{self.rememberSize}
+[REMEMBER POSITION]
+{self.rememberPosition}
+[AUTO EXPAND MONSTER MATERIALS]
+{self.autoExpand}
+[USE UNICODE SYMBOLS]
+{self.unicodeSymbols}
+[KEEP SEARCH WINDOW OPEN]
+{self.keepSearchOpen}
+""".strip("\n")
+
 		f = open("preferences.config", "w")
-		f.write("[INITIAL TAB]\n")
-		f.write(str(self.initialTab) + "\n")
-		f.write("[WINDOW SIZE]\n")
-		f.write(str(self.windowSize[0]) + "\n")
-		f.write(str(self.windowSize[1]) + "\n")
-		f.write("[WINDOW POSITION]\n")
-		f.write(str(self.windowPosition[0]) + "\n")
-		f.write(str(self.windowPosition[1]) + "\n")
-		f.write("[REMEMBER SIZE]\n")
-		f.write(str(self.rememberSize) + "\n")
-		f.write("[REMEMBER POSITION]\n")
-		f.write(str(self.rememberPosition) + "\n")
-		f.write("[AUTO EXPAND MONSTER MATERIALS]\n")
-		f.write(str(self.autoExpand) + "\n")
-		f.write("[USE UNICODE SYMBOLS]\n")
-		f.write(str(self.unicodeSymbols) + "\n")
+		f.write(settings)
+
 
 	def writeDefaultPreferencesFile(self):
+		settings = f"""
+[INITIAL TAB]
+Monsters
+[WINDOW SIZE]
+1420
+850
+[WINDOW POSITION]
+0
+0
+[REMEMBER SIZE]
+False
+[REMEMBER POSITION]
+False
+[AUTO EXPAND MONSTER MATERIALS]
+False
+[USE UNICODE SYMBOLS]
+True
+[KEEP SEARCH WINDOW OPEN]
+False
+""".strip("\n")
+
 		f = open("preferences.config", "w")
-		f.write("[INITIAL TAB]\n")
-		f.write("Monsters" + "\n")
-		f.write("[WINDOW SIZE]\n")
-		f.write("1420" + "\n")
-		f.write("850" + "\n")
-		f.write("[WINDOW POSITION]\n")
-		f.write("0" + "\n")
-		f.write("0" + "\n")
-		f.write("REMEMBER SIZE" + "\n")
-		f.write("False" + "\n")
-		f.write("REMEMBER POSITION" + "\n")
-		f.write("False" + "\n")
-		f.write("[AUTO EXPAND MONSTER MATERIALS]\n")
-		f.write("False" + "\n")
-		f.write("[USE UNICODE SYMBOLS]\n")
-		f.write("True" + "\n")
+		f.write(settings)
 
 
 	def strToBool(self, text: str) -> bool:
