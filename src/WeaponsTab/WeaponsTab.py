@@ -591,27 +591,11 @@ class WeaponsTab:
 			3: wx.Bitmap(f"images/decoration-slots-24/3.png"),
 		}
 
-		# notes [32] WRB - white red blue
-		# shelling [24:25] - normal 1
-		# phial type [22] - impact / power
-		# kinsect bonus [20] - sever
-		# special ammo [33] - wyvernblast
-		# deviation [34] - none / low
-		# 26:31 coatings:
-		# 26 = close
-		# 27 = power
-		# 28 = para
-		# 29 = poison
-		# 30 = sleep
-		# 31 = blast
-
-	
 		note1 = str(wep.notes)[0]
 		note2 = str(wep.notes)[1]
 		note3 = str(wep.notes)[2]
 
 		shelling = f"{str(wep.shelling).capitalize()} Lv {wep.shelling_level}"
-		
 
 		additionalDetails = {
 			"switch-axe": ["Phial Type", str(wep.phial).capitalize(), wx.Bitmap(f"images/weapon-detail-24/phials.png")],

@@ -1,7 +1,6 @@
 import wx
 import wx.grid
 import wx.lib.gizmos as gizmos
-import CustomGridRenderer as cgr
 import wx.propgrid as wxpg
 import sqlite3
 import typing
@@ -12,9 +11,10 @@ from typing import Dict
 from typing import NewType
 
 import Utilities as util
-
+import CustomGridRenderer as cgr
 import Links as link
 import MonstersTab as m
+from Debug.debug import debug
 
 wxColour = NewType("wxColour", None)
 sqlite3Connection = NewType("sqlite3Connection", None)
@@ -29,11 +29,10 @@ class MonstersTab:
 		
 		self.currentMonsterID = 17
 		self.currentMonsterName = "Great Jagras"
-		self.currentMonsterMaterialID = 212
 		self.currentMonsterSize = "large"
+		self.currentMaterialRank = "HR"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
-		self.ilMats = wx.ImageList(24, 24)
-		self.ilMats.Add(self.testIcon) # to prevent crash on linux, gtk wants at least one image in image list before you set it
+		self.padding = " " * 8
 
 		self.initMonstersTab()
 		self.initMonsterSizeButtons()
@@ -42,6 +41,7 @@ class MonstersTab:
 		self.loadMonsterList()
 		self.initMonsterSummary()
 		self.initMonsterDamage()
+		self.initWeaponButtons()
 		self.initMonsterMaterials()
 		self.loadMonsterDetail()
 
@@ -85,7 +85,7 @@ class MonstersTab:
 		self.monsterDamageSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.damagePanel, "Damage")
 		#
-		self.monsterMaterialsSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.monsterMaterialsSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.materialsPanel, "Materials")
 		# add the right side detailed view to the main size of the monsters notebook tab
 		self.monstersSizer.Add(self.monstersDetailedSizer, 1, wx.EXPAND)
@@ -95,6 +95,7 @@ class MonstersTab:
 
 		# set sizer for the monsters notebook tab
 		self.monstersPanel.SetSizer(self.monstersSizer)
+		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
 
 		self.damagePanel.SetScrollRate(20, 20)
 
@@ -609,43 +610,75 @@ class MonstersTab:
 			self.breakDamageTable.SetCellBackgroundColour(index, 4, util.hexToRGB(util.extractColors[b.extract]))
 			self.breakDamageTable.SetCellValue(index, 4, f"{b.extract.capitalize()}")
 
+
+	def initWeaponButtons(self):
+		ranks = ["LR", "HR", "MR"]
+
+		self.materialRankButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
+		for item in ranks:
+			button = wx.BitmapButton(self.materialsPanel, bitmap=wx.Bitmap(f"images/rank-stars-24/{item.lower()}.png"), name=item)
+			self.materialRankButtonsSizer.Add(button)
+			button.Bind(wx.EVT_BUTTON, self.onMaterialRankSelection)
+
+		self.monsterMaterialsSizer.Add(self.materialRankButtonsSizer)
+
 	
 	def initMonsterMaterials(self):
-		self.materialsTree = wx.lib.agw.hypertreelist.HyperTreeList(self.materialsPanel, -1, style=0,
-												agwStyle=
-												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												| gizmos.TR_NO_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												)
-		self.materialsTree.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.onMaterialDoubleClick)
-
-		self.materialsTree.AddColumn("")
-		self.materialsTree.AddColumn("")
-		self.materialsTree.AddColumn("id")
-		self.materialsTree.SetMainColumn(0)
-		self.materialsTree.SetColumnWidth(0, 400)
-		self.materialsTree.SetColumnWidth(1, 200)
-		self.materialsTree.SetColumnAlignment(1, wx.ALIGN_CENTER)
-		self.materialsTree.SetColumnWidth(2, 0)
-
-		self.materialsTree.SetImageList(self.ilMats)
-
+		self.materialsTree = cgr.HeaderBitmapGrid(self.materialsPanel)
+		self.materialsTree.SetFocus()
+		self.materialsTree.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.onMaterialDoubleClick)
+		self.materialsTree.Bind(wx.EVT_SIZE, self.onSize)
+		self.materialsTree.EnableEditing(False)
+		self.materialsTree.EnableDragRowSize(False)
 		self.monsterMaterialsSizer.Add(self.materialsTree, 1, wx.EXPAND)
-		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
+
+		self.materialsTree.CreateGrid(1, 3)
+		self.materialsTree.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.materialsTree.SetColSize(0, 480)
+		self.materialsTree.SetColSize(1, 200 - 20)
+		self.materialsTree.SetColSize(2, 0)
+		self.materialsTree.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.materialsTree.SetColLabelSize(2)
+		self.materialsTree.SetRowLabelSize(0)
+		self.materialsTree.HideRowLabels()
 	
 
 	def loadMonsterMaterials(self):
-		self.materialsTree.DeleteAllItems()
-
-		root = self.materialsTree.AddRoot("Materials")	
+		try:
+			self.materialsTree.DeleteRows(0, self.materialsTree.GetNumberRows())
+		except:
+			pass
+		
+		colors = {
+			"LR": "#4DD0E1",
+			"HR": "#FB8C00",
+			"MR": "#FFEB3B",
+		}
 
 		sql = """
-			SELECT r.rank, ct.name condition_name, r.stack, r.percentage,
-				i.id item_id, it.name item_name, i.icon_name item_icon_name, i.category item_category,
-				i.icon_color item_icon_color
+			SELECT DISTINCT rank 
+			FROM monster_reward
+			WHERE monster_id = :monsterId
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, (self.currentMonsterID,))
+		data = data.fetchall()
+
+		ranks = []
+		for row in data:
+			ranks.append(row[0])
+		
+		for child in self.materialsPanel.GetChildren():
+			if type(child) == cgr.HeaderBitmapGrid:
+				pass
+			elif child.GetName() not in ranks:
+				child.Hide()
+			elif child.GetName() in ranks:
+				child.Show()
+
+		sql = """
+			SELECT ct.name, r.stack, r.percentage, i.id, it.name, i.icon_name, i.category, i.icon_color 
 			FROM monster_reward r
 				JOIN monster_reward_condition_text ct
 					ON ct.id = r.condition_id
@@ -655,85 +688,56 @@ class MonstersTab:
 				JOIN item_text it
 					ON it.id = i.id
 					AND it.lang_id = :langId
-			WHERE r.monster_id = :monsterId ORDER BY r.id
+			WHERE r.monster_id = :monsterId
+			AND r.rank = :currentRank
+			ORDER BY ct.id
 		"""
 
-		conn = sqlite3.connect("mhw.db")
-		data = conn.execute(sql, ("en", self.currentMonsterID, ))
+		data = conn.execute(sql, ("en", self.currentMonsterID, self.currentMaterialRank,))
 		data = data.fetchall()
 
 		rewards = []
 		for row in data:
 			rewards.append(m.Reward(row))
 
-		self.rewardCondition = 0
-		self.monsterMaterial = 0
-		categoriesLR = []
-		categoriesHR = []
-		categoriesMR = []
-
-		self.ilMats.RemoveAll()
-		test = self.ilMats.Add(self.testIcon)
-	
-		initLR = False
-		initHR = False
-		initMR = False
-		for index, r in enumerate(rewards):
-			if index == 0:
-				self.currentMonsterMaterialID = r.itemID
-			if r.rank == "LR":
-				if not initLR:
-					self.lowRankNode = self.materialsTree.AppendItem(root, "Low Rank")
-					lowRankColour = util.hexToRGB("#4DD0E1")
-					self.materialsTree.SetItemBackgroundColour(self.lowRankNode, lowRankColour)
-					initLR = True
-				self.populateTree(r, categoriesLR, self.lowRankNode)
-			elif r.rank == "HR":
-				if not initHR:
-					self.highRankNode = self.materialsTree.AppendItem(root, "High Rank")
-					highRankColour = util.hexToRGB("#FB8C00")
-					self.materialsTree.SetItemBackgroundColour(self.highRankNode, highRankColour)
-					initHR = True
-				self.populateTree(r, categoriesHR, self.highRankNode)
-			# ICEBORNE material rewards
-			#elif r.rank == "MR":
-			#	if not initMR:
-			#		self.masterRankNode = self.materialsTree.AppendItem(root, "Master Rank")
-			#		masterRankColour = util.hexToRGB("#FFEB3B")
-			#		self.materialsTree.SetItemBackgroundColour(self.masterRankNode, masterRankColour)
-			#		initMR = True
-			#	self.populateTree(r, categoriesMR, self.masterRankNode)
-			if not self.root.pref.autoExpand:
-				self.materialsTree.Expand(self.rewardCondition)
-		if self.root.pref.autoExpand:
-			self.materialsTree.ExpandAll()
+		rewardConditions = []
+		for r in rewards:
+			if not r.conditionName in rewardConditions:
+				self.materialsTree.AppendRows()
+				row = self.materialsTree.GetNumberRows() - 1
+				self.materialsTree.SetCellValue(row, 0, r.conditionName)
+				self.materialsTree.SetCellFont(row, 0, self.materialsTree.GetCellFont(row, 0).Bold())
+				self.materialsTree.SetCellBackgroundColour(row, 0, colors[self.currentMaterialRank])
+				self.materialsTree.SetCellBackgroundColour(row, 1, colors[self.currentMaterialRank])
+				rewardConditions.append(r.conditionName)
+			self.populateTree(r)
+			# REMOVE this setting will not be needed anymore, remove it everywhere
+			#self.root.pref.autoExpand:
 
 
-	def populateTree(self, r, catergories, rankNode):
-		currentCategory = str(r.conditionName)
-		if currentCategory in catergories:
-			self.monsterMaterial = self.materialsTree.AppendItem(self.rewardCondition,  str(r.itemName))
-		else:
-			self.rewardCondition = self.materialsTree.AppendItem(rankNode, str(r.conditionName))
-			self.monsterMaterial = self.materialsTree.AppendItem(self.rewardCondition,  str(r.itemName))
-		self.materialsTree.SetItemText(self.monsterMaterial, f"{r.stack} x {r.percentage}%", 1)
-		self.materialsTree.SetItemText(self.monsterMaterial, f"{r.itemID},{r.category}", 2)
-		try:
-			img = self.ilMats.Add(wx.Bitmap(f"images/items-24/{r.iconName}{r.iconColor}.png"))
-			self.materialsTree.SetItemImage(self.monsterMaterial, img, which=wx.TreeItemIcon_Normal)
-		except:
-			self.materialsTree.SetItemImage(self.monsterMaterial, test, which=wx.TreeItemIcon_Normal)
-		catergories.append(currentCategory)
+	def populateTree(self, r):
+		self.materialsTree.AppendRows()
+		row = self.materialsTree.GetNumberRows() - 1
+		self.materialsTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+								wx.Bitmap(f"images/items-24/{r.iconName}{r.iconColor}.png"),
+								f"{self.padding}{r.itemName}"))
+		self.materialsTree.SetCellValue(row, 1, f"{r.stack} x {r.percentage}%")
+		self.materialsTree.SetCellValue(row, 2, f"{r.itemID},{r.category}")
 
 
 	def onMaterialDoubleClick(self, event):
-		materialInfo = self.materialsTree.GetItemText(event.GetItem(), 2)
+		materialInfo = self.materialsTree.GetCellValue(event.GetRow(), 2)
 		materialInfo = materialInfo.split(",")
 		self.link.event = True
 		self.link.eventType = "item"
 		self.link.info =  link.GenericDoubleLink(materialInfo)
 		self.root.followLink()
 		self.link.reset()
+
+	
+	def onMaterialRankSelection(self, event):
+		self.currentMaterialRank = event.GetEventObject().GetName()
+		self.loadMonsterMaterials()
 
 
 	def onMonsterSelected(self, event):
@@ -746,6 +750,14 @@ class MonstersTab:
 		self.currentMonsterSize = event.GetEventObject().GetName()
 		self.loadMonsterList()
 
+
+	def onSize(self, event):
+		try:
+			w = self.materialsPanel.GetSize()[0]
+			self.materialsTree.SetColSize(0, w * 0.66)
+			self.materialsTree.SetColSize(1, w * 0.34 - 20)
+		except:
+			pass
 	
 	def onScroll(self, event):
 		"""
