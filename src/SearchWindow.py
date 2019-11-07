@@ -14,7 +14,7 @@ class SearchWindow:
 		self.conn = sqlite3.connect("mhw.db")
 		self.padding = " " * 8
 
-		self.win = wx.Frame(root, title="Search", style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+		self.win = wx.Frame(root, title="Search")
 		self.win.SetIcon(wx.Icon("images/Nergigante.png"))
 		self.win.SetSize(700, 700)
 		self.win.Center()
@@ -53,11 +53,16 @@ class SearchWindow:
 
 	def onDoubleClick(self, event):
 		materialInfo = self.results.GetCellValue(event.GetRow(), 1).split(",")
-		if len(materialInfo) == 4:
-			self.root.items.currentItemName = materialInfo[-1]
-			materialInfo.remove(materialInfo[-1])
 		self.link.event = True
 		self.link.eventType = materialInfo[0]
+		if len(materialInfo) == 4:
+			if self.link.eventType == "item":
+				self.root.items.currentItemName = materialInfo[-1]
+			elif self.link.eventType == "armorset":
+				self.root.armor.currentlySelectedArmorSetID = materialInfo[-1]
+			else:
+				debug(materialInfo, "self.link.eventType", "self.link.eventType unsupported eventType!")
+			materialInfo.remove(materialInfo[-1])
 		materialInfo.remove(materialInfo[0])
 		if len(materialInfo) == 1:
 			self.link.info = link.GenericSingleLink(materialInfo[0])
@@ -96,7 +101,7 @@ class SearchWindow:
 			pass
 
 		sql = f"""
-			SELECT DISTINCT abs.setbonus_id, at.name, abt.name, stt.name, a.rarity, a.armorset_id, a.rank
+			SELECT DISTINCT abs.setbonus_id, at.name, abt.name, stt.name, a.rarity, a.id, a.rank, a.armorset_id
 			FROM armorset_bonus_skill abs
 				JOIN armorset_bonus_text abt
 					ON abt.id = abs.setbonus_id
@@ -113,6 +118,7 @@ class SearchWindow:
 				AND at.lang_id = 'en'
 				AND a.armor_type = 'head'
 				AND stt.name LIKE '%{self.searchText}%'
+			ORDER BY abs.setbonus_id
 		"""
 
 		data = self.conn.execute(sql,)
@@ -123,7 +129,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[4]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"armorset,{row[5]},{row[6]}")
+			self.results.SetCellValue(r, 1, f"armorset,{row[5]},{row[6]},{row[7]}")
 
 		sql = f"""
 			SELECT a.id, at.name, a.armor_type, a.rarity, a.rank
@@ -245,25 +251,17 @@ class SearchWindow:
 
 
 	def loadArmor(self):
-		# TODO this query could be made less complicated
 		sql = f"""
-			SELECT DISTINCT abs.setbonus_id, at.name, a.rarity, a.armorset_id, a.rank
-			FROM armorset_bonus_skill abs
-				JOIN armorset_bonus_text abt
-					ON abt.id = abs.setbonus_id
-				JOIN skilltree st
-					ON abs.skilltree_id = st.id
-				JOIN skilltree_text stt
-					ON abs.skilltree_id = stt.id
-				JOIN armor a
-					ON a.armorset_bonus_id = abs.setbonus_id
-				JOIN armorset_text at
-					ON a.armorset_id = at.id
-			WHERE abt.lang_id = 'en'
-				AND stt.lang_id = 'en'
-				AND at.lang_id = 'en'
-				AND a.armor_type = 'head'
-				AND at.name LIKE '%{self.searchText}%'
+			SELECT DISTINCT a.id, ast.name, a.rank, a.rarity, a.armorset_id
+			FROM armor a
+				JOIN armor_text at
+					ON at.id = a.id
+					AND at.lang_id = 'en'
+				JOIN armorset_text ast
+					ON ast.id = a.armorset_id
+					AND ast.lang_id = 'en'
+			WHERE ast.name LIKE '%{self.searchText}%'
+			AND a.armor_type = 'head'
 		"""
 
 		data = self.conn.execute(sql,)
@@ -272,9 +270,9 @@ class SearchWindow:
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[2]}.png")
+			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[3]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"armorset,{row[3]},{row[4]}")
+			self.results.SetCellValue(r, 1, f"armorset,{row[0]},{row[2]},{row[4]}")
 
 		sql = f"""
 			SELECT a.id, at.name, a.armor_type, a.rarity, a.rank
