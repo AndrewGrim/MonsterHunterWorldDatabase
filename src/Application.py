@@ -201,7 +201,7 @@ class Application(wx.Frame):
 
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
-		searchItem = fileMenu.Append(-1, "&Search...\tCtrl-F", "Searches for the given phrase globally.")
+		searchItem = fileMenu.Append(-1, "&Search\tCtrl-F", "Searches for the given phrase globally.")
 		exitItem = fileMenu.Append(-1, "&Quit\tCtrl-Q", "Exits the program.")
 
 		optionsMenu = wx.Menu()

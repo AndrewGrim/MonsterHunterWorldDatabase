@@ -12,7 +12,7 @@ class SearchWindow:
 		self.conn = sqlite3.connect("mhw.db")
 		self.padding = " " * 8
 
-		self.win = wx.Frame(root, title="Debug", style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
+		self.win = wx.Frame(root, title="Search", style=wx.DEFAULT_FRAME_STYLE | wx.STAY_ON_TOP)
 		self.win.SetIcon(wx.Icon("images/Nergigante.png"))
 		self.win.SetSize(700, 700)
 		self.win.Center()
