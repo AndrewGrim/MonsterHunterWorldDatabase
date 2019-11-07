@@ -34,6 +34,7 @@ class SearchWindow:
 
 		self.results = cgr.HeaderBitmapGrid(panel)
 		self.results.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.onDoubleClick)
+		self.results.Bind(wx.grid.EVT_GRID_TABBING, self.onTab)
 		self.results.EnableEditing(False)
 		self.results.EnableDragRowSize(False)
 		self.results.CreateGrid(1, 2)
@@ -49,6 +50,10 @@ class SearchWindow:
 		self.makeMenuBar()
 		self.win.Show()
 		self.init = False
+
+	
+	def onTab(self, event):
+		self.searchName.SetFocus()
 
 
 	def onDoubleClick(self, event):
