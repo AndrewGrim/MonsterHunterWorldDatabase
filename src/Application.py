@@ -144,7 +144,6 @@ class Application(wx.Frame):
 				self.charms.loadCharmDetail()
 				self.selectTab("Charms")
 
-			# TODO add armorset link
 			elif self.link.eventType == "armor":
 				self.armor.currentlySelectedArmorID = self.link.info.id
 				if self.armor.currentArmorTree != self.link.info.category:
@@ -152,6 +151,15 @@ class Application(wx.Frame):
 					self.armor.loadArmorTree()
 				self.armor.loadArmorDetailAll()
 				self.selectTab("Armor")
+
+			elif self.link.eventType == "armorset":
+				self.armor.currentlySelectedArmorSetID = self.link.info.id
+				if self.armor.currentArmorTree != self.link.info.category:
+					self.armor.currentArmorTree = self.link.info.category
+					self.armor.loadArmorTree()
+				self.armor.loadArmorSetDetail()
+				self.selectTab("Armor")
+				self.armor.armorDetailsNotebook.SetSelection(1)
 
 			elif self.link.eventType == "weapon":
 				self.weapons.skip = True

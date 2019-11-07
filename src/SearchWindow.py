@@ -248,7 +248,7 @@ class SearchWindow:
 	def loadArmor(self):
 		# TODO this query could be made less complicated
 		sql = f"""
-			SELECT DISTINCT abs.setbonus_id, at.name, a.rarity
+			SELECT DISTINCT abs.setbonus_id, at.name, a.rarity, a.armorset_id, a.rank
 			FROM armorset_bonus_skill abs
 				JOIN armorset_bonus_text abt
 					ON abt.id = abs.setbonus_id
@@ -270,13 +270,12 @@ class SearchWindow:
 		data = self.conn.execute(sql,)
 		data = data.fetchall()
 
-		# TODO add armorset link
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"armorset,{row[3]},{row[4]}")
 
 		sql = f"""
 			SELECT a.id, at.name, a.armor_type, a.rarity, a.rank

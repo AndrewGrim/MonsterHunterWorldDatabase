@@ -7,6 +7,7 @@
   - [ ] proper icons for appraisail kulve weapons
   - [ ] resize egg icon or make proper svg
   - [ ] get icons for kinsect tab
+  - [ ] armorset images
 - [ ] get missing data ie dlc monsters
   - [ ] kulve materials and icons
   - [ ] geralt and ciri armor sets
