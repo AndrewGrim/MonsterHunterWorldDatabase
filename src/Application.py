@@ -123,8 +123,8 @@ class Application(wx.Frame):
 	def followLink(self):
 		if self.link.event == True:
 			if self.link.eventType == "item":
-				#self.items.currentItemCategory = self.link.info.category
-				#self.items.loadItemList()
+				self.items.currentItemCategory = self.link.info.category
+				self.items.loadItemList()
 				self.items.currentlySelectedItemID = self.link.info.id
 				self.items.loadItemDetailAll()
 				self.selectTab("Items")
@@ -144,8 +144,12 @@ class Application(wx.Frame):
 				self.charms.loadCharmDetail()
 				self.selectTab("Charms")
 
+			# TODO add armorset link
 			elif self.link.eventType == "armor":
 				self.armor.currentlySelectedArmorID = self.link.info.id
+				if self.armor.currentArmorTree != self.link.info.category:
+					self.armor.currentArmorTree = self.link.info.category
+					self.armor.loadArmorTree()
 				self.armor.loadArmorDetailAll()
 				self.selectTab("Armor")
 
@@ -226,7 +230,7 @@ class Application(wx.Frame):
 
 
 	def onSearch(self, event):
-		self.search = search.SearchWindow(self)
+		self.search = search.SearchWindow(self, self.link)
 
 	
 	def onClose(self, event):

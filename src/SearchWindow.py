@@ -3,11 +3,13 @@ import sqlite3
 
 import CustomGridRenderer as cgr
 from Debug.debug import debug
+import Links as link
 
 class SearchWindow:
 
-	def __init__(self, root):
+	def __init__(self, root, link):
 		self.root = root
+		self.link = link
 		self.init = True
 		self.conn = sqlite3.connect("mhw.db")
 		self.padding = " " * 8
@@ -31,9 +33,9 @@ class SearchWindow:
 		sizer.Add(self.searchSkill, 1, wx.EXPAND)
 
 		self.results = cgr.HeaderBitmapGrid(panel)
+		self.results.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.onDoubleClick)
 		self.results.EnableEditing(False)
 		self.results.EnableDragRowSize(False)
-		self.results.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onResultSelection)
 		self.results.CreateGrid(1, 2)
 		self.results.SetDefaultRowSize(27, resizeExistingRows=True)
 		self.results.HideRowLabels()
@@ -47,6 +49,24 @@ class SearchWindow:
 		self.makeMenuBar()
 		self.win.Show()
 		self.init = False
+
+
+	def onDoubleClick(self, event):
+		materialInfo = self.results.GetCellValue(event.GetRow(), 1).split(",")
+		if len(materialInfo) == 4:
+			self.root.items.currentItemName = materialInfo[-1]
+			materialInfo.remove(materialInfo[-1])
+		self.link.event = True
+		self.link.eventType = materialInfo[0]
+		materialInfo.remove(materialInfo[0])
+		if len(materialInfo) == 1:
+			self.link.info = link.GenericSingleLink(materialInfo[0])
+		elif len(materialInfo) == 2:
+			self.link.info = link.GenericDoubleLink(materialInfo)
+		else:
+			debug(materialInfo, "materialInfo", "materialInfo length is other than accounted for!")
+		self.root.followLink()
+		self.link.reset()
 
 
 	def searchByName(self, event):
@@ -68,6 +88,7 @@ class SearchWindow:
 
 
 	def searchBySkill(self, event):
+		# TODO add links
 		self.searchText = self.searchSkill.GetValue().replace("'", "''")
 
 		try:
@@ -200,7 +221,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/monsters/24/{row[1]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"monster,{row[0]},{row[1]}")
 
 	
 	def loadWeapons(self):
@@ -221,7 +242,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/weapons/{row[1]}/rarity-24/{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[3]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"weapon,{row[0]},{row[1]}")
 
 
 	def loadArmor(self):
@@ -249,6 +270,7 @@ class SearchWindow:
 		data = self.conn.execute(sql,)
 		data = data.fetchall()
 
+		# TODO add armorset link
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
@@ -257,7 +279,7 @@ class SearchWindow:
 			self.results.SetCellValue(r, 1, f"{row[0]}")
 
 		sql = f"""
-			SELECT a.id, at.name, a.armor_type, a.rarity
+			SELECT a.id, at.name, a.armor_type, a.rarity, a.rank
 			FROM armor a
 				JOIN armor_text at USING (id)
 			WHERE at.lang_id = 'en'
@@ -272,7 +294,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"armor,{row[0]},{row[4]}")
 
 
 	def loadCharms(self):
@@ -293,7 +315,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/charms-24/{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"charm,{row[0]}")
 
 
 	def loadDecorations(self):
@@ -314,7 +336,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/items-24/Feystone{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"decoration,{row[0]}")
 
 
 	def loadSkills(self):
@@ -333,7 +355,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/skills-24/Skill{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"skill,{row[0]}")
 
 
 	def loadItems(self):
@@ -355,7 +377,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/items-24/{row[3]}{row[4]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"item,{row[0]},{row[2]},{row[1]}")
 
 
 	def loadLocations(self):
@@ -374,14 +396,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/locations-24/{row[1]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
-
-	
-	def onResultSelection(self, event):
-		if not self.init:
-			self.currentlySelectedID = self.results.GetCellValue(event.GetRow(), 1)
-			if self.currentlySelectedID != "":
-				print(self.currentlySelectedID)
+			self.results.SetCellValue(r, 1, f"location,{row[0]},{row[1]}")
 
 
 	def makeMenuBar(self):
