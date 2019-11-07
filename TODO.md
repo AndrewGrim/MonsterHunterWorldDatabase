@@ -24,4 +24,5 @@
 - [ ] Linux: in monstersTab materialTab is fucked
 - [ ] add colors to ele res cells in armor tab
 - [ ] implement sorting
+- [ ] have a look at weapons(db) with skills and add data if it doesnt exist, afterwards create links and include in searches
   

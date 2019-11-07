@@ -151,6 +151,7 @@ class Application(wx.Frame):
 					self.armor.loadArmorTree()
 				self.armor.loadArmorDetailAll()
 				self.selectTab("Armor")
+				self.armor.armorDetailsNotebook.SetSelection(0)
 
 			elif self.link.eventType == "armorset":
 				self.armor.currentlySelectedArmorSetID = self.link.info.id

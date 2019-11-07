@@ -88,7 +88,6 @@ class SearchWindow:
 
 
 	def searchBySkill(self, event):
-		# TODO add links
 		self.searchText = self.searchSkill.GetValue().replace("'", "''")
 
 		try:
@@ -97,7 +96,7 @@ class SearchWindow:
 			pass
 
 		sql = f"""
-			SELECT DISTINCT abs.setbonus_id, at.name, abt.name, stt.name, a.rarity, st.icon_color
+			SELECT DISTINCT abs.setbonus_id, at.name, abt.name, stt.name, a.rarity, a.armorset_id, a.rank
 			FROM armorset_bonus_skill abs
 				JOIN armorset_bonus_text abt
 					ON abt.id = abs.setbonus_id
@@ -124,10 +123,10 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[4]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"armorset,{row[5]},{row[6]}")
 
 		sql = f"""
-			SELECT a.id, at.name, a.armor_type, a.rarity
+			SELECT a.id, at.name, a.armor_type, a.rarity, a.rank
 			FROM armor_skill askill
 				JOIN armor a
 					ON askill.armor_id = a.id
@@ -150,7 +149,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"armor,{row[0]},{row[4]}")
 
 		sql = f"""
 			SELECT c.id, ct.name, c.rarity, stt.name 
@@ -175,7 +174,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/charms-24/{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"charm,{row[0]}")
 
 		sql = f"""
 			SELECT d.id, dt.name, d.icon_color, stt.name
@@ -198,7 +197,7 @@ class SearchWindow:
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/items-24/Feystone{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
-			self.results.SetCellValue(r, 1, f"{row[0]}")
+			self.results.SetCellValue(r, 1, f"decoration,{row[0]}")
 
 		self.loadSkills()
 
@@ -400,7 +399,7 @@ class SearchWindow:
 
 	def makeMenuBar(self):
 		fileMenu = wx.Menu()
-		closeItem = fileMenu.Append(-1, "&Close\tCtrl-F", "Closes the debug window.")
+		closeItem = fileMenu.Append(-1, "&Close\tCtrl-F", "Closes the search window.")
 		
 		menuBar = wx.MenuBar()
 		menuBar.Append(fileMenu, "&File")
