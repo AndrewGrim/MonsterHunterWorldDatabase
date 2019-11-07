@@ -612,13 +612,18 @@ class MonstersTab:
 
 
 	def initWeaponButtons(self):
-		ranks = ["LR", "HR", "MR"]
+		ranks = {
+			"LR": "Low Rank",
+			"HR": "High Rank",
+			"MR": "Master Rank"
+		}
 
 		self.materialRankButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
-		for item in ranks:
-			button = wx.BitmapButton(self.materialsPanel, bitmap=wx.Bitmap(f"images/rank-stars-24/{item.lower()}.png"), name=item)
-			self.materialRankButtonsSizer.Add(button)
+		for k, v in ranks.items():
+			button = wx.Button(self.materialsPanel, label=v, name=k)
+			button.SetBitmap(wx.Bitmap(f"images/rank-stars-24/{k.lower()}.png"))
 			button.Bind(wx.EVT_BUTTON, self.onMaterialRankSelection)
+			self.materialRankButtonsSizer.Add(button)
 
 		self.monsterMaterialsSizer.Add(self.materialRankButtonsSizer)
 
@@ -711,8 +716,6 @@ class MonstersTab:
 				self.materialsTree.SetCellBackgroundColour(row, 1, colors[self.currentMaterialRank])
 				rewardConditions.append(r.conditionName)
 			self.populateTree(r)
-			# REMOVE this setting will not be needed anymore, remove it everywhere
-			#self.root.pref.autoExpand:
 
 
 	def populateTree(self, r):
@@ -720,7 +723,7 @@ class MonstersTab:
 		row = self.materialsTree.GetNumberRows() - 1
 		self.materialsTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 								wx.Bitmap(f"images/items-24/{r.iconName}{r.iconColor}.png"),
-								f"{self.padding}{r.itemName}"))
+								f"{self.padding}{r.itemName}", imageOffset=85))
 		self.materialsTree.SetCellValue(row, 1, f"{r.stack} x {r.percentage}%")
 		self.materialsTree.SetCellValue(row, 2, f"{r.itemID},{r.category}")
 

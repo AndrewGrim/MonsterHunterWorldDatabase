@@ -11,7 +11,6 @@ class Preferences:
 		self.rememberPosition = False
 		self.windowSize = None
 		self.windowPosition = None
-		self.autoExpand = False
 		self.unicodeSymbols = False
 		self.keepSearchOpen = False
 		self.readPreferencesFile()
@@ -44,8 +43,6 @@ class Preferences:
 				self.rememberSize = (self.strToBool(f.readline().strip("\n")))
 			elif line == "[REMEMBER POSITION]":
 				self.rememberPosition = (self.strToBool(f.readline().strip("\n")))
-			elif line == "[AUTO EXPAND MONSTER MATERIALS]":
-				self.autoExpand = (self.strToBool(f.readline().strip("\n")))
 			elif line == "[USE UNICODE SYMBOLS]":
 				self.unicodeSymbols = (self.strToBool(f.readline().strip("\n")))
 			elif line == "[KEEP SEARCH WINDOW OPEN]":
@@ -65,8 +62,6 @@ class Preferences:
 {self.rememberSize}
 [REMEMBER POSITION]
 {self.rememberPosition}
-[AUTO EXPAND MONSTER MATERIALS]
-{self.autoExpand}
 [USE UNICODE SYMBOLS]
 {self.unicodeSymbols}
 [KEEP SEARCH WINDOW OPEN]
@@ -90,8 +85,6 @@ Monsters
 [REMEMBER SIZE]
 False
 [REMEMBER POSITION]
-False
-[AUTO EXPAND MONSTER MATERIALS]
 False
 [USE UNICODE SYMBOLS]
 True
