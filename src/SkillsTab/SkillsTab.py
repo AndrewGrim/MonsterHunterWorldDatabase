@@ -51,7 +51,7 @@ class SkillsTab:
 		self.skillDetailedSizer.Add(self.skillImageLabel, 1, wx.ALIGN_CENTER)
 		self.skillDetailedSizer.Add(self.skillDetailsNotebook, 3, wx.EXPAND)
 
-		self.skillSizer.Add(self.skillListSizer, 1, wx.EXPAND)
+		self.skillSizer.Add(self.skillListSizer, 0, wx.EXPAND)
 		self.skillSizer.Add(self.skillDetailedSizer, 1, wx.EXPAND)
 
 		self.skillPanel.SetSizer(self.skillSizer)

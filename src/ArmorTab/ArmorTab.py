@@ -112,7 +112,7 @@ class ArmorTab:
 		self.armorDetailedSizer.Add(self.armorDetailedImagesSizer, 1, wx.EXPAND)
 		self.armorDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
 
-		self.armorSizer.Add(self.armorTreeSizer, 1, wx.EXPAND)
+		self.armorSizer.Add(self.armorTreeSizer, 0, wx.EXPAND)
 		self.armorSizer.Add(self.armorDetailedSizer, 1, wx.EXPAND)
 
 		self.armorPanel.SetSizer(self.armorSizer)
@@ -157,7 +157,7 @@ class ArmorTab:
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
 		self.armorButtonsSizer.Add(380, 0, 0)
-		self.armorButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+		self.armorButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):
@@ -950,18 +950,21 @@ class ArmorTab:
 		When the application window is resized some columns's width gets readjusted.
 		"""
 
-		self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-		self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
-		self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-		self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
-		self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-		self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
-		self.armorSetDetailList.SetColSize(0, self.armorSetPanel.GetSize()[0] * 0.66)
-		self.armorSetDetailList.SetColSize(1, self.armorSetPanel.GetSize()[0] * 0.34 - 20)
-		self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-		self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
-		self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
-		self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
+		try:
+			self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.armorSkillList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.armorSkillList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.armorSetDetailList.SetColSize(0, self.armorSetPanel.GetSize()[0] * 0.66)
+			self.armorSetDetailList.SetColSize(1, self.armorSetPanel.GetSize()[0] * 0.34 - 20)
+			self.armorSetSkillList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+			self.armorSetSkillList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
+			self.armorSetMaterialList.SetColumnWidth(0, self.armorSetPanel.GetSize()[0] * 0.66)
+			self.armorSetMaterialList.SetColumnWidth(1, self.armorSetPanel.GetSize()[0] * 0.34 - 40)
+		except:
+			pass
 
 
 	def onScroll(self, event):

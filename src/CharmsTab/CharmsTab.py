@@ -52,7 +52,7 @@ class CharmsTab:
 		self.charmDetailedSizer.Add(self.charmImageLabel, 1, wx.EXPAND)
 		self.charmDetailedSizer.Add(self.charmDetailsNotebook, 3, wx.EXPAND)
 
-		self.charmSizer.Add(self.charmListSizer, 1, wx.EXPAND)
+		self.charmSizer.Add(self.charmListSizer, 0, wx.EXPAND)
 		self.charmSizer.Add(self.charmDetailedSizer, 1, wx.EXPAND)
 
 		self.charmPanel.SetSizer(self.charmSizer)

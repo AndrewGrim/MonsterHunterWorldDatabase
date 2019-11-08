@@ -50,7 +50,7 @@ class DecorationsTab:
 		self.decorationDetailedSizer.Add(self.decorationImageLabel, 1, wx.ALIGN_CENTER)
 		self.decorationDetailedSizer.Add(self.decorationDetailsNotebook, 3, wx.EXPAND)
 
-		self.decorationSizer.Add(self.decorationListSizer, 1, wx.EXPAND)
+		self.decorationSizer.Add(self.decorationListSizer, 0, wx.EXPAND)
 		self.decorationSizer.Add(self.decorationDetailedSizer, 1, wx.EXPAND)
 
 		self.decorationPanel.SetSizer(self.decorationSizer)

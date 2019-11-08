@@ -65,7 +65,7 @@ class MonstersTab:
 		self.monsterSelectionSizer.Add(self.monsterSizeButtonsSizer)
 		# create monsters table and add bindings on selection and on size change of the main window
 		# add left side sizer to the main sizer of the monsters tab
-		self.monstersSizer.Add(self.monsterSelectionSizer, 1, wx.EXPAND)
+		self.monstersSizer.Add(self.monsterSelectionSizer, 0, wx.EXPAND)
 
 		# right side
 		# sizer containing the monsters details
@@ -131,8 +131,8 @@ class MonstersTab:
 		self.search = wx.TextCtrl(self.monstersPanel)
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
-		self.monsterSizeButtonsSizer.Add(420, 0, 0)
-		self.monsterSizeButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+		self.monsterSizeButtonsSizer.Add((420, 0))
+		self.monsterSizeButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):
@@ -762,6 +762,7 @@ class MonstersTab:
 			self.materialsTree.SetColSize(1, w * 0.34 - 20)
 		except:
 			pass
+
 	
 	def onScroll(self, event):
 		"""

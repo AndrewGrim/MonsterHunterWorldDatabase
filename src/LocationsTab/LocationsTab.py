@@ -51,7 +51,7 @@ class LocationsTab:
 		self.locationDetailedSizer.Add(self.locationImageLabel, 1, wx.ALIGN_CENTER)
 		self.locationDetailedSizer.Add(self.locationDetailsNotebook, 3, wx.EXPAND)
 
-		self.locationSizer.Add(self.locationListSizer, 1, wx.EXPAND)
+		self.locationSizer.Add(self.locationListSizer, 0, wx.EXPAND)
 		self.locationSizer.Add(self.locationDetailedSizer, 1, wx.EXPAND)
 
 		self.locationPanel.SetSizer(self.locationSizer)

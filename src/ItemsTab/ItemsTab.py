@@ -60,7 +60,7 @@ class ItemsTab:
 		self.itemDetailedSizer.Add(self.itemImageLabel, 1, wx.ALIGN_CENTER)
 		self.itemDetailedSizer.Add(self.itemDetailsNotebook, 3, wx.EXPAND)
 
-		self.itemsSizer.Add(self.itemListSizer, 1, wx.EXPAND)
+		self.itemsSizer.Add(self.itemListSizer, 0, wx.EXPAND)
 		self.itemsSizer.Add(self.itemDetailedSizer, 1, wx.EXPAND)
 
 		self.itemPanel.SetSizer(self.itemsSizer)
@@ -119,7 +119,7 @@ class ItemsTab:
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
 		self.itemButtonsSizer.Add(130, 0, 0)
-		self.itemButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+		self.itemButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):

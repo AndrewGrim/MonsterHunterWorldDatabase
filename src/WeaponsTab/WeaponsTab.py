@@ -142,7 +142,7 @@ class WeaponsTab:
 		self.weaponsDetailedSizer.Add(self.weaponImageLabel, 1, wx.EXPAND)
 		self.weaponsDetailedSizer.Add(self.weaponDetailsNotebook, 3, wx.EXPAND)
 
-		self.weaponsSizer.Add(self.weaponTreeSizer, 2, wx.EXPAND)
+		self.weaponsSizer.Add(self.weaponTreeSizer, 0, wx.EXPAND)
 		self.weaponsSizer.Add(self.weaponsDetailedSizer, 1, wx.EXPAND)
 
 		self.weaponPanel.SetSizer(self.weaponsSizer)
@@ -177,7 +177,7 @@ class WeaponsTab:
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
 		self.weaponButtonsSizer.Add(372, 0, 0)
-		self.weaponButtonsSizer.Add(self.search, 0, wx.TOP, 4)
+		self.weaponButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):
