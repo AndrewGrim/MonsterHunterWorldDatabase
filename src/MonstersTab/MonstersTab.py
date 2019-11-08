@@ -75,6 +75,7 @@ class MonstersTab:
 		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage, size=(160, 160))
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
+		self.monsterDetailsNotebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChanged)
 		self.summaryPanel = wx.Panel(self.monsterDetailsNotebook)
 		self.damagePanel = wx.ScrolledWindow(self.monsterDetailsNotebook)
 		self.materialsPanel = wx.Panel(self.monsterDetailsNotebook)
@@ -95,8 +96,6 @@ class MonstersTab:
 
 		# set sizer for the monsters notebook tab
 		self.monstersPanel.SetSizer(self.monstersSizer)
-		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
-
 		self.damagePanel.SetScrollRate(20, 20)
 
 
@@ -116,9 +115,15 @@ class MonstersTab:
 		self.loadMonsterSummary()
 		self.loadMonsterDamage()
 		self.loadMonsterMaterials()
+		w, h = self.summaryPanel.GetSize()
+		self.summaryPanel.SetSize(w, h - 1)
+		self.summaryPanel.SetSize(w, h)
 		w, h = self.damagePanel.GetSize()
 		self.damagePanel.SetSize(w, h - 1)
 		self.damagePanel.SetSize(w, h)
+		w, h = self.materialsPanel.GetSize()
+		self.materialsPanel.SetSize(w, h - 1)
+		self.materialsPanel.SetSize(w, h)
 		self.root.Thaw()
 
 
@@ -164,7 +169,7 @@ class MonstersTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.monsterList.InsertColumn(0, info)
-		self.monsterList.SetColumnWidth(0, 670)
+		self.monsterList.SetColumnWidth(0, 685)
 		self.monsterList.InsertColumn(1, info)
 		self.monsterList.SetColumnWidth(1, 0)
 
@@ -212,71 +217,30 @@ class MonstersTab:
 		self.monsterSummaryDescriptionLabel = wx.StaticText(self.summaryPanel, label="Description", style=wx.ALIGN_LEFT)
 		self.monsterSummarySizer.Add(self.monsterSummaryDescriptionLabel, 0.5, wx.EXPAND)
 		
-		self.summaryTree = wx.lib.agw.hypertreelist.HyperTreeList(self.summaryPanel, -1, style=0, 
-																	agwStyle=
-																	gizmos.TR_DEFAULT_STYLE
-																	| gizmos.TR_ROW_LINES
-																	| gizmos.TR_COLUMN_LINES
-																	| gizmos.TR_NO_LINES
-																	| gizmos.TR_FULL_ROW_HIGHLIGHT
-																	| gizmos.TR_HIDE_ROOT
-																	)
-												
+		self.summaryTree = cgr.HeaderBitmapGrid(self.summaryPanel)
+		self.summaryTree.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.onMaterialDoubleClick)
+		self.summaryTree.Bind(wx.EVT_SIZE, self.onSize)
+		self.summaryTree.EnableEditing(False)
+		self.summaryTree.EnableDragRowSize(False)
 		self.monsterSummarySizer.Add(self.summaryTree, 12, wx.EXPAND)
 
-		self.summaryTree.AddColumn("")
-		self.summaryTree.AddColumn("")
-		self.summaryTree.SetMainColumn(0)
-		self.summaryTree.SetColumnWidth(0, 400)
-		self.summaryTree.SetColumnWidth(1, 200)
-		self.summaryTree.SetColumnAlignment(1, wx.ALIGN_CENTER)
-
-		self.summaryTree.SetImageList(self.il)
-
-		self.ancientForest = self.il.Add(wx.Bitmap("images/locations-24/Ancient Forest.png"))
-		self.wildspireWaste = self.il.Add(wx.Bitmap("images/locations-24/Wildspire Waste.png"))
-		self.coralHighlands = self.il.Add(wx.Bitmap("images/locations-24/Coral Highlands.png"))
-		self.rottenVale = self.il.Add(wx.Bitmap("images/locations-24/Rotten Vale.png"))
-		self.eldersRecess = self.il.Add(wx.Bitmap("images/locations-24/Elder's Recess.png"))
-
-		self.locationIcons = {
-			"Ancient Forest": self.ancientForest,
-			"Wildspire Waste": self.wildspireWaste,
-			"Coral Highlands": self.coralHighlands,
-			"Rotten Vale": self.rottenVale,
-			"Elder's Recess": self.eldersRecess,
-		}
-
-		self.fire = self.il.Add(wx.Bitmap("images/damage-types-24/fire.png"))
-		self.water = self.il.Add(wx.Bitmap("images/damage-types-24/water.png"))
-		self.ice = self.il.Add(wx.Bitmap("images/damage-types-24/ice.png"))
-		self.thunder = self.il.Add(wx.Bitmap("images/damage-types-24/thunder.png"))
-		self.dragon = self.il.Add(wx.Bitmap("images/damage-types-24/dragon.png"))
-
-		self.poison = self.il.Add(wx.Bitmap("images/damage-types-24/poison.png"))
-		self.sleep = self.il.Add(wx.Bitmap("images/damage-types-24/sleep.png"))
-		self.paralysis = self.il.Add(wx.Bitmap("images/damage-types-24/paralysis.png"))
-		self.blast = self.il.Add(wx.Bitmap("images/damage-types-24/blast.png"))
-		self.stun = self.il.Add(wx.Bitmap("images/damage-types-24/stun.png"))
-
-		self.damageTypes = {
-			"Fire": self.fire,
-			"Water": self.water,
-			"Ice": self.ice,
-			"Thunder": self.thunder,
-			"Dragon": self.dragon,
-			"Poison": self.poison,
-			"Sleep": self.sleep,
-			"Paralysis": self.paralysis,
-			"Blast": self.blast,
-			"Stun": self.stun,
-		}
+		self.summaryTree.CreateGrid(1, 2)
+		self.summaryTree.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.summaryTree.SetColSize(0, 480)
+		self.summaryTree.SetColSize(1, 200 - 20)
+		self.summaryTree.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.summaryTree.SetColLabelSize(2)
+		self.summaryTree.SetRowLabelSize(0)
+		self.summaryTree.HideRowLabels()
 
 		self.summaryPanel.SetSizer(self.monsterSummarySizer)
-
+		
 	
 	def loadMonsterSummary(self):
-		self.summaryTree.DeleteAllItems()
+		try:
+			self.summaryTree.DeleteRows(0, self.summaryTree.GetNumberRows())
+		except:
+			pass
 
 		monster = """
 			SELECT m.*, t.name, t.ecology, t.description, t.alt_state_description
@@ -288,7 +252,7 @@ class MonstersTab:
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(monster, ("en", self.currentMonsterID))
 		data = data.fetchone()
-	
+
 		# 5 - has alt weakness
 		# 6 - fire
 		# 7 - water
@@ -345,77 +309,95 @@ class MonstersTab:
 			3: "★★★",
 		}
 
-		root = self.summaryTree.AddRoot("Summary")
-		# weaknesses
-		self.monsterWeaknessNode = self.summaryTree.AppendItem(root, "Weakness")
-		# ailments
-		self.monsterAilmentsNode = self.summaryTree.AppendItem(root, "Ailments")
-		# habitat
-		self.monsterHabitatNode = self.summaryTree.AppendItem(root, "Habitat")
+		self.summaryTree.AppendRows()
+		row = self.summaryTree.GetNumberRows() - 1
+		self.summaryTree.SetCellValue(row, 0, "Weaknesses")
+		self.summaryTree.SetCellFont(row, 0, self.summaryTree.GetCellFont(row, 0).Bold())
+		self.summaryTree.SetCellBackgroundColour(row, 0, util.hexToRGB("#C2BFBF"))
+		self.summaryTree.SetCellBackgroundColour(row, 1, util.hexToRGB("#C2BFBF"))
 
 		if str(data[2]) != "small":
 			for weakness, col in weaknessElements.items():
+				self.summaryTree.AppendRows()
+				row = self.summaryTree.GetNumberRows() - 1
 				if bool(data[5]):
-					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 					if self.root.pref.unicodeSymbols:
-						self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]] + " (" + str(weaknessRating[data[col[1]]]) + ")", 1)
+						self.summaryTree.SetCellValue(row, 1, f"{weaknessRating[data[col[0]]]} ({weaknessRating[data[col[1]]]})")
 					else:
-						self.summaryTree.SetItemText(genericSummaryNode, f"{data[col[0]]}/3 ({data[col[1]]}/3)", 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
-					self.summaryTree.Expand(self.monsterWeaknessNode)
+						self.summaryTree.SetCellValue(row, 1, f"{data[col[0]]}/3 ({data[col[1]]}/3)")
+					self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+										wx.Bitmap(f"images/damage-types-24/{weakness.lower()}.png"),
+										f"{self.padding}{weakness}", imageOffset=30))
 				else:
-					genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
 					if self.root.pref.unicodeSymbols:
-						self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col[0]]], 1)
+						self.summaryTree.SetCellValue(row, 1, f"{weaknessRating[data[col[0]]]}")
 					else:
-						self.summaryTree.SetItemText(genericSummaryNode, f"{data[col[0]]}/3", 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
-					self.summaryTree.Expand(self.monsterWeaknessNode)
+						self.summaryTree.SetCellValue(row, 1, f"{data[col[0]]}/3")
+					self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+										wx.Bitmap(f"images/damage-types-24/{weakness.lower()}.png"),
+										f"{self.padding}{weakness}", imageOffset=30))
 
 			for weakness, col in weaknessStatus.items():
-				genericSummaryNode = self.summaryTree.AppendItem(self.monsterWeaknessNode, weakness)
+				self.summaryTree.AppendRows()
+				row = self.summaryTree.GetNumberRows() - 1
 				if self.root.pref.unicodeSymbols:
-					self.summaryTree.SetItemText(genericSummaryNode, weaknessRating[data[col]], 1)
+					self.summaryTree.SetCellValue(row, 1, f"{weaknessRating[data[col]]}")
 				else:
-					self.summaryTree.SetItemText(genericSummaryNode, f"{data[col]}/3", 1)
-				self.summaryTree.SetItemImage(genericSummaryNode, self.damageTypes[weakness], which=wx.TreeItemIcon_Normal)
-				self.summaryTree.Expand(self.monsterWeaknessNode)
+					self.summaryTree.SetCellValue(row, 1, f"{data[col]}/3")
+				self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+									wx.Bitmap(f"images/damage-types-24/{weakness.lower()}.png"),
+									f"{self.padding}{weakness}", imageOffset=30))
 
 			ailments = {
-				"Roar": [21, self.test],
-				"Wind": [22, self.test],
-				"Tremor": [23, self.test],
-				"Defense Down": [24, self.test],
-				"Fire Blight": [25, self.fire],
-				"Water Blight":[26, self.water],
-				"Thunder Blight": [27, self.thunder],
-				"Ice Blight": [28, self.ice],
-				"Dragon Blight": [29, self.dragon],
-				"Blast Blight": [30, self.blast],
-				"Poison": [31, self.poison],
-				"Sleep": [32, self.sleep],
-				"Paralysis": [33, self.paralysis],
-				"Bleed": [34, self.test],
-				"Stun": [35, self.stun],
-				"Mud": [36, self.test],
-				"Effluvia": [37, self.test],
+				"Roar": [21, self.testIcon],
+				"Wind": [22, self.testIcon],
+				"Tremor": [23, self.testIcon],
+				"Defense Down": [24, self.testIcon],
+				"Fire Blight": [25, wx.Bitmap("images/damage-types-24/fire.png")],
+				"Water Blight":[26, wx.Bitmap("images/damage-types-24/water.png")],
+				"Thunder Blight": [27, wx.Bitmap("images/damage-types-24/thunder.png")],
+				"Ice Blight": [28, wx.Bitmap("images/damage-types-24/ice.png")],
+				"Dragon Blight": [29, wx.Bitmap("images/damage-types-24/dragon.png")],
+				"Blast Blight": [30,wx.Bitmap("images/damage-types-24/blast.png")],
+				"Poison": [31, wx.Bitmap("images/damage-types-24/poison.png")],
+				"Sleep": [32, wx.Bitmap("images/damage-types-24/sleep.png")],
+				"Paralysis": [33, wx.Bitmap("images/damage-types-24/paralysis.png")],
+				"Bleed": [34, self.testIcon],
+				"Stun": [35, wx.Bitmap("images/damage-types-24/stun.png")],
+				"Mud": [36, self.testIcon],
+				"Effluvia": [37, self.testIcon],
 			}
 
 			textAilments = ["Roar", "Wind", "Tremor"]
+
+			self.summaryTree.AppendRows()
+			row = self.summaryTree.GetNumberRows() - 1
+			self.summaryTree.SetCellValue(row, 0, "Ailments")
+			self.summaryTree.SetCellFont(row, 0, self.summaryTree.GetCellFont(row, 0).Bold())
+			self.summaryTree.SetCellBackgroundColour(row, 0, util.hexToRGB("#C2BFBF"))
+			self.summaryTree.SetCellBackgroundColour(row, 1, util.hexToRGB("#C2BFBF"))
 
 			for ailment, col in ailments.items():
 				if str(data[col[0]]) == "None" or not bool(data[col[0]]):
 					pass
 				else:
-					genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, ailment)
+					self.summaryTree.AppendRows()
+					row = self.summaryTree.GetNumberRows() - 1
 					if ailment not in textAilments:
 						pass
 					else:
-						self.summaryTree.SetItemText(genericSummaryNode, str(data[col[0]]).capitalize(), 1)
-					self.summaryTree.SetItemImage(genericSummaryNode, col[1], which = wx.TreeItemIcon_Normal)
-			if self.summaryTree.GetChildrenCount(self.monsterAilmentsNode) == 0:
-				genericSummaryNode = self.summaryTree.AppendItem(self.monsterAilmentsNode, "None")
-			self.summaryTree.ExpandAll()
+						self.summaryTree.SetCellValue(row, 1, str(data[ailments[ailment][0]]).capitalize())
+					self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+									col[1], f"{self.padding}{ailment}", imageOffset=40))
+			if self.summaryTree.GetNumberRows() == 12:
+				self.summaryTree.AppendRows()
+				row = self.summaryTree.GetNumberRows() - 1
+				self.summaryTree.SetCellValue(row, 0, "None")#
+
+		else:
+			self.summaryTree.AppendRows()
+			row = self.summaryTree.GetNumberRows() - 1
+			self.summaryTree.SetCellValue(row, 0, "None")
 
 		habitats = """
 			SELECT h.start_area, h.move_area, h.rest_area,
@@ -436,14 +418,24 @@ class MonstersTab:
 		# 3 - location id
 		# 4 - location name
 
+		self.summaryTree.AppendRows()
+		row = self.summaryTree.GetNumberRows() - 1
+		self.summaryTree.SetCellValue(row, 0, "Habitat")
+		self.summaryTree.SetCellFont(row, 0, self.summaryTree.GetCellFont(row, 0).Bold())
+		self.summaryTree.SetCellBackgroundColour(row, 0, util.hexToRGB("#C2BFBF"))
+		self.summaryTree.SetCellBackgroundColour(row, 1, util.hexToRGB("#C2BFBF"))
+
 		for item in data:
-			genericSummaryNode = self.summaryTree.AppendItem(self.monsterHabitatNode, str(item[4]))
-			self.summaryTree.SetItemText(genericSummaryNode, str(item[0]) + " > " + str(item[1]) + " > " + str(item[2]), 1)
-			try:
-				self.summaryTree.SetItemImage(genericSummaryNode, self.locationIcons[item[4]], which = wx.TreeItemIcon_Normal)
-			except:
-				pass
-			self.summaryTree.Expand(self.monsterHabitatNode)
+			self.summaryTree.AppendRows()
+			row = self.summaryTree.GetNumberRows() - 1
+			self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+								wx.Bitmap(f"images/locations-24/{item[4]}.png"),
+								f"{self.padding}{item[4]}", imageOffset=50))
+			self.summaryTree.SetCellValue(row, 1, f"{item[0]} > {item[1]} > {item[2]}")
+		if self.summaryTree.GetCellValue(row, 0) == "Habitat":
+			self.summaryTree.AppendRows()
+			row = self.summaryTree.GetNumberRows() - 1
+			self.summaryTree.SetCellValue(row, 0, "None")
 
 	
 	def initMonsterDamage(self):
@@ -646,6 +638,8 @@ class MonstersTab:
 		self.materialsTree.SetColLabelSize(2)
 		self.materialsTree.SetRowLabelSize(0)
 		self.materialsTree.HideRowLabels()
+
+		self.materialsPanel.SetSizer(self.monsterMaterialsSizer)
 	
 
 	def loadMonsterMaterials(self):
@@ -754,8 +748,15 @@ class MonstersTab:
 		self.loadMonsterList()
 
 
+	def onTabChanged(self, event):
+		self.loadMonsterDetail()
+
+
 	def onSize(self, event):
 		try:
+			w = self.summaryPanel.GetSize()[0]
+			self.summaryTree.SetColSize(0, w * 0.66)
+			self.summaryTree.SetColSize(1, w * 0.34 - 20)
 			w = self.materialsPanel.GetSize()[0]
 			self.materialsTree.SetColSize(0, w * 0.66)
 			self.materialsTree.SetColSize(1, w * 0.34 - 20)
