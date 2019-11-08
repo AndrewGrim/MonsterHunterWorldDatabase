@@ -17,7 +17,7 @@ import KinsectsTab as k
 import Utilities as util
 import Links as link
 import Preferences as p
-import Debug as debug
+from Debug.debug import debug
 import AboutWindow as about
 import SearchWindow as search
 
