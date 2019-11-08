@@ -36,7 +36,7 @@ class Application(wx.Frame):
 
 		root = self
 		self.SetIcon(wx.Icon("images/Nergigante.png"))
-		self.SetTitle("Database")
+		self.SetTitle("Monster Hunter World Database")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		self.pref = p.Preferences(root)
 
@@ -264,7 +264,7 @@ class Application(wx.Frame):
 if __name__ == '__main__':
 	start = time.time()
 	app = wx.App()
-	frm = Application(None, title="Database")
+	frm = Application(None)
 	end = time.time()
 	print(f"Application load time: {round(end - start, 2)}s")
 	if "-speedTest" in sys.argv:
