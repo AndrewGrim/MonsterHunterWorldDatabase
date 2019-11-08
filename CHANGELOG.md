@@ -11,3 +11,9 @@ The first publicly available version has been released.
 * Added new setting to keep the new search window open after double clicking on an item.
 
 * Consolidated all item images in an items folder instead of storing them separately ie ammo, coatings, materials.
+
+## v1.2 2019-08-11
+
+* Changed all remaining trees to my custom grid. This results in a faster load time but mainly is just nicer to work with.
+
+* Because of the above, the setting "Auto expand materials" has been removed since it no longer applies.
