@@ -723,13 +723,14 @@ class MonstersTab:
 
 
 	def onMaterialDoubleClick(self, event):
-		materialInfo = self.materialsTree.GetCellValue(event.GetRow(), 2)
-		materialInfo = materialInfo.split(",")
-		self.link.event = True
-		self.link.eventType = "item"
-		self.link.info =  link.GenericDoubleLink(materialInfo)
-		self.root.followLink()
-		self.link.reset()
+		if self.monsterDetailsNotebook.GetCurrentPage() == self.materialsPanel:
+			materialInfo = self.materialsTree.GetCellValue(event.GetRow(), 2)
+			materialInfo = materialInfo.split(",")
+			self.link.event = True
+			self.link.eventType = "item"
+			self.link.info =  link.GenericDoubleLink(materialInfo)
+			self.root.followLink()
+			self.link.reset()
 
 	
 	def onMaterialRankSelection(self, event):
