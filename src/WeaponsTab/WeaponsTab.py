@@ -114,7 +114,7 @@ class WeaponsTab:
 		self.weaponTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.weaponsDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.weaponImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.weaponImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.jpg", wx.BITMAP_TYPE_ANY)
 		self.weaponImageLabel = wx.StaticBitmap(self.weaponPanel, bitmap=self.weaponImage, size=(230, 230))
 		self.weaponImageLabel.SetBackgroundColour((0, 0, 0))
 
@@ -500,8 +500,8 @@ class WeaponsTab:
 		weaponName = wep.name.replace('"', "'")
 		weaponType = self.currentWeaponTree
 		placeholder = "noImage"
-		if os.path.isfile(f"images/weapons/{weaponType}/{weaponName}.png"):
-			self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{weaponName}.png", wx.BITMAP_TYPE_ANY)
+		if os.path.isfile(f"images/weapons/{weaponType}/{weaponName}.jpg"):
+			self.weaponImage = wx.Bitmap(f"images/weapons/{weaponType}/{weaponName}.jpg", wx.BITMAP_TYPE_ANY)
 		else:
 			self.weaponImage = wx.Bitmap(f"images/{placeholder}.png", wx.BITMAP_TYPE_ANY)
 		self.weaponImageLabel.SetBitmap(self.weaponImage)

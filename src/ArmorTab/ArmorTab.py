@@ -86,7 +86,7 @@ class ArmorTab:
 		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.png", wx.BITMAP_TYPE_ANY)
+		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.jpg", wx.BITMAP_TYPE_ANY)
 		self.armorMaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
 		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
 		self.armorMaleImageLabel.SetBackgroundColour((0, 0, 0))
@@ -370,11 +370,11 @@ class ArmorTab:
 
 		noLog = wx.LogNull()
 		try:
-			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.png"))
+			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.jpg"))
 		except:
 			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 		try:
-			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{armor.name}.png"))
+			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{armor.name}.jpg"))
 		except:
 			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 		del noLog

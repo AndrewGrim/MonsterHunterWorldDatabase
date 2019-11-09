@@ -39,7 +39,7 @@ class KinsectsTab:
 		self.kinsectTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.kinsectDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.kinsectImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.png", wx.BITMAP_TYPE_ANY)
+		self.kinsectImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.jpg", wx.BITMAP_TYPE_ANY)
 		self.kinsectImageLabel = wx.StaticBitmap(self.kinsectPanel, bitmap=self.kinsectImage, size=(160, 160))
 
 		self.kinsectDetailsNotebook = wx.Notebook(self.kinsectPanel)

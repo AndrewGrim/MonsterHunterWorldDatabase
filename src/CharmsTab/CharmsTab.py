@@ -38,7 +38,7 @@ class CharmsTab:
 		self.charmListSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.charmDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.charmImage = wx.Bitmap("images/charms/Artillery Charm I.png", wx.BITMAP_TYPE_ANY)
+		self.charmImage = wx.Bitmap("images/charms/Artillery Charm I.jpg", wx.BITMAP_TYPE_ANY)
 		self.charmImageLabel = wx.StaticBitmap(self.charmPanel, bitmap=self.charmImage, size=(230, 230))
 		self.charmImageLabel.SetBackgroundColour((0, 0, 0))
 
@@ -203,7 +203,7 @@ class CharmsTab:
 		self.charmSkillList.ClearAll()
 		self.materialList.ClearAll()
 
-		self.charmImageLabel.SetBitmap(wx.Bitmap(f"images/charms/{self.currentCharmName}.png"))
+		self.charmImageLabel.SetBitmap(wx.Bitmap(f"images/charms/{self.currentCharmName}.jpg"))
 		self.charmNameLabel.SetLabelText(f"\n{self.currentCharmName}")
 
 		info = wx.ListItem()
