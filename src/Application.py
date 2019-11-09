@@ -20,6 +20,7 @@ import Preferences as p
 from Debug.debug import debug
 import AboutWindow as about
 import SearchWindow as search
+import LoadingWindow as load
 
 class Application(wx.Frame):
 
@@ -35,11 +36,12 @@ class Application(wx.Frame):
 			self.windowHeight = int(cmdArgs[index + 2])
 
 		root = self
+		self.Center()	
+		lo = load.LoadingWindow(self)
 		self.SetIcon(wx.Icon("images/Nergigante.png"))
 		self.SetTitle("Monster Hunter World Database")
 		self.Bind(wx.EVT_CLOSE, self.onClose)
 		self.pref = p.Preferences(root)
-
 		self.link = link.Link()
 
 		self.initMainNotebook()
@@ -54,9 +56,13 @@ class Application(wx.Frame):
 		local = il.Add(wx.Bitmap("images/locations-24/Elder's Recess.png"))
 		self.mainNotebook.AssignImageList(il)
 
+		lo.loading.SetValue(30)
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
+		lo.loading.SetValue(60)
 		self.weapons = w.WeaponsTab(root, self.mainNotebook, self.link)
+		lo.loading.SetValue(90)
 		self.armor = a.ArmorTab(root, self.mainNotebook, self.link)
+		lo.loading.SetValue(100)
 		self.charms = c.CharmsTab(root, self.mainNotebook, self.link)
 		self.decos = d.DecorationsTab(root, self.mainNotebook, self.link)
 		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
@@ -103,6 +109,8 @@ class Application(wx.Frame):
 		if "-debug" in cmdArgs:
 			self.debugWindow(None)
 
+		
+		lo.win.Destroy()
 		self.Show()
 
 
