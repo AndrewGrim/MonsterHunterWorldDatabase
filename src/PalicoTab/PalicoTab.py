@@ -230,15 +230,18 @@ class PalicoTab:
 				AND at.name LIKE '%{searchText}%'
 			"""
 
-		conn = sqlite3.Connection("mhw.db")
-		data = conn.execute(sql, ("en", self.currentArmorTree))
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute("SELECT * FROM palico_equipment")
 		data = data.fetchall()
 
 		armorList = []
 		
 		for row in data:
-			armorList.append(a.Armor(row))
+			#armorList.append(a.Armor(row))
+			armorList.append(row)
+
 		#self.populateArmorTree(armorList)
+		self.populateArmorTree(armorList)
 
 
 	def populateArmorTree(self, armorList: List[dbArmor]) -> None:
@@ -246,55 +249,34 @@ class PalicoTab:
 		armorList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
 		"""
 
+		print(armorList)
 		armorSet = "" 
 		row = 0
 		if self.root.pref.unicodeSymbols:
-			piecePadding = "┗━━━            "
+			piecePadding = "┗━━━" + (12 * " ")
 		else:
-			piecePadding = "                    "
-		setPadding = "        "
+			piecePadding = " " * 20
+		setPadding = " " * 8
 		for a in armorList:
 			self.armorTree.AppendRows()
-			if a.armorSetName != armorSet:
-				img = wx.Bitmap(f"images/armor/armorset/rarity-24/{a.rarity}.png")
-				if a.armorSetName[0:11] == "King Beetle":
-					name = a.name.replace("King", "King / Queen")
-					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"{setPadding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
-				else:
-					self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"{setPadding}{a.armorSetName}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+			if a[2] != armorSet:
+				img = wx.Bitmap(f"images/armor/armorset/rarity-24/1.png")
+				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+					img, f"{setPadding}{a[2]}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
 				self.armorTree.AppendRows()
 				row += 1
-			armorSet = a.armorSetName
-			img = wx.Bitmap(f"images/armor/{a.armorType}/rarity-24/{a.rarity}.png")
-			if a.name[0:11] == "King Beetle":
-				name = a.name.replace("King", "King / Queen")
-				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"{piecePadding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
-			else:
-				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"{piecePadding}{a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
-			self.armorTree.SetCellValue(row, 4, str(a.defenseBase))
-			self.armorTree.SetCellValue(row, 5, str(a.defenseMax))
-			self.armorTree.SetCellValue(row, 6, str(a.defenseAugmentedMax))
-			self.armorTree.SetCellValue(row, 7, str(a.fire))
-			self.armorTree.SetCellValue(row, 8, str(a.water))
-			self.armorTree.SetCellValue(row, 9, str(a.ice))
-			self.armorTree.SetCellValue(row, 10, str(a.thunder))
-			self.armorTree.SetCellValue(row, 11, str(a.dragon))
-			self.armorTree.SetCellValue(row, 12, str(a.id))
-			self.armorTree.SetCellValue(row, 13, str(a.armorSetID))
+			armorSet = a[2]
+			img = wx.Bitmap(f"images/armor/chest/rarity-24/1.png")
+			self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+				img, f"{piecePadding}{a[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
+			self.armorTree.SetCellValue(row, 1, str(a[3]))
+			self.armorTree.SetCellValue(row, 2, str(a[4]))
+			self.armorTree.SetCellValue(row, 3, str(a[5]))
+			self.armorTree.SetCellValue(row, 4, str(a[6]))
+			self.armorTree.SetCellValue(row, 5, str(a[7]))
+			self.armorTree.SetCellValue(row, 6, str(a[8]))
+			self.armorTree.SetCellValue(row, 7, str(a[0]))
 
-			if a.slot1 != 0:
-				self.armorTree.SetCellRenderer(row, 1,  cgr.ImageCellRenderer(
-					wx.Bitmap(f"images/decoration-slots-24/{a.slot1}.png")))
-			if a.slot2 != 0:
-				self.armorTree.SetCellRenderer(row, 2, cgr.ImageCellRenderer(
-					wx.Bitmap(f"images/decoration-slots-24/{a.slot2}.png")))
-			if a.slot3 != 0:
-				self.armorTree.SetCellRenderer(row, 3,  cgr.ImageCellRenderer(
-					wx.Bitmap(f"images/decoration-slots-24/{a.slot3}.png")))
 			row += 1
 
 
@@ -488,9 +470,9 @@ class PalicoTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		if self.armorTree.GetCellValue(event.GetRow(), 12) != "":
-			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 12)
-			self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
+		if self.armorTree.GetCellValue(event.GetRow(), 7) != "":
+			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 7)
+			#self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
 			self.loadArmorDetailAll()
 
 
