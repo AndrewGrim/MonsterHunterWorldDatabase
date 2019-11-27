@@ -68,9 +68,18 @@ class PalicoTab:
 
 
 	def initArmorTab(self):
-		self.armorPanel = wx.Panel(self.mainNotebook)
+		self.palicoPanel = wx.Panel(self.mainNotebook)
+		self.mainNotebook.AddPage(self.palicoPanel, "Palico")
+		self.palicoSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.palicoNotebook = wx.Notebook(self.palicoPanel)
+		self.palicoSizer.Add(self.palicoNotebook, 1, wx.EXPAND)
+
+		self.palicoPanel.SetSizer(self.palicoSizer)
+
+
+		self.armorPanel = wx.Panel(self.palicoNotebook)
 		
-		self.mainNotebook.AddPage(self.armorPanel, "Palico")
+		self.palicoNotebook.AddPage(self.armorPanel, "Equipment")
 		self.armorSizer = wx.BoxSizer(wx.HORIZONTAL)
 
 		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
@@ -100,6 +109,14 @@ class PalicoTab:
 		self.armorSizer.Add(self.armorDetailedSizer, 1, wx.EXPAND)
 
 		self.armorPanel.SetSizer(self.armorSizer)
+
+		#
+		#
+		# TODO gagdet panel for palicos
+		self.gadgetPanel = wx.Panel(self.palicoNotebook)
+		self.gadgetSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.gadgetPanel.SetSizer(self.gadgetSizer)
+		self.palicoNotebook.AddPage(self.gadgetPanel, "Gadgets")
 		
 		self.initArmorButtons()
 		self.initSearch()
