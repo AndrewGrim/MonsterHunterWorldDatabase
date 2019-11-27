@@ -8,6 +8,7 @@ import CustomGridRenderer as cgr
 import MonstersTab as m
 import WeaponsTab as w
 import ArmorTab as a
+import PalicoTab as pp
 import ItemsTab as i
 import DecorationsTab as d
 import SkillsTab as s
@@ -49,6 +50,7 @@ class Application(wx.Frame):
 		mon = il.Add(wx.Bitmap("images/Nergigante24.png"))
 		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/5.png"))
 		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
+		# TODO palico goes here
 		charm = il.Add(wx.Bitmap("images/charms-24/7.png"))
 		deco = il.Add(wx.Bitmap("images/items-24/FeystoneGold.png"))
 		skill = il.Add(wx.Bitmap("images/skills-24/SkillBlue.png"))
@@ -60,8 +62,10 @@ class Application(wx.Frame):
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
 		lo.loading.SetValue(60)
 		self.weapons = w.WeaponsTab(root, self.mainNotebook, self.link)
-		lo.loading.SetValue(90)
+		lo.loading.SetValue(80)
 		self.armor = a.ArmorTab(root, self.mainNotebook, self.link)
+		lo.loading.SetValue(90)
+		self.palico = pp.PalicoTab(root, self.mainNotebook, self.link)
 		lo.loading.SetValue(100)
 		self.charms = c.CharmsTab(root, self.mainNotebook, self.link)
 		self.decos = d.DecorationsTab(root, self.mainNotebook, self.link)
@@ -73,11 +77,12 @@ class Application(wx.Frame):
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, wep)
 		self.mainNotebook.SetPageImage(2, arm)
-		self.mainNotebook.SetPageImage(3, charm)
-		self.mainNotebook.SetPageImage(4, deco)
-		self.mainNotebook.SetPageImage(5, skill)
-		self.mainNotebook.SetPageImage(6, item)
-		self.mainNotebook.SetPageImage(7, local)	
+		# TODO palico goes here
+		self.mainNotebook.SetPageImage(4, charm)
+		self.mainNotebook.SetPageImage(5, deco)
+		self.mainNotebook.SetPageImage(6, skill)
+		self.mainNotebook.SetPageImage(7, item)
+		self.mainNotebook.SetPageImage(8, local)	
 
 		self.makeMenuBar()
 		self.CreateStatusBar()
