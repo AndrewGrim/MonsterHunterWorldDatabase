@@ -76,22 +76,36 @@ class PalicoTab:
 
 		self.palicoPanel.SetSizer(self.palicoSizer)
 
+		self.initEquipmentPanel()
+		self.initGadgetPanel()		
 
-		self.armorPanel = wx.Panel(self.palicoNotebook)
+		self.initArmorButtons()
+		self.initSearch()
+		self.initArmorTree()
+		self.loadArmorTree()
+		self.initArmorDetailTab()
+		#self.loadArmorDetailAll()
 		
-		self.palicoNotebook.AddPage(self.armorPanel, "Equipment")
+		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
+
+		self.armorDetailPanel.SetScrollRate(20, 20)
+
+	
+	def initEquipmentPanel(self):
+		self.equipmentPanel = wx.Panel(self.palicoNotebook)
+		self.palicoNotebook.AddPage(self.equipmentPanel, "Equipment")
 		self.armorSizer = wx.BoxSizer(wx.HORIZONTAL)
 
 		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.jpg", wx.BITMAP_TYPE_ANY)
-		self.armorMaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
-		self.armorFemaleImageLabel = wx.StaticBitmap(self.armorPanel, bitmap=armorImage, size=(230, 230))
+		self.armorMaleImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=armorImage, size=(230, 230))
+		self.armorFemaleImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=armorImage, size=(230, 230))
 		self.armorMaleImageLabel.SetBackgroundColour((0, 0, 0))
 		self.armorFemaleImageLabel.SetBackgroundColour((0, 0, 0))
 
-		self.armorDetailsNotebook = wx.Notebook(self.armorPanel)
+		self.armorDetailsNotebook = wx.Notebook(self.equipmentPanel)
 		self.armorDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
 		
 		self.armorDetailSizer = wx.BoxSizer(wx.VERTICAL)
@@ -108,34 +122,23 @@ class PalicoTab:
 		self.armorSizer.Add(self.armorTreeSizer, 0, wx.EXPAND)
 		self.armorSizer.Add(self.armorDetailedSizer, 1, wx.EXPAND)
 
-		self.armorPanel.SetSizer(self.armorSizer)
+		self.equipmentPanel.SetSizer(self.armorSizer)
 
-		#
-		#
+	
+	def initGadgetPanel(self):
 		# TODO gagdet panel for palicos
 		self.gadgetPanel = wx.Panel(self.palicoNotebook)
 		self.gadgetSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.gadgetPanel.SetSizer(self.gadgetSizer)
 		self.palicoNotebook.AddPage(self.gadgetPanel, "Gadgets")
-		
-		self.initArmorButtons()
-		self.initSearch()
-		self.initArmorTree()
-		self.loadArmorTree()
-		self.initArmorDetailTab()
-		#self.loadArmorDetailAll()
-		
-		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
-
-		self.armorDetailPanel.SetScrollRate(20, 20)
 
 
 	def initArmorButtons(self):
-		self.lowRankButton = wx.Button(self.armorPanel, label="Low Rank", name="LR")
+		self.lowRankButton = wx.Button(self.equipmentPanel, label="Low Rank", name="LR")
 		self.lowRankButton.SetBitmap(wx.Bitmap("images/rank-stars-24/lr.png"))
-		self.highRankButton = wx.Button(self.armorPanel, label="High Rank", name="HR")
+		self.highRankButton = wx.Button(self.equipmentPanel, label="High Rank", name="HR")
 		self.highRankButton.SetBitmap(wx.Bitmap("images/rank-stars-24/hr.png"))
-		#self.masterRankButton = wx.Button(self.armorPanel, label="Master Rank", name="MR")
+		#self.masterRankButton = wx.Button(self.equipmentPanel, label="Master Rank", name="MR")
 		#self.masterRankButton.SetBitmap(wx.Bitmap("images/rank-stars-24/mr.png"))
 
 		self.lowRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
@@ -152,7 +155,7 @@ class PalicoTab:
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.armorPanel)
+		self.search = wx.TextCtrl(self.equipmentPanel)
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
 		self.armorButtonsSizer.Add(380, 0, 0)
@@ -164,7 +167,7 @@ class PalicoTab:
 
 
 	def initArmorTree(self):
-		self.armorTree = cgr.HeaderBitmapGrid(self.armorPanel)
+		self.armorTree = cgr.HeaderBitmapGrid(self.equipmentPanel)
 		self.armorTree.EnableEditing(False)
 		self.armorTree.EnableDragRowSize(False)
 		self.armorTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onArmorSelection)
@@ -323,9 +326,9 @@ class PalicoTab:
 	def loadArmorDetailAll(self):
 		self.root.Freeze()
 		self.loadArmorDetail()
-		width, height = self.armorPanel.GetSize()
-		self.armorPanel.SetSize(width + 1, height + 1)
-		self.armorPanel.SetSize(width, height)
+		width, height = self.equipmentPanel.GetSize()
+		self.equipmentPanel.SetSize(width + 1, height + 1)
+		self.equipmentPanel.SetSize(width, height)
 		self.root.Thaw()
 
 
