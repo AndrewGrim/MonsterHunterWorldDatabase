@@ -6,7 +6,11 @@ def getDirPaths(dirName: str) -> None:
 	"""
 	Goes through the specified folder and retrieves all the file paths within.
 
-	dirName = The path to the directory.
+	Args:\n
+		dirName: str = The path to the directory.
+
+	Returns:\n
+		None.
 	"""
 
 	filePaths = []

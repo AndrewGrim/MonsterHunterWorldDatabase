@@ -14,12 +14,13 @@ from typing import Tuple
 from typing import Dict
 from typing import NewType
 
-import ArmorTab as a
+import ArmorTab as a # REMOVE
+import PalicoTab as p
 import Utilities as util
 import Links as link
 
 wxTreeListItem = NewType('wxTreeListItem', None)
-dbArmor = NewType('Armor', None)
+dbObject = NewType('dbObject', None)
 
 class PalicoTab:
 
@@ -174,13 +175,7 @@ class PalicoTab:
 		self.armorTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
 
 		armorTreeColumns = {
-			"Name": [324, wx.Bitmap("images/noImage24.png")],
-			"Defense": [32, wx.Bitmap("images/weapon-detail-24/defense.png")],
-			"Fire": [32, wx.Bitmap("images/damage-types-24/fire.png")],
-			"Water": [32, wx.Bitmap("images/damage-types-24/water.png")],
-			"Ice": [32, wx.Bitmap("images/damage-types-24/ice.png")],
-			"Thunder": [32, wx.Bitmap("images/damage-types-24/thunder.png")],
-			"Dragon": [32, wx.Bitmap("images/damage-types-24/dragon.png")],
+			"Name": [685, wx.Bitmap("images/noImage24.png")],
 			"id": [0,  wx.Bitmap("images/noImage24.png")],
 		}
 
@@ -207,75 +202,47 @@ class PalicoTab:
 		searchText = self.search.GetValue().replace("'", "''").replace("'", "''")
 
 		if len(searchText) == 0 or searchText == " ":
-			sql = """
-				SELECT a.*, at.name, ast.name armorset_name
-				FROM armor a
-					JOIN armor_text at USING (id)
-					JOIN armorset_text ast
-						ON ast.id = a.armorset_id
-						AND ast.lang_id = at.lang_id
-				WHERE at.lang_id = :langId
-				AND (:rank IS NULL OR a.rank = :rank)
-			"""
+			sql = "SELECT * FROM palico_weapons"
 		else:
-			sql = f"""
-				SELECT a.*, at.name, ast.name armorset_name
-				FROM armor a
-					JOIN armor_text at USING (id)
-					JOIN armorset_text ast
-						ON ast.id = a.armorset_id
-						AND ast.lang_id = at.lang_id
-				WHERE at.lang_id = :langId
-				AND (:rank IS NULL OR a.rank = :rank)
-				AND at.name LIKE '%{searchText}%'
-			"""
+			sql = f"SELECT * FROM palico_weapons WHERE name LIKE '%{searchText}%'"
 
 		conn = sqlite3.connect("mhw.db")
-		data = conn.execute("SELECT * FROM palico_equipment")
+		data = conn.execute(sql, ())
 		data = data.fetchall()
 
-		armorList = []
+		equipmentList = []
 		
 		for row in data:
-			#armorList.append(a.Armor(row))
-			armorList.append(row)
+			equipmentList.append(p.PalicoWeapon(row))
 
-		#self.populateArmorTree(armorList)
-		self.populateArmorTree(armorList)
+		self.populateArmorTree(equipmentList)
 
 
-	def populateArmorTree(self, armorList: List[dbArmor]) -> None:
+	def populateArmorTree(self, equipmentList: List[dbObject]) -> None:
 		"""
-		armorList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
+		equipmentList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
 		"""
 
-		print(armorList)
-		armorSet = "" 
+		equipmentSet = "" 
 		row = 0
 		if self.root.pref.unicodeSymbols:
 			piecePadding = "┗━━━" + (12 * " ")
 		else:
 			piecePadding = " " * 20
 		setPadding = " " * 8
-		for a in armorList:
+		for eq in equipmentList:
 			self.armorTree.AppendRows()
-			if a[2] != armorSet:
+			if eq.setName != equipmentSet:
 				img = wx.Bitmap(f"images/armor/armorset/rarity-24/1.png")
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"{setPadding}{a[2]}", hAlign=wx.ALIGN_LEFT, imageOffset=150))
+					img, f"{setPadding}{eq.setName}", hAlign=wx.ALIGN_LEFT, imageOffset=330))
 				self.armorTree.AppendRows()
 				row += 1
-			armorSet = a[2]
-			img = wx.Bitmap(f"images/armor/chest/rarity-24/1.png")
+			equipmentSet = eq.setName
+			img = wx.Bitmap(f"images/weapons/long-sword/rarity-24/1.png")
 			self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-				img, f"{piecePadding}{a[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
-			self.armorTree.SetCellValue(row, 1, str(a[3]))
-			self.armorTree.SetCellValue(row, 2, str(a[4]))
-			self.armorTree.SetCellValue(row, 3, str(a[5]))
-			self.armorTree.SetCellValue(row, 4, str(a[6]))
-			self.armorTree.SetCellValue(row, 5, str(a[7]))
-			self.armorTree.SetCellValue(row, 6, str(a[8]))
-			self.armorTree.SetCellValue(row, 7, str(a[0]))
+				img, f"{piecePadding}{eq.name}", hAlign=wx.ALIGN_LEFT, imageOffset=295))
+			self.armorTree.SetCellValue(row, 1, str(eq.id))
 
 			row += 1
 
@@ -470,8 +437,8 @@ class PalicoTab:
 		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
-		if self.armorTree.GetCellValue(event.GetRow(), 7) != "":
-			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 7)
+		if self.armorTree.GetCellValue(event.GetRow(), 1) != "":
+			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 1)
 			#self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
 			self.loadArmorDetailAll()
 
