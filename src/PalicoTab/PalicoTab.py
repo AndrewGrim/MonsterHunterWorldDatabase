@@ -201,20 +201,48 @@ class PalicoTab:
 			pass
 
 		searchText = self.search.GetValue().replace("'", "''").replace("'", "''")
-
-		if len(searchText) == 0 or searchText == " ":
-			sql = "SELECT * FROM palico_weapons"
-		else:
-			sql = f"SELECT * FROM palico_weapons WHERE name LIKE '%{searchText}%'"
-
 		conn = sqlite3.connect("mhw.db")
+
+		sql = """
+			SELECT
+				(SELECT count(*) FROM palico_weapons) +
+				(SELECT count(*) FROM palico_armor)
+		"""
+
 		data = conn.execute(sql, ())
-		data = data.fetchall()
+		data = data.fetchone()
+		rowCount = int(data[0])
 
 		equipmentList = []
+		for num in range(rowCount):
+			if num % 3 == 0 or num == 0:
+				data = conn.execute(f"SELECT * FROM palico_weapons WHERE id = {num}")
+				data = data.fetchone()
+				equipmentList.append(p.PalicoWeapon(data))
+				
+			else:
+				data = conn.execute(f"SELECT * FROM palico_armor WHERE id = {num}")
+				data = data.fetchone()
+				equipmentList.append(p.PalicoArmor(data))
+
+		#if len(searchText) == 0 or searchText == " ":
+		#	sql = """
+		#		SELECT * FROM palico_weapons
+		#	"""
+		#else:
+		#	sql = f"""
+		#		SELECT *
+		#		FROM palico_weapons w
+		#		JOIN palico_armor a
+		#		ON a.set_name = w.set_name
+		#		WHERE name LIKE '%{searchText}%'
+		#	"""
+		#
+		#data = conn.execute(sql, ())
+		#data = data.fetchall()
 		
-		for row in data:
-			equipmentList.append(p.PalicoWeapon(row))
+		#for row in data:
+		#	equipmentList.append(p.PalicoWeapon(row))
 
 		self.populateArmorTree(equipmentList)
 
@@ -234,13 +262,18 @@ class PalicoTab:
 		for eq in equipmentList:
 			self.armorTree.AppendRows()
 			if eq.setName != equipmentSet:
-				img = wx.Bitmap(f"images/armor/armorset/rarity-24/1.png")
+				img = wx.Bitmap(f"images/armor/armorset/rarity-24/{eq.rarity}.png")
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 					img, f"{setPadding}{eq.setName}", hAlign=wx.ALIGN_LEFT, imageOffset=330))
 				self.armorTree.AppendRows()
 				row += 1
 			equipmentSet = eq.setName
-			img = wx.Bitmap(f"images/weapons/long-sword/rarity-24/1.png")
+			if eq.id % 3 == 0 or eq.id == 0:
+				img = wx.Bitmap(f"images/weapons/long-sword/rarity-24/{eq.rarity}.png")
+			elif eq.id % 3 == 2:
+				img = wx.Bitmap(f"images/armor/chest/rarity-24/{eq.rarity}.png")
+			else:
+				img = wx.Bitmap(f"images/armor/head/rarity-24/{eq.rarity}.png")
 			self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 				img, f"{piecePadding}{eq.name}", hAlign=wx.ALIGN_LEFT, imageOffset=295))
 			self.armorTree.SetCellValue(row, 1, str(eq.id))
