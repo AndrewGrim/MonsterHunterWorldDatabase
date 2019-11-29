@@ -30,7 +30,7 @@ class PalicoTab:
 		self.link = link
 
 		self.currentArmorTree = "HR"
-		self.currentlySelectedArmorID = 159
+		self.currentlySelectedArmorID = 3
 		self.currentlySelectedArmorSetID = 39
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
@@ -46,13 +46,14 @@ class PalicoTab:
 		}
 
 		self.weaponDetail = {
-			# TODO might need an extra column here, will need to double check screenshots/in-game data
-			# damage type ??? slash/blunt
+			# TODO maybe add description in later as well? possibly have the name and description like in other tabs as opposed to part of the grid
 			1: ["images/unknown.png", "Rarity"],
-			2: ["images/weapon-detail-24/attack.png", "Attack"],
-			8: ["images/weapon-detail-24/element.png", "Element"],
-			9: ["images/weapon-detail-24/affinity.png", "Affinity"],
-			10: ["images/weapon-detail-24/defense.png", "Defense"],
+			2: ["images/weapon-detail-24/attack.png", "Melee Attack"],
+			3: ["images/weapon-detail-24/attack.png", "Ranged Attack"],
+			4: ["images/weapon-detail-24/attack.png", "Attack Type"],
+			5: ["images/weapon-detail-24/element.png", "Element"],
+			6: ["images/weapon-detail-24/affinity.png", "Affinity"],
+			7: ["images/weapon-detail-24/defense.png", "Defense"],
 		}
 
 		self.armorDetail = {
@@ -85,7 +86,7 @@ class PalicoTab:
 		self.initArmorTree()
 		self.loadArmorTree()
 		self.initArmorDetailTab()
-		#self.loadArmorDetailAll()
+		self.loadArmorDetailAll()
 		
 		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
@@ -254,7 +255,7 @@ class PalicoTab:
 		self.armorDetailList.EnableDragRowSize(False)
 		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
 
-		self.armorDetailList.CreateGrid(13, 2)
+		self.armorDetailList.CreateGrid(len(self.weaponDetail) + 1, 2)
 		self.armorDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
 		self.armorDetailList.SetColSize(0, 302)
 		self.armorDetailList.SetColSize(1, 155 - 20)
@@ -269,7 +270,7 @@ class PalicoTab:
 		self.armorMaterialsList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.il = wx.ImageList(24, 24)
 		self.armorMaterialsList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.armorDetailSizer.Add(self.armorMaterialsList, 0.9, wx.EXPAND)
+		self.armorDetailSizer.Add(self.armorMaterialsList, 1, wx.EXPAND)
 
 
 	def loadArmorDetailAll(self):
@@ -283,26 +284,17 @@ class PalicoTab:
 
 	def loadArmorDetail(self):
 		self.armorDetailList.DeleteRows(0, self.armorDetailList.GetNumberRows())
-		self.armorDetailList.AppendRows(13)
+		self.armorDetailList.AppendRows(len(self.weaponDetail) + 1)
 
 		self.il.RemoveAll()
 
-		sql = """
-			SELECT a.*, at.name, ast.name armorset_name
-			FROM armor a
-				JOIN armor_text at USING (id)
-				JOIN armorset_text ast
-					ON ast.id = a.armorset_id
-					AND ast.lang_id = at.lang_id
-			WHERE at.lang_id = :langId
-			AND a.id = :armorId
-		"""
+		sql = "SELECT * FROM palico_weapons WHERE id = :id"
 
 		conn = sqlite3.Connection("mhw.db")
-		data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+		data = conn.execute(sql, (self.currentlySelectedArmorID,))
 		data = data.fetchone()
 
-		armor = a.Armor(data)
+		armor = p.PalicoWeapon(data)
 
 		noLog = wx.LogNull()
 		try:
@@ -316,55 +308,42 @@ class PalicoTab:
 		del noLog
 		
 		armorDetail = {
-			0:  str(armor.name),
-			1:  str(armor.rarity),
-			2:  str(armor.defenseBase),
-			3:  str(armor.defenseMax),
-			4:  str(armor.defenseAugmentedMax),
-			5:  str(armor.slot1),
-			6:  str(armor.slot2),
-			7:  str(armor.slot3),
-			8:  str(armor.fire),
-			9:  str(armor.water),
-			10:  str(armor.ice),
-			11: str(armor.thunder),
-			12: str(armor.dragon),
+			0: str(armor.name),
+			1: str(armor.rarity),
+			2: str(armor.attackMelee),
+			3: str(armor.attackRanged),
+			4: str(armor.attackType),
+			5: f"{armor.element} {armor.elementAttack}",
+			6: str(armor.affinity),
+			7: str(armor.defense),
 		}
 
 		imageOffset = 85
-		rarityIcon = self.il.Add(wx.Bitmap(f"images/armor/{armor.armorType}/rarity-24/{armor.rarity}"))
+		rarityIcon = wx.Bitmap(f"images/weapons/long-sword/rarity-24/{armor.rarity}.png")
 
 		self.armorDetailList.SetCellValue(0, 0, "Name")
 		self.armorDetailList.SetCellValue(0, 1, armor.name)
-		for num in range(1, 13):
+		for num in range(1, len(armorDetail)):
 			if num == 1:
 				self.armorDetailList.SetCellRenderer(num, 0,
 									cgr.ImageTextCellRenderer(
 																rarityIcon,
-																self.armorDetail[num][1],
+																self.weaponDetail[num][1],
 																imageOffset=imageOffset,
 															))
 			else:
 				self.armorDetailList.SetCellRenderer(num, 0,
 									cgr.ImageTextCellRenderer(
-										wx.Bitmap(self.armorDetail[num][0]), 
-										self.armorDetail[num][1], 
+										wx.Bitmap(self.weaponDetail[num][0]), 
+										self.weaponDetail[num][1], 
 										imageOffset=imageOffset
 										))
-			if num not in [5, 6, 7]:
-				self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
-			else:
-				if armorDetail[num] != "0":
-					self.armorDetailList.SetCellRenderer(num, 1,
-										cgr.ImageTextCellRenderer(
-											wx.Bitmap(f"images/decoration-slots-24/{armorDetail[num]}.png"), 
-											armorDetail[num], 
-											imageOffset=30
-											))
-				else:
-					self.armorDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())
-					self.armorDetailList.SetCellValue(num, 1, "-")
 
+			if armorDetail[num] in ["None", "None 0"]:
+				self.armorDetailList.SetCellValue(num, 1, "-")
+			else:
+				self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
+		
 		self.loadArmorMaterials()
 
 
