@@ -29,7 +29,7 @@ class PalicoTab:
 		self.mainNotebook = mainNotebook
 		self.link = link
 
-		self.currentArmorTree = "HR"
+		self.currentEquipmentTree = "HR"
 		self.currentEquipmentID = 3
 		self.currentEquipmentCategory = "weapon"
 		self.currentlySelectedArmorSetID = 39
@@ -104,10 +104,8 @@ class PalicoTab:
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.jpg", wx.BITMAP_TYPE_ANY)
-		self.armorMaleImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=armorImage, size=(230, 230))
-		self.armorFemaleImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=armorImage, size=(230, 230))
-		self.armorMaleImageLabel.SetBackgroundColour((0, 0, 0))
-		self.armorFemaleImageLabel.SetBackgroundColour((0, 0, 0))
+		self.palicoEquipmentImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=armorImage, size=(230, 230))
+		self.palicoEquipmentImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.armorDetailsNotebook = wx.Notebook(self.equipmentPanel)
 		self.armorDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
@@ -117,8 +115,7 @@ class PalicoTab:
 		self.armorDetailPanel.SetSizer(self.armorDetailSizer)
 		
 		self.armorDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
-		self.armorDetailedImagesSizer.Add(self.armorMaleImageLabel, 1, wx.ALIGN_CENTER)
-		self.armorDetailedImagesSizer.Add(self.armorFemaleImageLabel, 1, wx.ALIGN_CENTER)
+		self.armorDetailedImagesSizer.Add(self.palicoEquipmentImageLabel, 1, wx.ALIGN_CENTER)
 
 		self.armorDetailedSizer.Add(self.armorDetailedImagesSizer, 1, wx.EXPAND)
 		self.armorDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
@@ -323,17 +320,6 @@ class PalicoTab:
 
 		self.il.RemoveAll()
 
-		noLog = wx.LogNull()
-		try:
-			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{weapon.name}.jpg"))
-		except:
-			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
-		try:
-			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{weapon.name}.jpg"))
-		except:
-			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
-		del noLog
-
 		if self.currentEquipmentCategory == "weapon":
 			sql = "SELECT * FROM palico_weapons WHERE id = :id"
 
@@ -343,7 +329,12 @@ class PalicoTab:
 
 			weapon = p.PalicoWeapon(data)
 
-			
+			noLog = wx.LogNull()
+			try:
+				self.palicoEquipmentImageLabel.SetBitmap(wx.Bitmap(f"images/palico/{weapon.name}.jpg"))
+			except:
+				self.palicoEquipmentImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
+			del noLog
 			
 			weaponDetail = {
 				0: str(weapon.name),
@@ -389,6 +380,13 @@ class PalicoTab:
 			data = data.fetchone()
 
 			armor = p.PalicoArmor(data)
+
+			noLog = wx.LogNull()
+			try:
+				self.palicoEquipmentImageLabel.SetBitmap(wx.Bitmap(f"images/palico/{armor.name}.jpg"))
+			except:
+				self.palicoEquipmentImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
+			del noLog
 			
 			armorDetail = {
 				0: str(armor.name),
@@ -493,7 +491,7 @@ class PalicoTab:
 		When an armor rank button at the top of the screen is pressed the armor tree is reloaded with the new armor rank information.
 		"""
 
-		self.currentArmorTree = event.GetEventObject().GetName()
+		self.currentEquipmentTree = event.GetEventObject().GetName()
 		self.loadArmorTree()
 
 
