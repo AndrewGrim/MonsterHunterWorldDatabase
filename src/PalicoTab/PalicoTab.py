@@ -30,7 +30,8 @@ class PalicoTab:
 		self.link = link
 
 		self.currentArmorTree = "HR"
-		self.currentlySelectedArmorID = 3
+		self.currentEquipmentID = 3
+		self.currentEquipmentCategory = "weapon"
 		self.currentlySelectedArmorSetID = 39
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
@@ -57,13 +58,14 @@ class PalicoTab:
 		}
 
 		self.armorDetail = {
+			# TODO maybe add description in later as well? possibly have the name and description like in other tabs as opposed to part of the grid
 			1: ["images/unknown.png", "Rarity"],
 			2: ["images/weapon-detail-24/defense.png", "Defense"],
-			8: ["images/damage-types-24/fire.png", "Fire"],
-			9: ["images/damage-types-24/water.png", "Water"],
-			10: ["images/damage-types-24/ice.png", "Ice"],
-			11: [ "images/damage-types-24/thunder.png", "Thunder"],
-			12: [ "images/damage-types-24/dragon.png", "Dragon"],
+			3: ["images/damage-types-24/fire.png", "Fire"],
+			4: ["images/damage-types-24/water.png", "Water"],
+			5: ["images/damage-types-24/ice.png", "Ice"],
+			6: [ "images/damage-types-24/thunder.png", "Thunder"],
+			7: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
 		self.initArmorTab()
@@ -321,61 +323,112 @@ class PalicoTab:
 
 		self.il.RemoveAll()
 
-		sql = "SELECT * FROM palico_weapons WHERE id = :id"
-
-		conn = sqlite3.Connection("mhw.db")
-		data = conn.execute(sql, (self.currentlySelectedArmorID,))
-		data = data.fetchone()
-
-		armor = p.PalicoWeapon(data)
-
 		noLog = wx.LogNull()
 		try:
-			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{armor.name}.jpg"))
+			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/male/{weapon.name}.jpg"))
 		except:
 			self.armorMaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 		try:
-			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{armor.name}.jpg"))
+			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/armor/female/{weapon.name}.jpg"))
 		except:
 			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 		del noLog
-		
-		armorDetail = {
-			0: str(armor.name),
-			1: str(armor.rarity),
-			2: str(armor.attackMelee),
-			3: str(armor.attackRanged),
-			4: str(armor.attackType),
-			5: f"{armor.element} {armor.elementAttack}",
-			6: str(armor.affinity),
-			7: str(armor.defense),
-		}
 
-		imageOffset = 85
-		rarityIcon = wx.Bitmap(f"images/weapons/long-sword/rarity-24/{armor.rarity}.png")
+		if self.currentEquipmentCategory == "weapon":
+			sql = "SELECT * FROM palico_weapons WHERE id = :id"
 
-		self.armorDetailList.SetCellValue(0, 0, "Name")
-		self.armorDetailList.SetCellValue(0, 1, armor.name)
-		for num in range(1, len(armorDetail)):
-			if num == 1:
-				self.armorDetailList.SetCellRenderer(num, 0,
-									cgr.ImageTextCellRenderer(
-																rarityIcon,
-																self.weaponDetail[num][1],
-																imageOffset=imageOffset,
-															))
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, (self.currentEquipmentID,))
+			data = data.fetchone()
+
+			weapon = p.PalicoWeapon(data)
+
+			
+			
+			weaponDetail = {
+				0: str(weapon.name),
+				1: str(weapon.rarity),
+				2: str(weapon.attackMelee),
+				3: str(weapon.attackRanged),
+				4: str(weapon.attackType),
+				5: f"{weapon.element} {weapon.elementAttack}",
+				6: str(weapon.affinity),
+				7: str(weapon.defense),
+			}
+
+			imageOffset = 85
+			rarityIcon = wx.Bitmap(f"images/weapons/long-sword/rarity-24/{weapon.rarity}.png")
+
+			self.armorDetailList.SetCellValue(0, 0, "Name")
+			self.armorDetailList.SetCellValue(0, 1, weapon.name)
+			for num in range(1, len(weaponDetail)):
+				if num == 1:
+					self.armorDetailList.SetCellRenderer(num, 0,
+										cgr.ImageTextCellRenderer(
+																	rarityIcon,
+																	self.weaponDetail[num][1],
+																	imageOffset=imageOffset,
+																))
+				else:
+					self.armorDetailList.SetCellRenderer(num, 0,
+										cgr.ImageTextCellRenderer(
+											wx.Bitmap(self.weaponDetail[num][0]), 
+											self.weaponDetail[num][1], 
+											imageOffset=imageOffset
+											))
+
+				if weaponDetail[num] in ["None", "None 0"]:
+					self.armorDetailList.SetCellValue(num, 1, "-")
+				else:
+					self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+		else:
+			sql = "SELECT * FROM palico_armor WHERE id = :id"
+
+			conn = sqlite3.Connection("mhw.db")
+			data = conn.execute(sql, (self.currentEquipmentID,))
+			data = data.fetchone()
+
+			armor = p.PalicoArmor(data)
+			
+			armorDetail = {
+				0: str(armor.name),
+				1: str(armor.rarity),
+				2: str(armor.defense),
+				3: str(armor.fire),
+				4: str(armor.water),
+				5: str(armor.ice),
+				6: str(armor.thunder),
+				7: str(armor.dragon),
+			}
+
+			imageOffset = 85
+			if armor.id % 3 == 2:
+				rarityIcon = wx.Bitmap(f"images/armor/chest/rarity-24/{armor.rarity}.png")
 			else:
-				self.armorDetailList.SetCellRenderer(num, 0,
-									cgr.ImageTextCellRenderer(
-										wx.Bitmap(self.weaponDetail[num][0]), 
-										self.weaponDetail[num][1], 
-										imageOffset=imageOffset
-										))
+				rarityIcon = wx.Bitmap(f"images/armor/head/rarity-24/{armor.rarity}.png")
 
-			if armorDetail[num] in ["None", "None 0"]:
-				self.armorDetailList.SetCellValue(num, 1, "-")
-			else:
-				self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
+			self.armorDetailList.SetCellValue(0, 0, "Name")
+			self.armorDetailList.SetCellValue(0, 1, armor.name)
+			for num in range(1, len(armorDetail)):
+				if num == 1:
+					self.armorDetailList.SetCellRenderer(num, 0,
+										cgr.ImageTextCellRenderer(
+																	rarityIcon,
+																	self.armorDetail[num][1],
+																	imageOffset=imageOffset,
+																))
+				else:
+					self.armorDetailList.SetCellRenderer(num, 0,
+										cgr.ImageTextCellRenderer(
+											wx.Bitmap(self.armorDetail[num][0]), 
+											self.armorDetail[num][1], 
+											imageOffset=imageOffset
+											))
+
+				if armorDetail[num] in ["None", "None 0"]:
+					self.armorDetailList.SetCellValue(num, 1, "-")
+				else:
+					self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
 		
 		self.loadArmorMaterials()
 
@@ -398,7 +451,7 @@ class PalicoTab:
 		"""
 
 		conn = sqlite3.Connection("mhw.db")
-		data = conn.execute(sql, ("en", self.currentlySelectedArmorID))
+		data = conn.execute(sql, ("en", self.currentEquipmentID))
 		data = data.fetchall()
 
 		if data != None:
@@ -450,7 +503,12 @@ class PalicoTab:
 		"""
 
 		if self.armorTree.GetCellValue(event.GetRow(), 1) != "":
-			self.currentlySelectedArmorID = self.armorTree.GetCellValue(event.GetRow(), 1)
+			self.currentEquipmentID = int(self.armorTree.GetCellValue(event.GetRow(), 1))
+			r = self.currentEquipmentID % 3
+			if r == 0:
+				self.currentEquipmentCategory = "weapon"
+			else:
+				self.currentEquipmentCategory = "armor"
 			#self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
 			self.loadArmorDetailAll()
 
