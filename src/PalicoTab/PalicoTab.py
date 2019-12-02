@@ -268,7 +268,7 @@ class PalicoTab:
 				row += 1
 			equipmentSet = eq.setName
 			if eq.id % 3 == 0 or eq.id == 0:
-				img = wx.Bitmap(f"images/weapons/long-sword/rarity-24/{eq.rarity}.png")
+				img = wx.Bitmap(f"images/palico/{eq.attackType.lower()}-rarity-24/{eq.rarity}.png")
 			elif eq.id % 3 == 2:
 				img = wx.Bitmap(f"images/armor/chest/rarity-24/{eq.rarity}.png")
 			else:
@@ -348,7 +348,7 @@ class PalicoTab:
 			}
 
 			imageOffset = 85
-			rarityIcon = wx.Bitmap(f"images/weapons/long-sword/rarity-24/{weapon.rarity}.png")
+			rarityIcon = wx.Bitmap(f"images/palico/{weapon.attackType.lower()}rarity-24/{weapon.rarity}.png")
 
 			self.armorDetailList.SetCellValue(0, 0, "Name")
 			self.armorDetailList.SetCellValue(0, 1, weapon.name)
