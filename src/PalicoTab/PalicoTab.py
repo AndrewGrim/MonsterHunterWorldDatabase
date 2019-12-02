@@ -348,7 +348,7 @@ class PalicoTab:
 			}
 
 			imageOffset = 85
-			rarityIcon = wx.Bitmap(f"images/palico/{weapon.attackType.lower()}rarity-24/{weapon.rarity}.png")
+			rarityIcon = wx.Bitmap(f"images/palico/{weapon.attackType.lower()}-rarity-24/{weapon.rarity}.png")
 
 			self.armorDetailList.SetCellValue(0, 0, "Name")
 			self.armorDetailList.SetCellValue(0, 1, weapon.name)
