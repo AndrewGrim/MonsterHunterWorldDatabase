@@ -11,9 +11,11 @@ class PalicoWeapon:
 		self.attackType = dbRow[7]
 		self.element = dbRow[8]
 		self.elementAttack = dbRow[9]
-		self.affinity = dbRow[10]
-		self.defense = dbRow[11]
-		self.description = dbRow[12]
+		self.elderseal = dbRow[10]
+		self.affinity = dbRow[11]
+		self.defense = dbRow[12]
+		self.price = dbRow[13]
+		self.description = dbRow[14]
 
 
 	def __repr__(self):

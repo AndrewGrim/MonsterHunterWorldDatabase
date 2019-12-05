@@ -53,8 +53,10 @@ class PalicoTab:
 			3: ["images/weapon-detail-24/attack.png", "Ranged Attack"],
 			4: ["images/weapon-detail-24/attack.png", "Attack Type"],
 			5: ["images/weapon-detail-24/element.png", "Element"],
-			6: ["images/weapon-detail-24/affinity.png", "Affinity"],
-			7: ["images/weapon-detail-24/defense.png", "Defense"],
+			6: ["images/weapon-detail-24/elderseal.png", "Elderseal"],
+			7: ["images/weapon-detail-24/affinity.png", "Affinity"],
+			8: ["images/weapon-detail-24/defense.png", "Defense"],
+			9: ["images/points.png", "Price"]
 		}
 
 		self.armorDetail = {
@@ -66,6 +68,7 @@ class PalicoTab:
 			5: ["images/damage-types-24/ice.png", "Ice"],
 			6: [ "images/damage-types-24/thunder.png", "Thunder"],
 			7: [ "images/damage-types-24/dragon.png", "Dragon"],
+			8: ["images/points.png", "Price"]
 		}
 
 		self.initArmorTab()
@@ -261,7 +264,7 @@ class PalicoTab:
 		for eq in equipmentList:
 			self.armorTree.AppendRows()
 			if eq.setName != equipmentSet:
-				img = wx.Bitmap(f"images/armor/armorset/rarity-24/{eq.rarity}.png")
+				img = wx.Bitmap(f"images/palico/armorset-rarity-24/{eq.rarity}.png")
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 					img, f"{setPadding}{eq.setName}", hAlign=wx.ALIGN_LEFT, imageOffset=330))
 				self.armorTree.AppendRows()
@@ -270,9 +273,9 @@ class PalicoTab:
 			if eq.id % 3 == 0 or eq.id == 0:
 				img = wx.Bitmap(f"images/palico/{eq.attackType.lower()}-rarity-24/{eq.rarity}.png")
 			elif eq.id % 3 == 2:
-				img = wx.Bitmap(f"images/armor/chest/rarity-24/{eq.rarity}.png")
+				img = wx.Bitmap(f"images/palico/chest-rarity-24/{eq.rarity}.png")
 			else:
-				img = wx.Bitmap(f"images/armor/head/rarity-24/{eq.rarity}.png")
+				img = wx.Bitmap(f"images/palico/head-rarity-24/{eq.rarity}.png")
 			self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 				img, f"{piecePadding}{eq.name}", hAlign=wx.ALIGN_LEFT, imageOffset=295))
 			self.armorTree.SetCellValue(row, 1, str(eq.id))
@@ -343,8 +346,10 @@ class PalicoTab:
 				3: str(weapon.attackRanged),
 				4: str(weapon.attackType),
 				5: f"{weapon.element} {weapon.elementAttack}",
-				6: str(weapon.affinity),
-				7: str(weapon.defense),
+				6: str(weapon.elderseal),
+				7: str(weapon.affinity),
+				8: str(weapon.defense),
+				9: str(weapon.price)
 			}
 
 			imageOffset = 85
@@ -397,13 +402,16 @@ class PalicoTab:
 				5: str(armor.ice),
 				6: str(armor.thunder),
 				7: str(armor.dragon),
+				8: str(armor.price)
 			}
 
 			imageOffset = 85
-			if armor.id % 3 == 2:
-				rarityIcon = wx.Bitmap(f"images/armor/chest/rarity-24/{armor.rarity}.png")
+			if armor.fullArmorSet == 1:
+				rarityIcon = wx.Bitmap(f"images/palico/armorset-rarity-24/{armor.rarity}.png")
+			elif armor.id % 3 == 2:
+				rarityIcon = wx.Bitmap(f"images/palico/chest-rarity-24/{armor.rarity}.png")
 			else:
-				rarityIcon = wx.Bitmap(f"images/armor/head/rarity-24/{armor.rarity}.png")
+				rarityIcon = wx.Bitmap(f"images/palico/head-rarity-24/{armor.rarity}.png")
 
 			self.armorDetailList.SetCellValue(0, 0, "Name")
 			self.armorDetailList.SetCellValue(0, 1, armor.name)

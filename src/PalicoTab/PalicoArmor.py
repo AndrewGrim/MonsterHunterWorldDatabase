@@ -13,7 +13,8 @@ class PalicoArmor:
 		self.ice = dbRow[9]
 		self.dragon = dbRow[10]
 		self.fullArmorSet = dbRow[11]
-		self.description = dbRow[12]
+		self.price = dbRow[12]
+		self.description = dbRow[13]
 
 
 	def __repr__(self):
