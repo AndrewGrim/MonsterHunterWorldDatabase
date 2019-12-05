@@ -216,35 +216,28 @@ class PalicoTab:
 		rowCount = int(data[0])
 
 		equipmentList = []
-		for num in range(rowCount):
-			if num % 3 == 0 or num == 0:
-				data = conn.execute(f"SELECT * FROM palico_weapons WHERE id = {num}")
-				data = data.fetchone()
-				equipmentList.append(p.PalicoWeapon(data))
-				
-			else:
-				data = conn.execute(f"SELECT * FROM palico_armor WHERE id = {num}")
-				data = data.fetchone()
-				equipmentList.append(p.PalicoArmor(data))
-
-		#if len(searchText) == 0 or searchText == " ":
-		#	sql = """
-		#		SELECT * FROM palico_weapons
-		#	"""
-		#else:
-		#	sql = f"""
-		#		SELECT *
-		#		FROM palico_weapons w
-		#		JOIN palico_armor a
-		#		ON a.set_name = w.set_name
-		#		WHERE name LIKE '%{searchText}%'
-		#	"""
-		#
-		#data = conn.execute(sql, ())
-		#data = data.fetchall()
-		
-		#for row in data:
-		#	equipmentList.append(p.PalicoWeapon(row))
+		if len(searchText) == 0 or searchText == " ":
+			for num in range(rowCount):
+				if num % 3 == 0 or num == 0:
+					data = conn.execute(f"SELECT * FROM palico_weapons WHERE id = {num}")
+					data = data.fetchone()
+					equipmentList.append(p.PalicoWeapon(data))
+					
+				else:
+					data = conn.execute(f"SELECT * FROM palico_armor WHERE id = {num}")
+					data = data.fetchone()
+					equipmentList.append(p.PalicoArmor(data))
+		else:
+			data = conn.execute(f"SELECT * FROM palico_weapons WHERE name LIKE '%{searchText}%' OR set_name LIKE '%{searchText}%'")
+			data = data.fetchall()
+			if len(data) != 0:
+				for eq in data:
+					equipmentList.append(p.PalicoWeapon(eq))
+			data = conn.execute(f"SELECT * FROM palico_armor WHERE name LIKE '%{searchText}%' OR set_name LIKE '%{searchText}%'")
+			data = data.fetchall()
+			if len(data) != 0:
+				for eq in data:
+					equipmentList.append(p.PalicoArmor(eq))
 
 		self.populateArmorTree(equipmentList)
 
