@@ -644,23 +644,23 @@ class WeaponsTab:
 			elif key == "Affinity":
 				try:
 					if int(affinity.replace("%", "")) > 0:
-						self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#C8E6C9"))
+						self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#C8E6C9")) # REMOVE because its using cgr this doesnt do anything
 						self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#C8E6C9"))
 					elif int(affinity.replace("%", "")) < 0:
-						self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#FFCDD2"))
+						self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#FFCDD2")) # REMOVE because its using cgr this doesnt do anything
 						self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#FFCDD2"))
 				except:
 					pass
 			elif key == "Element I":
 				try:
-					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[wep.element1]))
-					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[wep.element1]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[wep.element1])) # REMOVE because its using cgr this doesnt do anything
+					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[wep.element1])) # REMOVE because its using cgr this doesnt do anything
 				except:
 					pass
 			elif key == "Element II":
 				try:
-					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[wep.element2]))
-					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[wep.element2]))
+					self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB(self.elementColors[wep.element2])) # REMOVE because its using cgr this doesnt do anything
+					self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB(self.elementColors[wep.element2])) # REMOVE because its using cgr this doesnt do anything
 				except:
 					pass
 			elif key == "Elderseal" and elderseal != "-":

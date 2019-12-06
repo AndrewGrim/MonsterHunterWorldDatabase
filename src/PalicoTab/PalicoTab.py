@@ -14,6 +14,7 @@ from typing import Tuple
 from typing import Dict
 from typing import NewType
 
+import Utilities as util
 import PalicoTab as p
 import Utilities as util
 import Links as link
@@ -29,7 +30,7 @@ class PalicoTab:
 		self.link = link
 
 		self.currentEquipmentTree = "HR"
-		self.currentEquipmentID = 0
+		self.currentEquipmentID = 78
 		self.currentEquipmentCategory = "weapon"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
@@ -68,6 +69,18 @@ class PalicoTab:
 			7: [ "images/damage-types-24/dragon.png", "Dragon"],
 			8: ["images/points.png", "Buy"]
 		}
+
+		self.elementColors = {
+			"Fire": "EF5350",
+			"Water": "2196F3",
+			"Ice": "90CAF9",
+			"Thunder": "FFEE58",
+			"Dragon": "7E57C2",
+			"Poison": "AB47BC",
+			"Paralysis": "FFCA28",
+			"Blast": "8D6E63",
+			"Sleep": "78909C",
+		}	
 
 		self.initArmorTab()
 
@@ -337,15 +350,17 @@ class PalicoTab:
 				2: str(weapon.attackMelee),
 				3: str(weapon.attackRanged),
 				4: str(weapon.attackType),
-				5: f"{weapon.element} {weapon.elementAttack}",
+				5: str(weapon.elementAttack),
 				6: str(weapon.elderseal),
 				7: str(weapon.affinity),
 				8: str(weapon.defense),
 				9: str(weapon.price)
 			}
 
-			imageOffset = 85
+			imageOffset = 55
 			rarityIcon = wx.Bitmap(f"images/palico/{weapon.attackType.lower()}-rarity-24/{weapon.rarity}.png")
+			if weapon.element != "None":
+				element = wx.Bitmap(f"images/damage-types-24/{weapon.element.lower()}.png")
 
 			self.armorDetailList.SetCellValue(0, 0, "Name")
 			self.armorDetailList.SetCellValue(0, 1, weapon.name)
@@ -365,10 +380,31 @@ class PalicoTab:
 											imageOffset=imageOffset
 											))
 
-				if weaponDetail[num] in ["None", "None 0"]:
+				if weaponDetail[num] == "None":
 					self.armorDetailList.SetCellValue(num, 1, "-")
 				else:
-					self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+					if num == 5:
+						if weapon.element != "None":
+							self.armorDetailList.SetCellRenderer(num, 1,
+											cgr.ImageTextCellRenderer(
+																		element,
+																		weaponDetail[num],
+																		imageOffset=imageOffset - 25,
+																		colour=util.hexToRGB(self.elementColors[weapon.element]),
+																	))
+						else:
+							self.armorDetailList.SetCellValue(num, 1, "-")
+					elif num == 7:
+						if weapon.affinity.find("+") != -1:
+							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#C8E6C9"))
+							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+						elif weapon.affinity.find("-") != -1:
+							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#FFCDD2"))
+							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+						else:
+							self.armorDetailList.SetCellValue(num, 1, "-")
+					else:
+						self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
 		else:
 			sql = "SELECT * FROM palico_armor WHERE id = :id"
 
@@ -397,7 +433,7 @@ class PalicoTab:
 				8: str(armor.price)
 			}
 
-			imageOffset = 85
+			imageOffset = 55
 			if armor.fullArmorSet == 1:
 				rarityIcon = wx.Bitmap(f"images/palico/armorset-rarity-24/{armor.rarity}.png")
 			elif armor.id % 3 == 2:
