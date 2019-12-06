@@ -14,7 +14,6 @@ from typing import Tuple
 from typing import Dict
 from typing import NewType
 
-import ArmorTab as a # REMOVE
 import PalicoTab as p
 import Utilities as util
 import Links as link
@@ -30,9 +29,8 @@ class PalicoTab:
 		self.link = link
 
 		self.currentEquipmentTree = "HR"
-		self.currentEquipmentID = 3
+		self.currentEquipmentID = 0
 		self.currentEquipmentCategory = "weapon"
-		self.currentlySelectedArmorSetID = 39
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.rarityColors = {
@@ -207,7 +205,7 @@ class PalicoTab:
 
 		sql = """
 			SELECT
-				(SELECT count(*) FROM palico_weapons) +
+				(SELECT count(*) FROM palico_weapon) +
 				(SELECT count(*) FROM palico_armor)
 		"""
 
@@ -219,7 +217,7 @@ class PalicoTab:
 		if len(searchText) == 0 or searchText == " ":
 			for num in range(rowCount):
 				if num % 3 == 0 or num == 0:
-					data = conn.execute(f"SELECT * FROM palico_weapons WHERE id = {num}")
+					data = conn.execute(f"SELECT * FROM palico_weapon WHERE id = {num}")
 					data = data.fetchone()
 					equipmentList.append(p.PalicoWeapon(data))
 					
@@ -228,7 +226,7 @@ class PalicoTab:
 					data = data.fetchone()
 					equipmentList.append(p.PalicoArmor(data))
 		else:
-			data = conn.execute(f"SELECT * FROM palico_weapons WHERE name LIKE '%{searchText}%' OR set_name LIKE '%{searchText}%'")
+			data = conn.execute(f"SELECT * FROM palico_weapon WHERE name LIKE '%{searchText}%' OR set_name LIKE '%{searchText}%'")
 			data = data.fetchall()
 			if len(data) != 0:
 				for eq in data:
@@ -291,14 +289,14 @@ class PalicoTab:
 		self.armorDetailList.SetColLabelSize(2)
 		self.armorDetailList.SetRowLabelSize(1)
 
-		self.armorMaterialsList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
+		self.equipmentMaterialsList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
-		self.armorMaterialsList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
+		self.equipmentMaterialsList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.il = wx.ImageList(24, 24)
-		self.armorMaterialsList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.armorDetailSizer.Add(self.armorMaterialsList, 1, wx.EXPAND)
+		self.equipmentMaterialsList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.armorDetailSizer.Add(self.equipmentMaterialsList, 1, wx.EXPAND)
 
 
 	def loadArmorDetailAll(self):
@@ -317,7 +315,7 @@ class PalicoTab:
 		self.il.RemoveAll()
 
 		if self.currentEquipmentCategory == "weapon":
-			sql = "SELECT * FROM palico_weapons WHERE id = :id"
+			sql = "SELECT * FROM palico_weapon WHERE id = :id"
 
 			conn = sqlite3.Connection("mhw.db")
 			data = conn.execute(sql, (self.currentEquipmentID,))
@@ -429,62 +427,62 @@ class PalicoTab:
 				else:
 					self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
 		
-		self.loadArmorMaterials()
+		self.loadEquipmentMaterials()
 
 
-	def loadArmorMaterials(self):
-		self.armorMaterialsList.ClearAll()
+	def loadEquipmentMaterials(self):
+		self.equipmentMaterialsList.ClearAll()
 
-		sql = """
+		sql = f"""
 			SELECT i.id item_id, it.name item_name, i.icon_name item_icon_name,
-				i.category item_category, i.icon_color item_icon_color, a.quantity
-			FROM armor_recipe a
+				i.category item_category, i.icon_color item_icon_color, w.quantity
+			FROM palico_{self.currentEquipmentCategory}_recipe w
 				JOIN item i
-					ON a.item_id = i.id
+					ON w.item_id = i.id
 				JOIN item_text it
 					ON it.id = i.id
-					AND it.lang_id = :langId
-			WHERE it.lang_id = :langId
-			AND a.armor_id= :armorId
+					AND it.lang_id = 'en'
+			WHERE it.lang_id = 'en'
+			AND w.id = :equipmentID
 			ORDER BY i.id
 		"""
 
 		conn = sqlite3.Connection("mhw.db")
-		data = conn.execute(sql, ("en", self.currentEquipmentID))
+		data = conn.execute(sql, (self.currentEquipmentID,))
 		data = data.fetchall()
 
 		if data != None:
-			armorMaterials = []
+			equipmentMaterials = []
 			for row in data:
-				armorMaterials.append(a.ArmorMaterial(row))
+				equipmentMaterials.append(p.PalicoEquipmentMaterial(row))
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 			info.Image = -1
 			info.Align = wx.LIST_FORMAT_LEFT
 			info.Text = "Req. Materials"
-			self.armorMaterialsList.InsertColumn(0, info)
-			self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.equipmentMaterialsList.InsertColumn(0, info)
+			self.equipmentMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 			info.Image = -1
 			info.Align = wx.LIST_FORMAT_CENTER
 			info.Text = ""
-			self.armorMaterialsList.InsertColumn(1, info)
-			self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.equipmentMaterialsList.InsertColumn(1, info)
+			self.equipmentMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 
-			self.armorMaterialsList.InsertColumn(2, info)
-			self.armorMaterialsList.SetColumnWidth(2, 0)
+			self.equipmentMaterialsList.InsertColumn(2, info)
+			self.equipmentMaterialsList.SetColumnWidth(2, 0)
 
-			for material in armorMaterials:
+			for material in equipmentMaterials:
 				try:
 					img = self.il.Add(wx.Bitmap(f"images/items-24/{material.iconName}{material.iconColor}.png"))
 				except:
 					img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
-				index = self.armorMaterialsList.InsertItem(self.armorMaterialsList.GetItemCount(), material.name, img)
-				self.armorMaterialsList.SetItem(index, 1, str(material.quantity))
-				self.armorMaterialsList.SetItem(index, 2, f"{material.id},{material.category}")
+				index = self.equipmentMaterialsList.InsertItem(self.equipmentMaterialsList.GetItemCount(), material.name, img)
+				self.equipmentMaterialsList.SetItem(index, 1, str(material.quantity))
+				self.equipmentMaterialsList.SetItem(index, 2, f"{material.id},{material.category}")
 
 
 	def onArmorTypeSelection(self, event):
@@ -508,7 +506,7 @@ class PalicoTab:
 				self.currentEquipmentCategory = "weapon"
 			else:
 				self.currentEquipmentCategory = "armor"
-			#self.currentlySelectedArmorSetID = self.armorTree.GetCellValue(event.GetRow(), 13)
+
 			self.loadArmorDetailAll()
 
 
@@ -530,8 +528,8 @@ class PalicoTab:
 		try:
 			self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
 			self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
-			self.armorMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-			self.armorMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.equipmentMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.equipmentMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
 		except:
 			pass
 
