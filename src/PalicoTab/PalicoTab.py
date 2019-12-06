@@ -54,7 +54,7 @@ class PalicoTab:
 			6: ["images/weapon-detail-24/elderseal.png", "Elderseal"],
 			7: ["images/weapon-detail-24/affinity.png", "Affinity"],
 			8: ["images/weapon-detail-24/defense.png", "Defense"],
-			9: ["images/points.png", "Price"]
+			9: ["images/points.png", "Buy"]
 		}
 
 		self.armorDetail = {
@@ -66,7 +66,7 @@ class PalicoTab:
 			5: ["images/damage-types-24/ice.png", "Ice"],
 			6: [ "images/damage-types-24/thunder.png", "Thunder"],
 			7: [ "images/damage-types-24/dragon.png", "Dragon"],
-			8: ["images/points.png", "Price"]
+			8: ["images/points.png", "Buy"]
 		}
 
 		self.initArmorTab()
@@ -84,7 +84,7 @@ class PalicoTab:
 		self.initEquipmentPanel()
 		self.initGadgetPanel()		
 
-		self.initArmorButtons()
+		self.initEquipmentButtons()
 		self.initSearch()
 		self.initArmorTree()
 		self.loadArmorTree()
@@ -104,8 +104,8 @@ class PalicoTab:
 		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		armorImage = wx.Bitmap("images/armor/male/Leather Headgear.jpg", wx.BITMAP_TYPE_ANY)
-		self.palicoEquipmentImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=armorImage, size=(230, 230))
+		equipmentImage = wx.Bitmap("images/palico/Felyne Acorn Spade α.jpg", wx.BITMAP_TYPE_ANY)
+		self.palicoEquipmentImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=equipmentImage, size=(230, 230))
 		self.palicoEquipmentImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.armorDetailsNotebook = wx.Notebook(self.equipmentPanel)
@@ -135,7 +135,7 @@ class PalicoTab:
 		self.palicoNotebook.AddPage(self.gadgetPanel, "Gadgets")
 
 
-	def initArmorButtons(self):
+	def initEquipmentButtons(self):
 		self.lowRankButton = wx.Button(self.equipmentPanel, label="Low Rank", name="LR")
 		self.lowRankButton.SetBitmap(wx.Bitmap("images/rank-stars-24/lr.png"))
 		self.highRankButton = wx.Button(self.equipmentPanel, label="High Rank", name="HR")
@@ -143,25 +143,25 @@ class PalicoTab:
 		#self.masterRankButton = wx.Button(self.equipmentPanel, label="Master Rank", name="MR")
 		#self.masterRankButton.SetBitmap(wx.Bitmap("images/rank-stars-24/mr.png"))
 
-		self.lowRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
-		self.highRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
-		#self.masterRankButton.Bind(wx.EVT_BUTTON, self.onArmorTypeSelection)
+		self.lowRankButton.Bind(wx.EVT_BUTTON, self.onEquipmentRankSelection)
+		self.highRankButton.Bind(wx.EVT_BUTTON, self.onEquipmentRankSelection)
+		#self.masterRankButton.Bind(wx.EVT_BUTTON, self.onEquipmentRankSelection)
 	
-		self.armorButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.equipmentButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-		self.armorButtonsSizer.Add(self.lowRankButton)
-		self.armorButtonsSizer.Add(self.highRankButton)
-		#self.armorButtonsSizer.Add(self.masterRankButton)
+		self.equipmentButtonsSizer.Add(self.lowRankButton)
+		self.equipmentButtonsSizer.Add(self.highRankButton)
+		#self.equipmentButtonsSizer.Add(self.masterRankButton)
 
-		self.armorTreeSizer.Add(self.armorButtonsSizer)
+		self.armorTreeSizer.Add(self.equipmentButtonsSizer)
 
 	
 	def initSearch(self):
 		self.search = wx.TextCtrl(self.equipmentPanel)
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
-		self.armorButtonsSizer.Add(380, 0, 0)
-		self.armorButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.equipmentButtonsSizer.Add(380, 0, 0)
+		self.equipmentButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):
@@ -217,21 +217,22 @@ class PalicoTab:
 		if len(searchText) == 0 or searchText == " ":
 			for num in range(rowCount):
 				if num % 3 == 0 or num == 0:
-					data = conn.execute(f"SELECT * FROM palico_weapon WHERE id = {num}")
+					data = conn.execute(f"SELECT * FROM palico_weapon WHERE id = {num} AND rank = '{self.currentEquipmentTree}'")
 					data = data.fetchone()
-					equipmentList.append(p.PalicoWeapon(data))
-					
+					if data != None:
+						equipmentList.append(p.PalicoWeapon(data))
 				else:
-					data = conn.execute(f"SELECT * FROM palico_armor WHERE id = {num}")
+					data = conn.execute(f"SELECT * FROM palico_armor WHERE id = {num} AND rank = '{self.currentEquipmentTree}'")
 					data = data.fetchone()
-					equipmentList.append(p.PalicoArmor(data))
+					if data != None:
+						equipmentList.append(p.PalicoArmor(data))
 		else:
-			data = conn.execute(f"SELECT * FROM palico_weapon WHERE name LIKE '%{searchText}%' OR set_name LIKE '%{searchText}%'")
+			data = conn.execute(f"SELECT * FROM palico_weapon WHERE rank = '{self.currentEquipmentTree}' AND name LIKE '%{searchText}%' OR rank = '{self.currentEquipmentTree}' AND set_name LIKE '%{searchText}%'")
 			data = data.fetchall()
 			if len(data) != 0:
 				for eq in data:
 					equipmentList.append(p.PalicoWeapon(eq))
-			data = conn.execute(f"SELECT * FROM palico_armor WHERE name LIKE '%{searchText}%' OR set_name LIKE '%{searchText}%'")
+			data = conn.execute(f"SELECT * FROM palico_armor WHERE rank = '{self.currentEquipmentTree}' AND name LIKE '%{searchText}%' OR rank = '{self.currentEquipmentTree}' AND set_name LIKE '%{searchText}%'")
 			data = data.fetchall()
 			if len(data) != 0:
 				for eq in data:
@@ -485,7 +486,7 @@ class PalicoTab:
 				self.equipmentMaterialsList.SetItem(index, 2, f"{material.id},{material.category}")
 
 
-	def onArmorTypeSelection(self, event):
+	def onEquipmentRankSelection(self, event):
 		"""
 		When an armor rank button at the top of the screen is pressed the armor tree is reloaded with the new armor rank information.
 		"""
