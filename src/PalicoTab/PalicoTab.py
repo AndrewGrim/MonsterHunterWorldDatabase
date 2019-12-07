@@ -372,6 +372,7 @@ class PalicoTab:
 																	self.weaponDetail[num][1],
 																	imageOffset=imageOffset,
 																))
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[weapon.rarity]))
 				else:
 					self.armorDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
@@ -394,6 +395,10 @@ class PalicoTab:
 																	))
 						else:
 							self.armorDetailList.SetCellValue(num, 1, "-")
+					elif num == 6:
+						if weapon.elderseal != None:
+							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#D1C4E9"))
+							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
 					elif num == 7:
 						if weapon.affinity.find("+") != -1:
 							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#C8E6C9"))
@@ -403,8 +408,20 @@ class PalicoTab:
 							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
 						else:
 							self.armorDetailList.SetCellValue(num, 1, "-")
+					elif num == 8:
+						if weapon.defense != None:
+							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#D7CCC8"))
+							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+						else:
+							self.armorDetailList.SetCellValue(num, 1, "-")
 					else:
 						self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+					# elif key == "Elderseal" and elderseal != "-":
+					# 	self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#D1C4E9"))
+					# 	self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D1C4E9"))
+					# elif key == "Defense" and defense != "-":
+					# 	self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#D7CCC8"))
+					# 	self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D7CCC8"))
 		else:
 			sql = "SELECT * FROM palico_armor WHERE id = :id"
 
@@ -427,12 +444,13 @@ class PalicoTab:
 				2: str(armor.defense),
 				3: str(armor.fire),
 				4: str(armor.water),
-				5: str(armor.ice),
-				6: str(armor.thunder),
+				5: str(armor.thunder),
+				6: str(armor.ice),
 				7: str(armor.dragon),
 				8: str(armor.price)
 			}
 
+			colorLevel = 0
 			imageOffset = 55
 			if armor.fullArmorSet == 1:
 				rarityIcon = wx.Bitmap(f"images/palico/armorset-rarity-24/{armor.rarity}.png")
@@ -444,6 +462,17 @@ class PalicoTab:
 			self.armorDetailList.SetCellValue(0, 0, "Name")
 			self.armorDetailList.SetCellValue(0, 1, armor.name)
 			for num in range(1, len(armorDetail)):
+				if num == 3:
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["fire"][colorLevel]))
+				elif num == 4:
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["water"][colorLevel]))
+				elif num == 5:
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["thunder"][colorLevel]))
+				elif num == 6:
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["ice"][colorLevel]))
+				elif num == 7:
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["dragon"][colorLevel]))
+
 				if num == 1:
 					self.armorDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
@@ -451,6 +480,7 @@ class PalicoTab:
 																	self.armorDetail[num][1],
 																	imageOffset=imageOffset,
 																))
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[armor.rarity]))
 				else:
 					self.armorDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
