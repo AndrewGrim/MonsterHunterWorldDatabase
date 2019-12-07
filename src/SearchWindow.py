@@ -65,6 +65,8 @@ class SearchWindow:
 				self.root.items.currentItemName = materialInfo[-1]
 			elif self.link.eventType == "armorset":
 				self.root.armor.currentlySelectedArmorSetID = materialInfo[-1]
+			elif self.link.eventType == "palico":
+				self.root.palico.currentEquipmentCategory = materialInfo[-1]
 			else:
 				debug(materialInfo, "self.link.eventType", "self.link.eventType unsupported eventType!")
 			materialInfo.remove(materialInfo[-1])
@@ -92,6 +94,7 @@ class SearchWindow:
 		self.loadMonsters()
 		self.loadWeapons()
 		self.loadArmor()
+		self.loadPalico()
 		self.loadCharms()
 		self.loadDecorations()
 		self.loadSkills()
@@ -298,6 +301,43 @@ class SearchWindow:
 			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"armor,{row[0]},{row[4]}")
+
+
+	def loadPalico(self):
+		sql = f"""
+			SELECT id, name, rank, rarity, attack_type
+			FROM palico_weapon
+			WHERE name LIKE '%{self.searchText}%'
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/palico/{row[4]}-rarity-24/{row[3]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"palico,{row[0]},{row[2]},weapon")
+
+		sql = f"""
+			SELECT id, name, rank, rarity
+			FROM palico_armor
+			WHERE name LIKE '%{self.searchText}%'
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			if row[0] % 3 == 2:
+				img = wx.Bitmap(f"images/palico/chest-rarity-24/{row[3]}.png")
+			else:
+				img = wx.Bitmap(f"images/palico/head-rarity-24/{row[3]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"palico,{row[0]},{row[2]},armor")
 
 
 	def loadCharms(self):

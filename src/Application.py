@@ -50,7 +50,7 @@ class Application(wx.Frame):
 		mon = il.Add(wx.Bitmap("images/Nergigante24.png"))
 		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/5.png"))
 		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
-		# TODO palico goes here
+		pal = il.Add(wx.Bitmap("images/palico/head-rarity-24/9.png"))
 		charm = il.Add(wx.Bitmap("images/charms-24/7.png"))
 		deco = il.Add(wx.Bitmap("images/items-24/FeystoneGold.png"))
 		skill = il.Add(wx.Bitmap("images/skills-24/SkillBlue.png"))
@@ -77,7 +77,7 @@ class Application(wx.Frame):
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, wep)
 		self.mainNotebook.SetPageImage(2, arm)
-		# TODO palico goes here
+		self.mainNotebook.SetPageImage(3, pal)
 		self.mainNotebook.SetPageImage(4, charm)
 		self.mainNotebook.SetPageImage(5, deco)
 		self.mainNotebook.SetPageImage(6, skill)
@@ -189,6 +189,14 @@ class Application(wx.Frame):
 				self.locations.currentLocationName = self.link.info.category
 				self.locations.loadLocationDetail()
 				self.selectTab("Locations")
+
+			elif self.link.eventType == "palico":
+				self.palico.currentEquipmentID = self.link.info.id
+				if self.palico.currentEquipmentTree != self.link.info.category:
+					self.palico.currentEquipmentTree = self.link.info.category
+					self.palico.loadEquipmentTree()
+				self.palico.loadEquipmentDetailTab()
+				self.selectTab("Palico")
 
 			else:
 				debug(self.link, "self.link", "Link type not supported!")

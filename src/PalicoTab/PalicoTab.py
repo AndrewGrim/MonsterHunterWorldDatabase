@@ -317,14 +317,14 @@ class PalicoTab:
 
 	def loadEquipmentDetailTab(self):
 		self.root.Freeze()
-		self.loadArmorDetail()
+		self.loadEquipmentDetail()
 		width, height = self.equipmentPanel.GetSize()
 		self.equipmentPanel.SetSize(width + 1, height + 1)
 		self.equipmentPanel.SetSize(width, height)
 		self.root.Thaw()
 
 
-	def loadArmorDetail(self):
+	def loadEquipmentDetail(self):
 		self.equipmentDetailList.DeleteRows(0, self.equipmentDetailList.GetNumberRows())
 		self.equipmentDetailList.AppendRows(len(self.weaponDetail) + 1)
 
