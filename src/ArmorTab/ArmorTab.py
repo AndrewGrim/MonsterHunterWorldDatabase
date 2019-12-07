@@ -34,14 +34,18 @@ class ArmorTab:
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.rarityColors = {
-			1: "C2BFBF",
-			2: "F3F3F3",
-			3: "A9B978",
-			4: "6AAC85",
-			5: "55D1F0",
-			6: "5e8efc",
-			7: "9D93E7",
-			8: "B58377",
+			1: "#C2BFBF",
+			2: "#F3F3F3",
+			3: "#aac44b",
+			4: "#57ac4c",
+			5: "#75b8c2",
+			6: "#6764d7",
+			7: "#895edc",
+			8: "#c47c5e",
+			9: "#cb7793",
+			10: "#4fd1f5",
+			11: "#f5d569",
+			12: "#d5edfa",
 		}
 
 		self.armorDetail = {
