@@ -12,8 +12,8 @@ class PalicoWeapon:
 		self.element = dbRow[8]
 		self.elementAttack = dbRow[9]
 		self.elderseal = dbRow[10]
-		self.defense = dbRow[11]
-		self.affinity = dbRow[12]
+		self.affinity = dbRow[11]
+		self.defense = dbRow[12]
 		self.price = dbRow[13]
 		self.description = dbRow[14]
 
