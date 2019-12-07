@@ -105,6 +105,13 @@ class PalicoTab:
 		self.loadEquipmentTree()
 		self.initEquipmentDetailTab()
 		self.loadEquipmentDetailTab()
+
+		il = wx.ImageList(24, 24)
+		eq = il.Add(wx.Bitmap("images/palico/armorset-rarity-24/0.png"))
+		gadget = il.Add(wx.Bitmap("images/palico/gadgets/24/0.png"))
+		self.palicoNotebook.AssignImageList(il)
+		self.palicoNotebook.SetPageImage(0, eq)
+		self.palicoNotebook.SetPageImage(1, gadget)
 		
 		self.equipmentDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
@@ -123,18 +130,18 @@ class PalicoTab:
 		self.palicoEquipmentImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=equipmentImage, size=(230, 230))
 		self.palicoEquipmentImageLabel.SetBackgroundColour((0, 0, 0))
 
-		self.armorDetailsNotebook = wx.Notebook(self.equipmentPanel)
-		self.equipmentDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
+		self.equipmentDetailesNotebook = wx.Notebook(self.equipmentPanel)
+		self.equipmentDetailPanel = wx.ScrolledWindow(self.equipmentDetailesNotebook)
 		
 		self.equipmentDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.armorDetailsNotebook.AddPage(self.equipmentDetailPanel, "Detail")
+		self.equipmentDetailesNotebook.AddPage(self.equipmentDetailPanel, "Detail")
 		self.equipmentDetailPanel.SetSizer(self.equipmentDetailSizer)
 		
 		self.equipmentDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.equipmentDetailedImagesSizer.Add(self.palicoEquipmentImageLabel, 1, wx.ALIGN_CENTER)
 
 		self.equipmentDetailedSizer.Add(self.equipmentDetailedImagesSizer, 1, wx.EXPAND)
-		self.equipmentDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
+		self.equipmentDetailedSizer.Add(self.equipmentDetailesNotebook, 3, wx.EXPAND)
 
 		self.equipmentSizer.Add(self.equipmentTreeSizer, 0, wx.EXPAND)
 		self.equipmentSizer.Add(self.equipmentDetailedSizer, 1, wx.EXPAND)
@@ -143,11 +150,44 @@ class PalicoTab:
 
 	
 	def initGadgetPanel(self):
-		# TODO gagdet panel for palicos
 		self.gadgetPanel = wx.Panel(self.palicoNotebook)
 		self.gadgetSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.gadgetDetailSizer = wx.BoxSizer(wx.VERTICAL)
+
+		self.list = wx.ListCtrl(self.gadgetPanel)
+		self.gadgetSizer.Add(self.list, 1, wx.EXPAND)
+
+		self.gadgetSizer.Add(self.gadgetDetailSizer, 1, wx.EXPAND)
+		gadget = wx.Bitmap("images/palico/gadgets/230/Vigorwasp Spray.jpg", wx.BITMAP_TYPE_ANY)
+		self.palicoGadgetImageLabel = wx.StaticBitmap(self.gadgetPanel, bitmap=gadget, size=(230, 230))
+		self.palicoGadgetImageLabel.SetBackgroundColour((0, 0, 0))
+		self.gadgetDetailSizer.Add(self.palicoGadgetImageLabel, 1, wx.EXPAND)
+
+		self.gadgetDetailesNotebook = wx.Notebook(self.gadgetPanel)
+		self.gadgetDetailPanel = wx.Panel(self.gadgetDetailesNotebook)
+		self.gadgetDetailesNotebook.AddPage(self.gadgetDetailPanel, "Detail")
+		self.gadgetDetailSizer.Add(self.gadgetDetailesNotebook, 2, wx.EXPAND)
+
+		self.gadgetDetailNotebookSizer = wx.BoxSizer(wx.VERTICAL)
+		self.name = wx.StaticText(self.gadgetDetailPanel, label="test")
+		self.name.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+		self.gadgetDetailNotebookSizer.Add(self.name, 0.5, wx.EXPAND)
+		self.label = wx.StaticText(self.gadgetDetailPanel, label="test")
+		self.label.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+		self.gadgetDetailNotebookSizer.Add(self.label, 2, wx.EXPAND)
+
+		self.gadgetDetailPanel.SetSizer(self.gadgetDetailNotebookSizer)
 		self.gadgetPanel.SetSizer(self.gadgetSizer)
 		self.palicoNotebook.AddPage(self.gadgetPanel, "Gadgets")
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute("SELECT * FROM palico_gadget")
+		data = data.fetchall()
+		for row in data:
+			print(row)
+		self.name.SetLabel(data[0][1] + ":" + "\n")
+		self.label.SetLabel(data[0][2])
+		self.label.Wrap(600)
 
 
 	def initEquipmentButtons(self):
