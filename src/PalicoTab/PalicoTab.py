@@ -35,18 +35,21 @@ class PalicoTab:
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.rarityColors = {
-			1: "C2BFBF",
-			2: "F3F3F3",
-			3: "A9B978",
-			4: "6AAC85",
-			5: "55D1F0",
-			6: "5e8efc",
-			7: "9D93E7",
-			8: "B58377",
+			1: "#C2BFBF",
+			2: "#F3F3F3",
+			3: "#aac44b",
+			4: "#57ac4c",
+			5: "#75b8c2",
+			6: "#6764d7",
+			7: "#895edc",
+			8: "#c47c5e",
+			9: "#cb7793",
+			10: "#4fd1f5",
+			11: "#f5d569",
+			12: "#d5edfa",
 		}
 
 		self.weaponDetail = {
-			# TODO maybe add description in later as well? possibly have the name and description like in other tabs as opposed to part of the grid
 			1: ["images/unknown.png", "Rarity"],
 			2: ["images/weapon-detail-24/attack.png", "Melee Attack"],
 			3: ["images/weapon-detail-24/attack.png", "Ranged Attack"],
@@ -59,7 +62,6 @@ class PalicoTab:
 		}
 
 		self.armorDetail = {
-			# TODO maybe add description in later as well? possibly have the name and description like in other tabs as opposed to part of the grid
 			1: ["images/unknown.png", "Rarity"],
 			2: ["images/weapon-detail-24/defense.png", "Defense"],
 			3: ["images/damage-types-24/fire.png", "Fire"],
@@ -99,45 +101,45 @@ class PalicoTab:
 
 		self.initEquipmentButtons()
 		self.initSearch()
-		self.initArmorTree()
-		self.loadArmorTree()
-		self.initArmorDetailTab()
-		self.loadArmorDetailAll()
+		self.initEquipmentTree()
+		self.loadEquipmentTree()
+		self.initEquipmentDetailTab()
+		self.loadEquipmentDetailTab()
 		
-		self.armorDetailList.Bind(wx.EVT_SIZE, self.onSize)
+		self.equipmentDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
-		self.armorDetailPanel.SetScrollRate(20, 20)
+		self.equipmentDetailPanel.SetScrollRate(20, 20)
 
 	
 	def initEquipmentPanel(self):
 		self.equipmentPanel = wx.Panel(self.palicoNotebook)
 		self.palicoNotebook.AddPage(self.equipmentPanel, "Equipment")
-		self.armorSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.equipmentSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-		self.armorTreeSizer = wx.BoxSizer(wx.VERTICAL) 
+		self.equipmentTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
-		self.armorDetailedSizer = wx.BoxSizer(wx.VERTICAL)
+		self.equipmentDetailedSizer = wx.BoxSizer(wx.VERTICAL)
 		equipmentImage = wx.Bitmap("images/palico/Felyne Acorn Spade α.jpg", wx.BITMAP_TYPE_ANY)
 		self.palicoEquipmentImageLabel = wx.StaticBitmap(self.equipmentPanel, bitmap=equipmentImage, size=(230, 230))
 		self.palicoEquipmentImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.armorDetailsNotebook = wx.Notebook(self.equipmentPanel)
-		self.armorDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
+		self.equipmentDetailPanel = wx.ScrolledWindow(self.armorDetailsNotebook)
 		
-		self.armorDetailSizer = wx.BoxSizer(wx.VERTICAL)
-		self.armorDetailsNotebook.AddPage(self.armorDetailPanel, "Detail")
-		self.armorDetailPanel.SetSizer(self.armorDetailSizer)
+		self.equipmentDetailSizer = wx.BoxSizer(wx.VERTICAL)
+		self.armorDetailsNotebook.AddPage(self.equipmentDetailPanel, "Detail")
+		self.equipmentDetailPanel.SetSizer(self.equipmentDetailSizer)
 		
-		self.armorDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
-		self.armorDetailedImagesSizer.Add(self.palicoEquipmentImageLabel, 1, wx.ALIGN_CENTER)
+		self.equipmentDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.equipmentDetailedImagesSizer.Add(self.palicoEquipmentImageLabel, 1, wx.ALIGN_CENTER)
 
-		self.armorDetailedSizer.Add(self.armorDetailedImagesSizer, 1, wx.EXPAND)
-		self.armorDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
+		self.equipmentDetailedSizer.Add(self.equipmentDetailedImagesSizer, 1, wx.EXPAND)
+		self.equipmentDetailedSizer.Add(self.armorDetailsNotebook, 3, wx.EXPAND)
 
-		self.armorSizer.Add(self.armorTreeSizer, 0, wx.EXPAND)
-		self.armorSizer.Add(self.armorDetailedSizer, 1, wx.EXPAND)
+		self.equipmentSizer.Add(self.equipmentTreeSizer, 0, wx.EXPAND)
+		self.equipmentSizer.Add(self.equipmentDetailedSizer, 1, wx.EXPAND)
 
-		self.equipmentPanel.SetSizer(self.armorSizer)
+		self.equipmentPanel.SetSizer(self.equipmentSizer)
 
 	
 	def initGadgetPanel(self):
@@ -166,7 +168,7 @@ class PalicoTab:
 		self.equipmentButtonsSizer.Add(self.highRankButton)
 		#self.equipmentButtonsSizer.Add(self.masterRankButton)
 
-		self.armorTreeSizer.Add(self.equipmentButtonsSizer)
+		self.equipmentTreeSizer.Add(self.equipmentButtonsSizer)
 
 	
 	def initSearch(self):
@@ -178,15 +180,15 @@ class PalicoTab:
 
 
 	def onSearchTextEnter(self, event):
-		self.loadArmorTree()
+		self.loadEquipmentTree()
 
 
-	def initArmorTree(self):
+	def initEquipmentTree(self):
 		self.armorTree = cgr.HeaderBitmapGrid(self.equipmentPanel)
 		self.armorTree.EnableEditing(False)
 		self.armorTree.EnableDragRowSize(False)
-		self.armorTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onArmorSelection)
-		self.armorTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
+		self.armorTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onEquipmentSelection)
+		self.equipmentTreeSizer.Add(self.armorTree, 1, wx.EXPAND)
 
 		armorTreeColumns = {
 			"Name": [685, wx.Bitmap("images/noImage24.png")],
@@ -207,7 +209,7 @@ class PalicoTab:
 			self.armorTree.SetColSize(col, v[0])
 
 
-	def loadArmorTree(self):
+	def loadEquipmentTree(self):
 		try:
 			self.armorTree.DeleteRows(0, self.armorTree.GetNumberRows())
 		except:
@@ -256,7 +258,7 @@ class PalicoTab:
 
 	def populateArmorTree(self, equipmentList: List[dbObject]) -> None:
 		"""
-		equipmentList = The list of all the queried Armor objects, which contain the data pertaining to the individual armor pieces.
+		equipmentList = The list of all the queried Equipment objects, which contain the data pertaining to the individual equipment pieces.
 		"""
 
 		equipmentSet = "" 
@@ -288,32 +290,32 @@ class PalicoTab:
 			row += 1
 
 
-	def initArmorDetailTab(self):
-		self.armorDetailList = cgr.HeaderBitmapGrid(self.armorDetailPanel)
-		self.armorDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
-		self.armorDetailList.EnableEditing(False)
-		self.armorDetailList.EnableDragRowSize(False)
-		self.armorDetailSizer.Add(self.armorDetailList, 1, wx.EXPAND)
+	def initEquipmentDetailTab(self):
+		self.equipmentDetailList = cgr.HeaderBitmapGrid(self.equipmentDetailPanel)
+		self.equipmentDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
+		self.equipmentDetailList.EnableEditing(False)
+		self.equipmentDetailList.EnableDragRowSize(False)
+		self.equipmentDetailSizer.Add(self.equipmentDetailList, 1, wx.EXPAND)
 
-		self.armorDetailList.CreateGrid(len(self.weaponDetail) + 1, 2)
-		self.armorDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
-		self.armorDetailList.SetColSize(0, 302)
-		self.armorDetailList.SetColSize(1, 155 - 20)
-		self.armorDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.armorDetailList.SetColLabelSize(2)
-		self.armorDetailList.SetRowLabelSize(1)
+		self.equipmentDetailList.CreateGrid(len(self.weaponDetail) + 1, 2)
+		self.equipmentDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.equipmentDetailList.SetColSize(0, 302)
+		self.equipmentDetailList.SetColSize(1, 155 - 20)
+		self.equipmentDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.equipmentDetailList.SetColLabelSize(2)
+		self.equipmentDetailList.SetRowLabelSize(1)
 
-		self.equipmentMaterialsList = wx.ListCtrl(self.armorDetailPanel, style=wx.LC_REPORT
+		self.equipmentMaterialsList = wx.ListCtrl(self.equipmentDetailPanel, style=wx.LC_REPORT
 																	| wx.LC_VRULES
 																	| wx.LC_HRULES
 																	)
 		self.equipmentMaterialsList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onMaterialDoubleClick)
 		self.il = wx.ImageList(24, 24)
 		self.equipmentMaterialsList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.armorDetailSizer.Add(self.equipmentMaterialsList, 1, wx.EXPAND)
+		self.equipmentDetailSizer.Add(self.equipmentMaterialsList, 1, wx.EXPAND)
 
 
-	def loadArmorDetailAll(self):
+	def loadEquipmentDetailTab(self):
 		self.root.Freeze()
 		self.loadArmorDetail()
 		width, height = self.equipmentPanel.GetSize()
@@ -323,8 +325,8 @@ class PalicoTab:
 
 
 	def loadArmorDetail(self):
-		self.armorDetailList.DeleteRows(0, self.armorDetailList.GetNumberRows())
-		self.armorDetailList.AppendRows(len(self.weaponDetail) + 1)
+		self.equipmentDetailList.DeleteRows(0, self.equipmentDetailList.GetNumberRows())
+		self.equipmentDetailList.AppendRows(len(self.weaponDetail) + 1)
 
 		self.il.RemoveAll()
 
@@ -362,19 +364,19 @@ class PalicoTab:
 			if weapon.element != "None":
 				element = wx.Bitmap(f"images/damage-types-24/{weapon.element.lower()}.png")
 
-			self.armorDetailList.SetCellValue(0, 0, "Name")
-			self.armorDetailList.SetCellValue(0, 1, weapon.name)
+			self.equipmentDetailList.SetCellValue(0, 0, "Name")
+			self.equipmentDetailList.SetCellValue(0, 1, weapon.name)
 			for num in range(1, len(weaponDetail)):
 				if num == 1:
-					self.armorDetailList.SetCellRenderer(num, 0,
+					self.equipmentDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
 																	rarityIcon,
 																	self.weaponDetail[num][1],
 																	imageOffset=imageOffset,
 																))
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[weapon.rarity]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[weapon.rarity]))
 				else:
-					self.armorDetailList.SetCellRenderer(num, 0,
+					self.equipmentDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
 											wx.Bitmap(self.weaponDetail[num][0]), 
 											self.weaponDetail[num][1], 
@@ -382,11 +384,11 @@ class PalicoTab:
 											))
 
 				if weaponDetail[num] == "None":
-					self.armorDetailList.SetCellValue(num, 1, "-")
+					self.equipmentDetailList.SetCellValue(num, 1, "-")
 				else:
 					if num == 5:
 						if weapon.element != "None":
-							self.armorDetailList.SetCellRenderer(num, 1,
+							self.equipmentDetailList.SetCellRenderer(num, 1,
 											cgr.ImageTextCellRenderer(
 																		element,
 																		weaponDetail[num],
@@ -394,34 +396,28 @@ class PalicoTab:
 																		colour=util.hexToRGB(self.elementColors[weapon.element]),
 																	))
 						else:
-							self.armorDetailList.SetCellValue(num, 1, "-")
+							self.equipmentDetailList.SetCellValue(num, 1, "-")
 					elif num == 6:
 						if weapon.elderseal != None:
-							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#D1C4E9"))
-							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+							self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#D1C4E9"))
+							self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num])
 					elif num == 7:
 						if weapon.affinity.find("+") != -1:
-							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#C8E6C9"))
-							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+							self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#C8E6C9"))
+							self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num])
 						elif weapon.affinity.find("-") != -1:
-							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#FFCDD2"))
-							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+							self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#FFCDD2"))
+							self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num])
 						else:
-							self.armorDetailList.SetCellValue(num, 1, "-")
+							self.equipmentDetailList.SetCellValue(num, 1, "-")
 					elif num == 8:
 						if weapon.defense != None:
-							self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#D7CCC8"))
-							self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
+							self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB("#D7CCC8"))
+							self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num])
 						else:
-							self.armorDetailList.SetCellValue(num, 1, "-")
+							self.equipmentDetailList.SetCellValue(num, 1, "-")
 					else:
-						self.armorDetailList.SetCellValue(num, 1, weaponDetail[num])
-					# elif key == "Elderseal" and elderseal != "-":
-					# 	self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#D1C4E9"))
-					# 	self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D1C4E9"))
-					# elif key == "Defense" and defense != "-":
-					# 	self.weaponDetailList.SetCellBackgroundColour(row, 0, util.hexToRGB("#D7CCC8"))
-					# 	self.weaponDetailList.SetCellBackgroundColour(row, 1, util.hexToRGB("#D7CCC8"))
+						self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num])
 		else:
 			sql = "SELECT * FROM palico_armor WHERE id = :id"
 
@@ -459,30 +455,30 @@ class PalicoTab:
 			else:
 				rarityIcon = wx.Bitmap(f"images/palico/head-rarity-24/{armor.rarity}.png")
 
-			self.armorDetailList.SetCellValue(0, 0, "Name")
-			self.armorDetailList.SetCellValue(0, 1, armor.name)
+			self.equipmentDetailList.SetCellValue(0, 0, "Name")
+			self.equipmentDetailList.SetCellValue(0, 1, armor.name)
 			for num in range(1, len(armorDetail)):
 				if num == 3:
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["fire"][colorLevel]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["fire"][colorLevel]))
 				elif num == 4:
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["water"][colorLevel]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["water"][colorLevel]))
 				elif num == 5:
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["thunder"][colorLevel]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["thunder"][colorLevel]))
 				elif num == 6:
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["ice"][colorLevel]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["ice"][colorLevel]))
 				elif num == 7:
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["dragon"][colorLevel]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors["dragon"][colorLevel]))
 
 				if num == 1:
-					self.armorDetailList.SetCellRenderer(num, 0,
+					self.equipmentDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
 																	rarityIcon,
 																	self.armorDetail[num][1],
 																	imageOffset=imageOffset,
 																))
-					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[armor.rarity]))
+					self.equipmentDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[armor.rarity]))
 				else:
-					self.armorDetailList.SetCellRenderer(num, 0,
+					self.equipmentDetailList.SetCellRenderer(num, 0,
 										cgr.ImageTextCellRenderer(
 											wx.Bitmap(self.armorDetail[num][0]), 
 											self.armorDetail[num][1], 
@@ -490,9 +486,9 @@ class PalicoTab:
 											))
 
 				if armorDetail[num] in ["None", "None 0"]:
-					self.armorDetailList.SetCellValue(num, 1, "-")
+					self.equipmentDetailList.SetCellValue(num, 1, "-")
 				else:
-					self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
+					self.equipmentDetailList.SetCellValue(num, 1, armorDetail[num])
 		
 		self.loadEquipmentMaterials()
 
@@ -529,7 +525,7 @@ class PalicoTab:
 			info.Align = wx.LIST_FORMAT_LEFT
 			info.Text = "Req. Materials"
 			self.equipmentMaterialsList.InsertColumn(0, info)
-			self.equipmentMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
+			self.equipmentMaterialsList.SetColumnWidth(0, self.equipmentDetailPanel.GetSize()[0] * 0.66)
 
 			info = wx.ListItem()
 			info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -537,7 +533,7 @@ class PalicoTab:
 			info.Align = wx.LIST_FORMAT_CENTER
 			info.Text = ""
 			self.equipmentMaterialsList.InsertColumn(1, info)
-			self.equipmentMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.equipmentMaterialsList.SetColumnWidth(1, self.equipmentDetailPanel.GetSize()[0] * 0.34 - 40)
 
 			self.equipmentMaterialsList.InsertColumn(2, info)
 			self.equipmentMaterialsList.SetColumnWidth(2, 0)
@@ -554,16 +550,16 @@ class PalicoTab:
 
 	def onEquipmentRankSelection(self, event):
 		"""
-		When an armor rank button at the top of the screen is pressed the armor tree is reloaded with the new armor rank information.
+		When an equipment rank button at the top of the screen is pressed the equipment tree is reloaded with the new equipment rank information.
 		"""
 
 		self.currentEquipmentTree = event.GetEventObject().GetName()
-		self.loadArmorTree()
+		self.loadEquipmentTree()
 
 
-	def onArmorSelection(self, event):
+	def onEquipmentSelection(self, event):
 		"""
-		When a specific armor piece is selected in the tree, the detail view gets populated with the information from the database.
+		When a specific equipment piece is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 
 		if self.armorTree.GetCellValue(event.GetRow(), 1) != "":
@@ -574,7 +570,7 @@ class PalicoTab:
 			else:
 				self.currentEquipmentCategory = "armor"
 
-			self.loadArmorDetailAll()
+			self.loadEquipmentDetailTab()
 
 
 	def onMaterialDoubleClick(self, event):
@@ -593,10 +589,10 @@ class PalicoTab:
 		"""
 
 		try:
-			self.armorDetailList.SetColSize(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-			self.armorDetailList.SetColSize(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 20)
-			self.equipmentMaterialsList.SetColumnWidth(0, self.armorDetailPanel.GetSize()[0] * 0.66)
-			self.equipmentMaterialsList.SetColumnWidth(1, self.armorDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.equipmentDetailList.SetColSize(0, self.equipmentDetailPanel.GetSize()[0] * 0.66)
+			self.equipmentDetailList.SetColSize(1, self.equipmentDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.equipmentMaterialsList.SetColumnWidth(0, self.equipmentDetailPanel.GetSize()[0] * 0.66)
+			self.equipmentMaterialsList.SetColumnWidth(1, self.equipmentDetailPanel.GetSize()[0] * 0.34 - 40)
 		except:
 			pass
 
@@ -607,12 +603,12 @@ class PalicoTab:
 		"""
 
 		if event.GetWheelRotation() > 0:
-			if self.armorDetailPanel.GetViewStart()[1] < 3:
-				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 1 * -1)
+			if self.equipmentDetailPanel.GetViewStart()[1] < 3:
+				self.equipmentDetailPanel.Scroll(0, self.equipmentDetailPanel.GetViewStart()[1] + 1 * -1)
 			else:
-				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 3 * -1)
+				self.equipmentDetailPanel.Scroll(0, self.equipmentDetailPanel.GetViewStart()[1] + 3 * -1)
 		else:
-			if self.armorDetailPanel.GetViewStart()[1] < 3:
-				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 1)
+			if self.equipmentDetailPanel.GetViewStart()[1] < 3:
+				self.equipmentDetailPanel.Scroll(0, self.equipmentDetailPanel.GetViewStart()[1] + 1)
 			else:
-				self.armorDetailPanel.Scroll(0, self.armorDetailPanel.GetViewStart()[1] + 3)
+				self.equipmentDetailPanel.Scroll(0, self.equipmentDetailPanel.GetViewStart()[1] + 3)
