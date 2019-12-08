@@ -198,6 +198,13 @@ class Application(wx.Frame):
 					self.palico.loadEquipmentTree()
 				self.palico.loadEquipmentDetailTab()
 				self.selectTab("Palico")
+				self.palico.palicoNotebook.SetSelection(0)
+
+			elif self.link.eventType == "gadget":
+				self.palico.currentGadgetID = self.link.info.id
+				self.palico.loadGadgetDetail()
+				self.selectTab("Palico")
+				self.palico.palicoNotebook.SetSelection(1)
 
 			else:
 				debug(self.link, "self.link", "Link type not supported!")

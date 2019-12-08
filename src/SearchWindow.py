@@ -339,6 +339,16 @@ class SearchWindow:
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"palico,{row[0]},{row[2]},armor")
 
+		data = self.conn.execute(f"SELECT * FROM palico_gadget WHERE name LIKE '%{self.searchText}%'")
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/palico/gadgets/24/{row[1]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"gadget,{row[0]}")
+
 
 	def loadCharms(self):
 		sql = f"""
