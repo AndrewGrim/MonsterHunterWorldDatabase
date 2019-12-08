@@ -107,6 +107,12 @@ class ArmorTab:
 		self.armorSetSizer = wx.BoxSizer(wx.VERTICAL)
 		# TODO prob add armorset icon 0.png to the tab
 		self.armorDetailsNotebook.AddPage(self.armorSetPanel, "Armor Set Detail")
+		il = wx.ImageList(24, 24)
+		head = il.Add(wx.Bitmap("images/armor/head/rarity-24/0.png"))
+		armorset = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/0.png"))
+		self.armorDetailsNotebook.AssignImageList(il)
+		self.armorDetailsNotebook.SetPageImage(0, head)
+		self.armorDetailsNotebook.SetPageImage(1, armorset)
 		self.armorSetPanel.SetSizer(self.armorSetSizer)
 		
 		self.armorDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
