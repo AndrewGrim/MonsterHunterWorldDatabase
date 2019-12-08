@@ -19,6 +19,7 @@ import Utilities as util
 import Links as link
 import Preferences as p
 from Debug.debug import debug
+import Debug.DebugWindow
 import AboutWindow as about
 import SearchWindow as search
 import LoadingWindow as load
@@ -271,7 +272,7 @@ class Application(wx.Frame):
 
 
 	def debugWindow(self, event):
-		self.debug = debug.DebugWindow(self)
+		self.debug = Debug.DebugWindow(self)
 
 
 	def preferencesWindow(self, event):
