@@ -73,7 +73,7 @@ class Application(wx.Frame):
 		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		self.locations = l.LocationsTab(root, self.mainNotebook, self.link)
-		#self.kinsects = k.KinsectsTab(root, self.mainNotebook) # TODO need images
+		self.kinsects = k.KinsectsTab(root, self.mainNotebook) # TODO need images
 
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, wep)

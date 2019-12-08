@@ -14,10 +14,10 @@ from typing import Tuple
 from typing import Dict
 from typing import NewType
 import Utilities as util
-import Kinsect as k
+import KinsectsTab as k
 
 wxTreeListItem = NewType('wxTreeListItem', None)
-Kinsect = NewType('Kinsect', None)
+kKinsect = NewType('Kinsect', None)
 
 class KinsectsTab:
 
@@ -39,8 +39,9 @@ class KinsectsTab:
 		self.kinsectTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.kinsectDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		self.kinsectImage = wx.Bitmap("images/weapons/great-sword/Buster Sword I.jpg", wx.BITMAP_TYPE_ANY)
-		self.kinsectImageLabel = wx.StaticBitmap(self.kinsectPanel, bitmap=self.kinsectImage, size=(160, 160))
+		kinsectImage = wx.Bitmap("images/kinsects/Culldrone I.jpg", wx.BITMAP_TYPE_ANY)
+		self.kinsectImageLabel = wx.StaticBitmap(self.kinsectPanel, bitmap=kinsectImage, size=(230, 230))
+		self.kinsectImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.kinsectDetailsNotebook = wx.Notebook(self.kinsectPanel)
 		self.kinsectDetailPanel = wx.Panel(self.kinsectDetailsNotebook)
@@ -48,8 +49,11 @@ class KinsectsTab:
 		self.kinsectDetailSizer = wx.BoxSizer(wx.VERTICAL)
 		self.kinsectDetailsNotebook.AddPage(self.kinsectDetailPanel, "Detail")
 		self.kinsectDetailPanel.SetSizer(self.kinsectDetailSizer)
+
+		self.kinsectDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
+		self.kinsectDetailedImagesSizer.Add(self.kinsectImageLabel, 1, wx.ALIGN_CENTER)
 		
-		self.kinsectDetailedSizer.Add(self.kinsectImageLabel, 1, wx.ALIGN_CENTER)
+		self.kinsectDetailedSizer.Add(self.kinsectImageLabel, 1, wx.EXPAND)
 		self.kinsectDetailedSizer.Add(self.kinsectDetailsNotebook, 3, wx.EXPAND)
 
 		self.kinsectSizer.Add(self.kinsectTreeSizer, 1, wx.EXPAND)
@@ -128,7 +132,7 @@ class KinsectsTab:
 
 		kinsects = []
 		for row in data:
-			kinsects.append((k.Kinsect(row)))
+			kinsects.append(k.Kinsect(row))
 
 		kinsectNodes = {}
 		for kin in kinsects:
@@ -141,7 +145,7 @@ class KinsectsTab:
 		self.kinsectTree.ExpandAll()
 
 
-	def populateKinsectTree(self, kinsectNode: wxTreeListItem, kin: Kinsect, kinsectNodes: Dict[int, wxTreeListItem]) -> None:
+	def populateKinsectTree(self, kinsectNode: wxTreeListItem, kin: kKinsect, kinsectNodes: Dict[int, wxTreeListItem]) -> None:
 		kinsect = self.kinsectTree.AppendItem(kinsectNode,  kin.name)
 		self.kinsectTree.SetItemImage(kinsect, self.test, which=wx.TreeItemIcon_Normal)
 		self.kinsectTree.SetItemText(kinsect, kin.attackType, 1)
@@ -200,6 +204,7 @@ class KinsectsTab:
 
 		kin = k.Kinsect(data)
 
+		self.kinsectImageLabel.SetBitmap(wx.Bitmap(f"images/kinsects/{kin.name}.jpg"))
 		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Rarity", self.test)
 		self.kinsectDetailList.SetItem(index, 1, f"{kin.rarity}")
 		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Attack Type", self.test)
