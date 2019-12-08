@@ -13,6 +13,7 @@ from typing import Union
 from typing import Tuple
 from typing import Dict
 from typing import NewType
+
 import Utilities as util
 import KinsectsTab as k
 
@@ -27,6 +28,30 @@ class KinsectsTab:
 
 		self.currentlySelectedKinsectID = 1
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
+
+		self.kinsectDetail = {
+			1: ["images/unknown.png", "Rarity"],
+			2: ["images/weapon-detail-24/attacktype.png", "Attack Type"],
+			3: ["images/weapon-detail-24/dusteffect.png", "Dust Effect"],
+			4: ["images/weapon-detail-24/power.png", "Power"],
+			5: ["images/weapon-detail-24/speed.png", "Speed"],
+			6: ["images/weapon-detail-24/heal.png", "Heal"],
+		}
+
+		self.rarityColors = {
+			1: "#C2BFBF",
+			2: "#F3F3F3",
+			3: "#aac44b",
+			4: "#57ac4c",
+			5: "#75b8c2",
+			6: "#6764d7",
+			7: "#895edc",
+			8: "#c47c5e",
+			9: "#cb7793",
+			10: "#4fd1f5",
+			11: "#f5d569",
+			12: "#d5edfa",
+		}
 
 		self.initKinsectTab()
 
@@ -159,12 +184,19 @@ class KinsectsTab:
 
 
 	def initKinsectDetailTab(self):
-		self.kinsectDetailList = wx.ListCtrl(self.kinsectDetailPanel, style=wx.LC_REPORT
-																		| wx.LC_VRULES
-																		| wx.LC_HRULES
-																		)
-		self.kinsectDetailList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.kinsectDetailList = cgr.HeaderBitmapGrid(self.kinsectDetailPanel)
+		self.kinsectDetailList.Bind(wx.EVT_SIZE, self.onSize)
+		self.kinsectDetailList.EnableEditing(False)
+		self.kinsectDetailList.EnableDragRowSize(False)
 		self.kinsectDetailSizer.Add(self.kinsectDetailList, 1, wx.EXPAND)
+
+		self.kinsectDetailList.CreateGrid(len(self.kinsectDetail) + 1, 2)
+		self.kinsectDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.kinsectDetailList.SetColSize(0, 302)
+		self.kinsectDetailList.SetColSize(1, 155 - 20)
+		self.kinsectDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.kinsectDetailList.SetColLabelSize(2)
+		self.kinsectDetailList.SetRowLabelSize(1)
 
 		self.kinsectMaterialList = wx.ListCtrl(self.kinsectDetailPanel, style=wx.LC_REPORT
 																		| wx.LC_VRULES
@@ -174,20 +206,15 @@ class KinsectsTab:
 		self.kinsectDetailSizer.Add(self.kinsectMaterialList, 1, wx.EXPAND)
 
 		self.loadKinsectDetails()	
-		self.loadKinsectMaterials()
 
 
 	def loadKinsectDetails(self):
-		info = wx.ListItem()
-		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
-		info.Image = -1
-		info.Align = wx.LIST_FORMAT_CENTER
-		info.Text = ""
-		self.kinsectDetailList.InsertColumn(0, info)
-		self.kinsectDetailList.SetColumnWidth(0, 480)
-		self.kinsectDetailList.InsertColumn(1, info)
-		self.kinsectDetailList.SetColumnWidth(1, 200)
+		self.root.Freeze()
+		self.kinsectDetailList.DeleteRows(0, self.kinsectDetailList.GetNumberRows())
+		self.kinsectDetailList.AppendRows(len(self.kinsectDetail) + 1)
 
+		self.kinsectMaterialList.ClearAll()
+		self.il.RemoveAll()
 
 		sql = """
 			SELECT k.*, kt.name
@@ -204,19 +231,44 @@ class KinsectsTab:
 
 		kin = k.Kinsect(data)
 
+		kinsectDetail = {
+			0: str(kin.name),
+			1: str(kin.rarity),
+			2: str(kin.attackType),
+			3: str(kin.dustEffect),
+			4: str(kin.power),
+			5: str(kin.speed),
+			6: str(kin.heal),
+		}
+
+		imageOffset = 55
 		self.kinsectImageLabel.SetBitmap(wx.Bitmap(f"images/kinsects/{kin.name}.jpg"))
-		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Rarity", self.test)
-		self.kinsectDetailList.SetItem(index, 1, f"{kin.rarity}")
-		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Attack Type", self.test)
-		self.kinsectDetailList.SetItem(index, 1, f"{kin.attackType}")
-		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Dust Effect", self.test)
-		self.kinsectDetailList.SetItem(index, 1, f"{kin.dustEffect}")
-		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Power", self.test)
-		self.kinsectDetailList.SetItem(index, 1, f"{kin.power}")
-		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Speed", self.test)
-		self.kinsectDetailList.SetItem(index, 1, f"{kin.speed}")
-		index = self.kinsectDetailList.InsertItem(self.kinsectDetailList.GetItemCount(), "Heal", self.test)
-		self.kinsectDetailList.SetItem(index, 1, f"{kin.heal}")
+		rarityIcon = wx.Bitmap(f"images/kinsects/{kin.attackType.lower()}-rarity-24/{kin.rarity}.png")
+		self.kinsectDetailList.SetCellValue(0, 0, "Name")
+		self.kinsectDetailList.SetCellValue(0, 1, kin.name)
+		for num in range(1, len(kinsectDetail)):
+			if num == 1:
+				self.kinsectDetailList.SetCellRenderer(num, 0,
+									cgr.ImageTextCellRenderer(
+																rarityIcon,
+																self.kinsectDetail[num][1],
+																imageOffset=imageOffset,
+															))
+				self.kinsectDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(self.rarityColors[kin.rarity]))
+			else:
+				self.kinsectDetailList.SetCellRenderer(num, 0,
+									cgr.ImageTextCellRenderer(
+										wx.Bitmap(self.kinsectDetail[num][0]), 
+										self.kinsectDetail[num][1], 
+										imageOffset=imageOffset
+										))
+
+			if kinsectDetail[num] == None:
+				self.kinsectDetailList.SetCellValue(num, 1, "-")
+			else:
+				self.kinsectDetailList.SetCellValue(num, 1, str(kinsectDetail[num]))
+
+		self.loadKinsectMaterials()
 
 
 	def loadKinsectMaterials(self):
@@ -263,8 +315,14 @@ class KinsectsTab:
 			materials.append(k.KinsectMaterial(row))
 
 		for mat in materials:
+			img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
 			index = self.kinsectMaterialList.InsertItem(self.kinsectMaterialList.GetItemCount(), mat.name, self.test)
 			self.kinsectMaterialList.SetItem(index, 1, f"{mat.quantity}")
+
+		width, height = self.kinsectPanel.GetSize()
+		self.kinsectPanel.SetSize(width + 1, height + 1)
+		self.kinsectPanel.SetSize(width, height)
+		self.root.Thaw()
 		
 
 	def onKinsectSelection(self, event):
@@ -273,10 +331,18 @@ class KinsectsTab:
 		"""
 		self.currentlySelectedKinsectID = self.kinsectTree.GetItemText(event.GetItem(), 6)
 
-		self.kinsectDetailList.ClearAll()
-		self.kinsectMaterialList.ClearAll()
 		self.loadKinsectDetails()
-		self.loadKinsectMaterials()
-		width, height = self.kinsectDetailPanel.GetSize()
-		self.kinsectDetailPanel.SetSize(width + 1, height + 1)
-		self.kinsectDetailPanel.SetSize(width, height)
+
+
+	def onSize(self, event):
+		"""
+		When the application window is resized some columns's width gets readjusted.
+		"""
+
+		try:
+			self.kinsectDetailList.SetColSize(0, self.kinsectDetailPanel.GetSize()[0] * 0.66)
+			self.kinsectDetailList.SetColSize(1, self.kinsectDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.kinsectMaterialList.SetColumnWidth(0, self.kinsectDetailPanel.GetSize()[0] * 0.66)
+			self.kinsectMaterialList.SetColumnWidth(1, self.kinsectDetailPanel.GetSize()[0] * 0.34 - 40)
+		except:
+			pass
