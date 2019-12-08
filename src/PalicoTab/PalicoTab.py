@@ -32,6 +32,7 @@ class PalicoTab:
 		self.currentEquipmentTree = "HR"
 		self.currentEquipmentID = 78
 		self.currentEquipmentCategory = "weapon"
+		self.currentGadgetID = 0
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.rarityColors = {
@@ -154,8 +155,34 @@ class PalicoTab:
 		self.gadgetSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.gadgetDetailSizer = wx.BoxSizer(wx.VERTICAL)
 
-		self.list = wx.ListCtrl(self.gadgetPanel)
-		self.gadgetSizer.Add(self.list, 1, wx.EXPAND)
+		self.gadgetList = wx.ListCtrl(self.gadgetPanel, style=wx.LC_REPORT
+														| wx.LC_VRULES
+														| wx.LC_HRULES
+														| wx.LC_NO_HEADER
+														)
+		self.gadgetList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onGadgetSelected)
+		self.ilGadgets = wx.ImageList(24, 24)
+		self.gadgetList.SetImageList(self.ilGadgets, wx.IMAGE_LIST_SMALL)
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = ""
+		self.gadgetList.InsertColumn(0, info)
+		self.gadgetList.SetColumnWidth(0, 690)
+
+		self.gadgetList.InsertColumn(1, info)
+		self.gadgetList.SetColumnWidth(1, 0)
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute("SELECT * FROM palico_gadget")
+		data = data.fetchall()
+
+		for row in data:
+			img = self.ilGadgets.Add(wx.Bitmap(f"images/palico/gadgets/24/{row[1]}.png"))
+			index = self.gadgetList.InsertItem(self.gadgetList.GetItemCount(), row[1], img)
+			self.gadgetList.SetItem(index, 1, str(row[0]))
+		self.gadgetSizer.Add(self.gadgetList, 1, wx.EXPAND)
 
 		self.gadgetSizer.Add(self.gadgetDetailSizer, 1, wx.EXPAND)
 		gadget = wx.Bitmap("images/palico/gadgets/230/Vigorwasp Spray.jpg", wx.BITMAP_TYPE_ANY)
@@ -169,25 +196,38 @@ class PalicoTab:
 		self.gadgetDetailSizer.Add(self.gadgetDetailesNotebook, 2, wx.EXPAND)
 
 		self.gadgetDetailNotebookSizer = wx.BoxSizer(wx.VERTICAL)
-		self.name = wx.StaticText(self.gadgetDetailPanel, label="test")
-		self.name.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.gadgetDetailNotebookSizer.Add(self.name, 0.5, wx.EXPAND)
-		self.label = wx.StaticText(self.gadgetDetailPanel, label="test")
-		self.label.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.gadgetDetailNotebookSizer.Add(self.label, 2, wx.EXPAND)
+		self.gadgetNameLabel = wx.StaticText(self.gadgetDetailPanel, label="test")
+		self.gadgetNameLabel.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False).Bold())
+		self.gadgetDetailNotebookSizer.Add(self.gadgetNameLabel, 0.5, wx.EXPAND)
+		self.gadgetDescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="test")
+		self.gadgetDescriptionLabel.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
+		self.gadgetDetailNotebookSizer.Add(self.gadgetDescriptionLabel, 2, wx.EXPAND)
 
 		self.gadgetDetailPanel.SetSizer(self.gadgetDetailNotebookSizer)
 		self.gadgetPanel.SetSizer(self.gadgetSizer)
 		self.palicoNotebook.AddPage(self.gadgetPanel, "Gadgets")
 
+		self.loadGadgetDetail()
+
+
+	def loadGadgetDetail(self):
 		conn = sqlite3.connect("mhw.db")
-		data = conn.execute("SELECT * FROM palico_gadget")
-		data = data.fetchall()
-		for row in data:
-			print(row)
-		self.name.SetLabel(data[0][1] + ":" + "\n")
-		self.label.SetLabel(data[0][2])
-		self.label.Wrap(600)
+		data = conn.execute("SELECT * FROM palico_gadget WHERE id = :gadgetID", (self.currentGadgetID,))
+		data = data.fetchone()
+		self.palicoGadgetImageLabel.SetBitmap(wx.Bitmap(f"images/palico/gadgets/230/{data[1]}.jpg"))
+		self.gadgetNameLabel.SetLabel(data[1] + ":" + "\n")
+		self.gadgetDescriptionLabel.SetLabel(data[2])
+		self.gadgetDescriptionLabel.Wrap(600)
+
+	
+	def onGadgetSelected(self, event):
+		self.currentGadgetID = str(self.gadgetList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
+		self.root.Freeze()
+		self.loadGadgetDetail()
+		width, height = self.gadgetPanel.GetSize()
+		self.gadgetPanel.SetSize(width + 1, height + 1)
+		self.gadgetPanel.SetSize(width, height)
+		self.root.Thaw()
 
 
 	def initEquipmentButtons(self):
