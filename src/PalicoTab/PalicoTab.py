@@ -211,6 +211,7 @@ class PalicoTab:
 
 
 	def loadGadgetDetail(self):
+		self.root.Freeze()
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute("SELECT * FROM palico_gadget WHERE id = :gadgetID", (self.currentGadgetID,))
 		data = data.fetchone()
@@ -218,16 +219,15 @@ class PalicoTab:
 		self.gadgetNameLabel.SetLabel(data[1] + ":" + "\n")
 		self.gadgetDescriptionLabel.SetLabel(data[2])
 		self.gadgetDescriptionLabel.Wrap(600)
-
-	
-	def onGadgetSelected(self, event):
-		self.currentGadgetID = str(self.gadgetList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
-		self.root.Freeze()
-		self.loadGadgetDetail()
 		width, height = self.gadgetPanel.GetSize()
 		self.gadgetPanel.SetSize(width + 1, height + 1)
 		self.gadgetPanel.SetSize(width, height)
 		self.root.Thaw()
+
+	
+	def onGadgetSelected(self, event):
+		self.currentGadgetID = str(self.gadgetList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
+		self.loadGadgetDetail()
 
 
 	def initEquipmentButtons(self):
