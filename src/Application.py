@@ -208,6 +208,11 @@ class Application(wx.Frame):
 				self.selectTab("Palico")
 				self.palico.palicoNotebook.SetSelection(1)
 
+			elif self.link.eventType == "kinsect":
+				self.kinsects.currentlySelectedKinsectID = self.link.info.id
+				self.kinsects.loadKinsectDetails()
+				self.selectTab("Kinsects")
+
 			else:
 				debug(self.link, "self.link", "Link type not supported!")
 

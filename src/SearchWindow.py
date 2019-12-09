@@ -95,6 +95,7 @@ class SearchWindow:
 		self.loadWeapons()
 		self.loadArmor()
 		self.loadPalico()
+		self.loadKinsects()
 		self.loadCharms()
 		self.loadDecorations()
 		self.loadSkills()
@@ -348,6 +349,27 @@ class SearchWindow:
 			img = wx.Bitmap(f"images/palico/gadgets/24/{row[1]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"gadget,{row[0]}")
+
+
+	def loadKinsects(self):
+		sql = f"""
+				SELECT k.id, kt.name, k.attack_type, k.rarity
+				FROM kinsect k
+					JOIN kinsect_text kt USING (id)
+				WHERE kt.lang_id = 'en'
+				AND kt.name LIKE '%{self.searchText}%'
+				ORDER BY k.id ASC
+			"""
+
+		data = self.conn.execute(sql)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/kinsects/{row[2]}-rarity-24/{row[3]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"kinsect,{row[0]}")
 
 
 	def loadCharms(self):
