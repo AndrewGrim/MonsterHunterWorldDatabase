@@ -25,6 +25,7 @@ class KinsectsTab:
 	def __init__(self, root, mainNotebook):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.init = True
 
 		self.currentlySelectedKinsectID = 1
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
@@ -81,106 +82,144 @@ class KinsectsTab:
 		self.kinsectDetailedSizer.Add(self.kinsectImageLabel, 1, wx.EXPAND)
 		self.kinsectDetailedSizer.Add(self.kinsectDetailsNotebook, 3, wx.EXPAND)
 
-		self.kinsectSizer.Add(self.kinsectTreeSizer, 1, wx.EXPAND)
+		self.kinsectSizer.Add(self.kinsectTreeSizer, 0, wx.EXPAND)
 		self.kinsectSizer.Add(self.kinsectDetailedSizer, 1, wx.EXPAND)
 
 		self.kinsectPanel.SetSizer(self.kinsectSizer)
-		
+
+		self.initSearch()
 		self.initKinsectTree()
 		self.initKinsectDetailTab()
 
+	
+	def initSearch(self):
+		self.search = wx.TextCtrl(self.kinsectPanel)
+		self.search.SetHint("  search by name")
+		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.kinsectTreeSizer.Add(697, 0, 0)
+		self.kinsectTreeSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+
+
+	def onSearchTextEnter(self, event):
+		self.loadKinsectTree()
+
 
 	def initKinsectTree(self):
-		self.kinsectTree = wx.lib.agw.hypertreelist.HyperTreeList(self.kinsectPanel, -1, style=0,
-												agwStyle=
-												gizmos.TR_DEFAULT_STYLE
-												| gizmos.TR_ROW_LINES
-												| gizmos.TR_COLUMN_LINES
-												| gizmos.TR_FULL_ROW_HIGHLIGHT
-												| gizmos.TR_HIDE_ROOT
-												| gizmos.TR_ELLIPSIZE_LONG_ITEMS
-												)
-		self.kinsectTree.Bind(wx.EVT_TREE_SEL_CHANGED, self.onKinsectSelection)
+		self.kinsectTree = cgr.HeaderBitmapGrid(self.kinsectPanel)
+		self.kinsectTree.EnableEditing(False)
+		self.kinsectTree.EnableDragRowSize(False)
+		self.kinsectTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onKinsectSelection)
 		self.kinsectTreeSizer.Add(self.kinsectTree, 1, wx.EXPAND)
 
-		isz = (24, 24)
-		self.il = wx.ImageList(isz[0], isz[1])
+		kinsectTreeColumns = {
+			"Name": [472, None],
+			"Attack Type": [45, wx.Bitmap("images/weapon-detail-24/attacktype.png")],
+			"Dust Effect": [57, wx.Bitmap("images/weapon-detail-24/dusteffect.png")],
+			"Power": [35, wx.Bitmap("images/weapon-detail-24/power.png")],
+			"Speed": [35, wx.Bitmap("images/weapon-detail-24/speed.png")],
+			"Heal": [35, wx.Bitmap("images/weapon-detail-24/heal.png")],
+			"id": [0,  None],
+		}
 
-		self.test = self.il.Add(self.testIcon)
+		self.kinsectTree.CreateGrid(1, len(kinsectTreeColumns))
+		self.kinsectTree.SetDefaultRowSize(27, resizeExistingRows=True)
+		self.kinsectTree.HideRowLabels()
+		self.kinsectTree.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
-		self.kinsectTree.SetImageList(self.il)
-
-		self.kinsectTree.AddColumn("Name") # 0
-		self.kinsectTree.AddColumn("") # attackType 1
-		self.kinsectTree.AddColumn("") # dustEffect 2
-		self.kinsectTree.AddColumn("") # power 3
-		self.kinsectTree.AddColumn("") # speed 4
-		self.kinsectTree.AddColumn("") # heal 5
-		self.kinsectTree.AddColumn("id") # id 6
-		
-		self.kinsectTree.SetMainColumn(0)
-		self.kinsectTree.SetColumnWidth(0, 400)
-
-		for num in range(1, 6):
-			self.kinsectTree.SetColumnAlignment(num, wx.ALIGN_CENTER)
-
-		self.kinsectTree.SetColumnWidth(1, 70)
-		self.kinsectTree.SetColumnWidth(2, 70)
-		self.kinsectTree.SetColumnWidth(3, 45)
-		self.kinsectTree.SetColumnWidth(4, 45)
-		self.kinsectTree.SetColumnWidth(5, 45)
-		self.kinsectTree.SetColumnWidth(6, 0)
-
-		self.kinsectTree.SetColumnImage(1, self.test)
-		self.kinsectTree.SetColumnImage(2, self.test)
-		self.kinsectTree.SetColumnImage(3, self.test)
-		self.kinsectTree.SetColumnImage(4, self.test)
-		self.kinsectTree.SetColumnImage(5, self.test)
+		for col, (k, v) in enumerate(kinsectTreeColumns.items()):
+			if v[1] == None:
+				self.kinsectTree.SetColLabelValue(col, k)
+			else:
+				self.kinsectTree.SetColLabelRenderer(col, cgr.HeaderBitmapColLabelRenderer(v[1], ""))
+			self.kinsectTree.SetColSize(col, v[0])
 
 		self.loadKinsectTree()
 
 
 	def loadKinsectTree(self):
-		root = self.kinsectTree.AddRoot("Kinsect")
+		self.init = True
+		try:
+			self.kinsectTree.DeleteRows(0, self.kinsectTree.GetNumberRows())
+		except:
+			pass
 
-		sql = """
-			SELECT k.*, kt.name
-			FROM kinsect k
-				JOIN kinsect_text kt USING (id)
-			WHERE kt.lang_id = :langId
-			ORDER BY k.id ASC
-		"""
+		searchText = self.search.GetValue().replace("'", "''")
+
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT k.*, kt.name
+				FROM kinsect k
+					JOIN kinsect_text kt USING (id)
+				WHERE kt.lang_id = :langId
+				ORDER BY k.id ASC
+			"""
+		else:
+			sql = f"""
+				SELECT k.*, kt.name
+				FROM kinsect k
+					JOIN kinsect_text kt USING (id)
+				WHERE kt.lang_id = :langId
+				AND kt.name LIKE '%{searchText}%'
+				ORDER BY k.id ASC
+			"""
 
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute(sql, ("en", ))
 		data = data.fetchall()
 
+		self.offset = {
+			0: 0,
+			1: 223,
+			2: 198,
+			3: 176,
+			4: 151,
+			5: 127,
+			6: 103,
+			7: 78,
+			8: 55,
+			9: 30,
+			10: 0,
+			11: -25,
+			12: -50,
+			13: -75,
+		}
+
+		kinsectNodes = {}
+
 		kinsects = []
 		for row in data:
 			kinsects.append(k.Kinsect(row))
 
-		kinsectNodes = {}
 		for kin in kinsects:
-			if kin.previousID is None:
-				self.populateKinsectTree(root, kin, kinsectNodes)
+			if len(searchText) != 0:
+				self.populateKinsectTree(1, kin, None)
 			else:
-				self.populateKinsectTree(kinsectNodes[kin.previousID], kin, kinsectNodes)
+				if kin.previousID == None:
+					self.populateKinsectTree(1, kin, kinsectNodes)
+				else:
+					self.populateKinsectTree(kinsectNodes[kin.previousID], kin, kinsectNodes)
+
+		self.init = False
 
 
-		self.kinsectTree.ExpandAll()
+	def populateKinsectTree(self, indent:int, kin: Tuple[str], kinsectNodes: Dict[int, int]) -> None:
+		self.kinsectTree.AppendRows() 
+		row = self.kinsectTree.GetNumberRows() - 1
 
+		padding = "        " * indent
+		img = wx.Bitmap(f"images/kinsects/{kin.attackType.lower()}-rarity-24/{kin.rarity}.png")
+		self.kinsectTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+						img, f"{padding}{kin.name}", hAlign=wx.ALIGN_LEFT, imageOffset=self.offset[indent]))		
+		self.kinsectTree.SetCellValue(row, 0, str(kin.name))
+		self.kinsectTree.SetCellValue(row, 1, str(kin.attackType.capitalize()))
+		self.kinsectTree.SetCellValue(row, 2, str(kin.dustEffect.capitalize()))
+		self.kinsectTree.SetCellValue(row, 3, f"Lv {str(kin.power).capitalize()}")
+		self.kinsectTree.SetCellValue(row, 4, f"Lv {str(kin.speed).capitalize()}")
+		self.kinsectTree.SetCellValue(row, 5, f"Lv {str(kin.heal).capitalize()}")
+		self.kinsectTree.SetCellValue(row, 6, str(kin.id))
 
-	def populateKinsectTree(self, kinsectNode: wxTreeListItem, kin: kKinsect, kinsectNodes: Dict[int, wxTreeListItem]) -> None:
-		kinsect = self.kinsectTree.AppendItem(kinsectNode,  kin.name)
-		self.kinsectTree.SetItemImage(kinsect, self.test, which=wx.TreeItemIcon_Normal)
-		self.kinsectTree.SetItemText(kinsect, kin.attackType, 1)
-		self.kinsectTree.SetItemText(kinsect, kin.dustEffect, 2)
-		self.kinsectTree.SetItemText(kinsect, f"Lv {kin.power}", 3)
-		self.kinsectTree.SetItemText(kinsect, f"Lv {kin.speed}", 4)
-		self.kinsectTree.SetItemText(kinsect, f"Lv {kin.heal}", 5)
-		self.kinsectTree.SetItemText(kinsect, f"{kin.id}", 6)
-
-		kinsectNodes[kin.id] = kinsect
+		if len(self.search.GetValue()) == 0:
+			kinsectNodes[kin.id] = indent + 1
 
 
 	def initKinsectDetailTab(self):
@@ -202,6 +241,8 @@ class KinsectsTab:
 																		| wx.LC_VRULES
 																		| wx.LC_HRULES
 																		)
+		self.il = wx.ImageList(24, 24)
+		self.test = self.il.Add(self.testIcon)
 		self.kinsectMaterialList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.kinsectDetailSizer.Add(self.kinsectMaterialList, 1, wx.EXPAND)
 
@@ -329,9 +370,11 @@ class KinsectsTab:
 		"""
 		When a specific kinsect is selected in the tree, the detail view gets populated with the information from the database.
 		"""
-		self.currentlySelectedKinsectID = self.kinsectTree.GetItemText(event.GetItem(), 6)
 
-		self.loadKinsectDetails()
+		if not self.init:
+			self.currentlySelectedKinsectID = self.kinsectTree.GetCellValue(event.GetRow(), 6)
+			if self.currentlySelectedKinsectID != "":
+				self.loadKinsectDetails()
 
 
 	def onSize(self, event):
