@@ -79,6 +79,7 @@ class CharmsTab:
 		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.searchSizer.Add(self.searchName)
 		self.searchSizer.Add(self.searchSkill)
+		self.searchSizer.Add(482, 0, 0)
 
 		self.charmListSizer.Add(self.searchSizer)
 

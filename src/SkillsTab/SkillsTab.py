@@ -71,6 +71,7 @@ class SkillsTab:
 
 		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.searchSizer.Add(self.search)
+		self.searchSizer.Add(592, 0, 0)
 
 		self.skillListSizer.Add(self.searchSizer)
 
