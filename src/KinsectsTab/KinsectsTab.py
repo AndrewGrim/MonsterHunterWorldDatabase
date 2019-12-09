@@ -79,7 +79,7 @@ class KinsectsTab:
 		self.kinsectDetailedImagesSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.kinsectDetailedImagesSizer.Add(self.kinsectImageLabel, 1, wx.ALIGN_CENTER)
 		
-		self.kinsectDetailedSizer.Add(self.kinsectImageLabel, 1, wx.EXPAND)
+		self.kinsectDetailedSizer.Add(self.kinsectDetailedImagesSizer, 1, wx.EXPAND)
 		self.kinsectDetailedSizer.Add(self.kinsectDetailsNotebook, 3, wx.EXPAND)
 
 		self.kinsectSizer.Add(self.kinsectTreeSizer, 0, wx.EXPAND)
