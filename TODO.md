@@ -20,5 +20,4 @@
 - [ ] add colors to ele res cells in armor tab
 - [ ] implement sorting
 - [ ] have a look at weapons(db) with skills and add data if it doesnt exist, afterwards create links and include in searches
-- [ ] add palico and kinsect to item usage with link
   

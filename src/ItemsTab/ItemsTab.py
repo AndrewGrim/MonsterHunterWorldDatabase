@@ -431,6 +431,8 @@ class ItemsTab:
 		self.loadUsageCharms()
 		self.loadUsageArmor()
 		self.loadUsageWeapons()
+		self.loadUsagePalico()
+		self.loadUsageKinsects()
 
 		self.loadItemObtaining()
 
@@ -561,6 +563,68 @@ class ItemsTab:
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), weapon.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{weapon.quantity}")
 			self.itemUsageList.SetItem(index, 2, f"weapon,{weapon.id},{weapon.weaponType}")
+		
+
+	def loadUsagePalico(self):
+		sql = """
+			SELECT p.id, p.name, p.attack_type, p.rarity, pr.quantity, p.rank
+			FROM palico_weapon p
+				JOIN palico_weapon_recipe pr
+				ON p.id = pr.id
+			WHERE pr.item_id = :palicoID
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedItemID,))
+		data = data.fetchall()
+
+		for wep in data:
+			img = self.il.Add(wx.Bitmap(f"images/palico/{wep[2]}-rarity-24/{wep[3]}.png"))
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), wep[1], img)
+			self.itemUsageList.SetItem(index, 1, f"{wep[4]}")
+			self.itemUsageList.SetItem(index, 2, f"palico,{wep[0]},{wep[5]},weapon")
+
+		sql = """
+			SELECT p.id, p.name, p.rarity, pr.quantity, p.rank
+			FROM palico_armor p
+				JOIN palico_armor_recipe pr
+				ON p.id = pr.id
+			WHERE pr.item_id = :palicoID
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedItemID,))
+		data = data.fetchall()
+
+		for arm in data:
+			if arm[0] % 3 == 2:
+				img = self.il.Add(wx.Bitmap(f"images/palico/chest-rarity-24/{arm[2]}.png"))
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/palico/head-rarity-24/{arm[2]}.png"))
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), arm[1], img)
+			self.itemUsageList.SetItem(index, 1, f"{arm[3]}")
+			self.itemUsageList.SetItem(index, 2, f"palico,{arm[0]},{arm[4]},armor")
+
+
+	def loadUsageKinsects(self):
+		sql = """
+			SELECT k.id, kt.name, k.attack_type, k.rarity, kr.quantity
+			FROM kinsect k
+				JOIN kinsect_text kt USING (id)
+				JOIN kinsect_recipe kr ON k.id = kr.kinsect_id
+			WHERE kt.lang_id = 'en'
+				AND kr.item_id = :kinsectID
+		"""
+
+		conn = sqlite3.Connection("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedItemID,))
+		data = data.fetchall()
+
+		for kin in data:
+			img = self.il.Add(wx.Bitmap(f"images/kinsects/{kin[2]}-rarity-24/{kin[3]}.png"))
+			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), kin[1], img)
+			self.itemUsageList.SetItem(index, 1, f"{kin[4]}")
+			self.itemUsageList.SetItem(index, 2, f"kinsect,{kin[0]}")
 
 
 	def initItemObtaining(self):
@@ -738,11 +802,14 @@ class ItemsTab:
 
 	def onUsageOrObtainingDoubleClick(self, event):
 		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2).split(",")
-		if len(materialInfo) == 4:
-			self.currentItemName = materialInfo[-1]
-			materialInfo.remove(materialInfo[-1])
 		self.link.event = True
 		self.link.eventType = materialInfo[0]
+		if len(materialInfo) == 4:
+			if self.link.eventType == "palico":
+				self.root.palico.currentEquipmentCategory = materialInfo[-1]
+			else:
+				self.currentItemName = materialInfo[-1]
+			materialInfo.remove(materialInfo[-1])
 		materialInfo.remove(materialInfo[0])
 		if len(materialInfo) == 1:
 			self.link.info = link.GenericSingleLink(materialInfo[0])
