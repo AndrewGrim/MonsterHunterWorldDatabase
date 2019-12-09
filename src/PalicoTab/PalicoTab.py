@@ -54,7 +54,7 @@ class PalicoTab:
 			1: ["images/unknown.png", "Rarity"],
 			2: ["images/weapon-detail-24/attack.png", "Melee Attack"],
 			3: ["images/weapon-detail-24/attack.png", "Ranged Attack"],
-			4: ["images/weapon-detail-24/attack.png", "Attack Type"],
+			4: ["images/weapon-detail-24/attacktype.png", "Attack Type"],
 			5: ["images/weapon-detail-24/element.png", "Element"],
 			6: ["images/weapon-detail-24/elderseal.png", "Elderseal"],
 			7: ["images/weapon-detail-24/affinity.png", "Affinity"],

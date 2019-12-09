@@ -236,9 +236,9 @@ class KinsectsTab:
 			1: str(kin.rarity),
 			2: str(kin.attackType),
 			3: str(kin.dustEffect),
-			4: str(kin.power),
-			5: str(kin.speed),
-			6: str(kin.heal),
+			4: f"Lv {kin.power}",
+			5: f"Lv {kin.speed}",
+			6: f"Lv {kin.heal}",
 		}
 
 		imageOffset = 55
