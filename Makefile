@@ -3,4 +3,6 @@ debug:
 speed:
 	pipenv run python tests/speedTest.py
 db:
-	cd ../MHWorldData-Custom/ && ./build.bat && cp mhw.db ../MonsterHunterWorld/mhw.db
+	cd ../MHWorldData-Custom/ && ./build.sh && cp mhw.db ../MonsterHunterWorld/mhw.db
+zip:
+	./build.sh

@@ -23,3 +23,9 @@ The first publicly available version has been released.
 * Added a loading bar when starting the application.
 
 * Changed equipment images to jpges and removed unused monster pngs. Resulting in a zip size about one third of the previous version.
+
+## v1.4.0 2019-12-09
+
+* Added a tab containing all palico equipment and gadgets.
+
+* Added a tab containing all kinsect information.
