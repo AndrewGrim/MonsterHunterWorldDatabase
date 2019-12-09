@@ -16,7 +16,7 @@ class PreferencesWindow:
 		sizer = wx.BoxSizer(wx.VERTICAL)
 		vSizer = wx.BoxSizer(wx.VERTICAL)
 
-		tabs = ["Monsters", "Weapons", "Armor", "Palico", "Charms", "Decorations", "Skills", "Items", "Locations",]
+		tabs = ["Monsters", "Weapons", "Armor", "Palico", "Kinsects" "Charms", "Decorations", "Skills", "Items", "Locations",]
 		self.label = wx.StaticText(panel, label="Set initial tab:")
 		self.selectTab = wx.Choice(panel, choices=tabs, size=(200, 20))
 		self.selectTab.SetSelection(self.selectTab.FindString(self.pref.initialTab))

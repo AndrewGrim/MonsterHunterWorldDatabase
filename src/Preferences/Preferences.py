@@ -23,6 +23,8 @@ class Preferences:
 			"charm": "Charms", 
 			"location": "Locations", 
 			"skill": "Skills",
+			"palico": "Palico",
+			"kinsect": "Kinsects",
 		}
 
 
