@@ -15,6 +15,7 @@ import SkillsTab as s
 import CharmsTab as c
 import LocationsTab as l
 import KinsectsTab as k
+import QuestsTab as q
 import Utilities as util
 import Links as link
 import Preferences as p
@@ -49,6 +50,7 @@ class Application(wx.Frame):
 		self.initMainNotebook()
 		il = wx.ImageList(24, 24)
 		mon = il.Add(wx.Bitmap("images/Nergigante24.png"))
+		que = il.Add(wx.Bitmap("images/rank-stars-24/hr.png")) # TODO change to proper icon
 		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/5.png"))
 		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
 		pal = il.Add(wx.Bitmap("images/palico/head-rarity-24/9.png"))
@@ -62,6 +64,7 @@ class Application(wx.Frame):
 
 		lo.loading.SetValue(30)
 		self.monsters = m.MonstersTab(root, self.mainNotebook, self.link)
+		self.quests = q.QuestsTab(root, self.mainNotebook, self.link)
 		lo.loading.SetValue(60)
 		self.weapons = w.WeaponsTab(root, self.mainNotebook, self.link)
 		lo.loading.SetValue(80)
@@ -77,15 +80,16 @@ class Application(wx.Frame):
 		self.locations = l.LocationsTab(root, self.mainNotebook, self.link)
 
 		self.mainNotebook.SetPageImage(0, mon)
-		self.mainNotebook.SetPageImage(1, wep)
-		self.mainNotebook.SetPageImage(2, arm)
-		self.mainNotebook.SetPageImage(3, pal)
-		self.mainNotebook.SetPageImage(4, kin)
-		self.mainNotebook.SetPageImage(5, charm)
-		self.mainNotebook.SetPageImage(6, deco)
-		self.mainNotebook.SetPageImage(7, skill)
-		self.mainNotebook.SetPageImage(8, item)
-		self.mainNotebook.SetPageImage(9, local)	
+		self.mainNotebook.SetPageImage(1, que)
+		self.mainNotebook.SetPageImage(2, wep)
+		self.mainNotebook.SetPageImage(3, arm)
+		self.mainNotebook.SetPageImage(4, pal)
+		self.mainNotebook.SetPageImage(5, kin)
+		self.mainNotebook.SetPageImage(6, charm)
+		self.mainNotebook.SetPageImage(7, deco)
+		self.mainNotebook.SetPageImage(8, skill)
+		self.mainNotebook.SetPageImage(9, item)
+		self.mainNotebook.SetPageImage(10, local)	
 
 		self.makeMenuBar()
 		self.CreateStatusBar()
