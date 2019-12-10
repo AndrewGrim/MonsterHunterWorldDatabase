@@ -25,6 +25,7 @@ class Preferences:
 			"skill": "Skills",
 			"palico": "Palico",
 			"kinsect": "Kinsects",
+			"quest": "Quests",
 		}
 
 
