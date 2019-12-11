@@ -66,22 +66,22 @@ class QuestsTab:
 		self.initQuestButtons()
 		self.initSearch()
 		self.initQuestTree()
-		#self.initQuestDetailTab()
+		self.initQuestDetail()
 
-		#self.questDetailList.Bind(wx.EVT_SIZE, self.onSize)
+		self.questDetailList.Bind(wx.EVT_SIZE, self.onSize)
 
-		#self.questDetailPanel.SetScrollRate(20, 20)
+		self.questDetailPanel.SetScrollRate(20, 20)
 
 
 	def initQuestButtons(self):
-		weapons = ["assigned", "optional", "event", "special", "arena"]
+		quests = ["assigned", "optional", "event", "special", "arena"]
 
 		self.questButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
-		for i, item in enumerate(weapons):
+		for i, item in enumerate(quests):
 			button = wx.Button(self.questPanel, label=item.capitalize(), name=item)
 			button.SetBitmap(wx.Bitmap(f"images/unknown.png"))
 			self.questButtonsSizer.Add(button)
-			#button.Bind(wx.EVT_BUTTON, self.onQuestTypeSelection)
+			button.Bind(wx.EVT_BUTTON, self.onQuestTypeSelection)
 
 		self.questTreeSizer.Add(self.questButtonsSizer)
 
@@ -90,7 +90,7 @@ class QuestsTab:
 		self.search = wx.TextCtrl(self.questPanel)
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
-		self.questButtonsSizer.Add(150, 0, 0)
+		self.questButtonsSizer.Add(120, 0, 0)
 		self.questButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
@@ -102,16 +102,13 @@ class QuestsTab:
 		self.questTree = cgr.HeaderBitmapGrid(self.questPanel)
 		self.questTree.EnableEditing(False)
 		self.questTree.EnableDragRowSize(False)
-		#self.questTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onQuestSelection)
+		self.questTree.Bind(wx.grid.EVT_GRID_SELECT_CELL, self.onQuestSelection)
 		self.questTreeSizer.Add(self.questTree, 1, wx.EXPAND)
 
 		questTreeColumns = {
-			"Name": [200, None],
-			"Attack Type": [45, wx.Bitmap("images/weapon-detail-24/attacktype.png")],
-			"Dust Effect": [57, wx.Bitmap("images/weapon-detail-24/dusteffect.png")],
-			"Power": [35, wx.Bitmap("images/weapon-detail-24/power.png")],
-			"Speed": [35, wx.Bitmap("images/weapon-detail-24/speed.png")],
-			"Heal": [35, wx.Bitmap("images/weapon-detail-24/heal.png")],
+			"Name": [500, None], # joined by quest type icon
+			"Location": [100, None],
+			"Zenny": [60, wx.Bitmap("images/zenny.png")],
 			"id": [0,  None],
 		}
 
@@ -137,3 +134,135 @@ class QuestsTab:
 		except:
 			pass
 		self.init = False
+
+
+	def initQuestDetail(self):
+		self.questDetailList = cgr.HeaderBitmapGrid(self.questDetailPanel)
+		self.questDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
+		self.questDetailList.EnableEditing(False)
+		self.questDetailList.EnableDragRowSize(False)
+		self.questDetailSizer.Add(self.questDetailList, 1, wx.EXPAND)
+
+		self.questDetailList.CreateGrid(6, 2)
+		self.questDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
+		self.questDetailList.SetColSize(0, 302)
+		self.questDetailList.SetColSize(1, 155 - 20)
+		self.questDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+		self.questDetailList.SetColLabelSize(0)
+		self.questDetailList.SetRowLabelSize(0)
+
+		self.questMonstersList = wx.ListCtrl(self.questDetailPanel, style=wx.LC_REPORT
+																			| wx.LC_VRULES
+																			| wx.LC_HRULES
+																			)
+		self.questMonstersList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
+		self.questMonstersList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
+		self.il = wx.ImageList(24, 24)
+		self.questMonstersList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.questDetailSizer.Add(self.questMonstersList, 1, wx.EXPAND|wx.TOP, 5)
+
+		self.materialsRequiredList = wx.ListCtrl(self.questDetailPanel, style=wx.LC_REPORT
+																			| wx.LC_VRULES
+																			| wx.LC_HRULES
+																			)
+		self.materialsRequiredList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
+		self.materialsRequiredList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
+		self.materialsRequiredList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.questDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND|wx.TOP, 5)
+
+		self.loadQuestDetail()
+
+
+	def loadQuestDetail(self):
+		self.root.Freeze()
+
+		self.questMonstersList.ClearAll()
+		self.materialsRequiredList.ClearAll()
+		self.il.RemoveAll()
+
+		questDetail = {
+			"Name": "Tyrannt Has Fallen",
+		}
+
+		for i, (k, v) in enumerate(questDetail.items()):
+			self.questDetailList.SetCellValue(i, 0, k)
+			self.questDetailList.SetCellValue(i, 1, v)
+
+		self.questDetailList.DeleteRows(0, self.questDetailList.GetNumberRows())
+		self.questDetailList.AppendRows(4) # TODO change to length
+
+		self.loadQuestMonsters()
+		self.loadQuestMaterials()
+		width, height = self.questPanel.GetSize()
+		self.questPanel.SetSize(width + 1, height + 1)
+		self.questPanel.SetSize(width, height)
+		self.root.Thaw()
+
+
+	def loadQuestMonsters(self):
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = ""
+		self.questMonstersList.InsertColumn(0, info)
+		self.questMonstersList.SetColumnWidth(0, 480)
+
+		self.questMonstersList.InsertColumn(1, info)
+		self.questMonstersList.SetColumnWidth(1, 200)
+
+		self.questMonstersList.InsertItem(0, "test")
+		# img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
+		# index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(), mat.name, self.test)
+		# self.materialsRequiredList.SetItem(index, 1, f"{mat.quantity}")
+
+
+	def loadQuestMaterials(self):
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Req. Materials"
+		self.materialsRequiredList.InsertColumn(0, info)
+		self.materialsRequiredList.SetColumnWidth(0, 480)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.materialsRequiredList.InsertColumn(1, info)
+		self.materialsRequiredList.SetColumnWidth(1, 200)
+
+		self.materialsRequiredList.InsertItem(0, "test")
+		# img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
+		# index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(), mat.name, self.test)
+		# self.materialsRequiredList.SetItem(index, 1, f"{mat.quantity}")
+
+
+	def onQuestSelection(self, event):
+		pass
+
+
+	def onQuestTypeSelection(self, event):
+		pass
+
+
+	def onListDoubleClick(self, event):
+		pass
+
+
+	def onSize(self, event):
+		try:
+			self.questDetailList.SetColSize(0, self.questDetailPanel.GetSize()[0] * 0.66)
+			self.questDetailList.SetColSize(1, self.questDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.questMonstersList.SetColumnWidth(0, self.questDetailPanel.GetSize()[0] * 0.66)
+			self.questMonstersList.SetColumnWidth(1, self.questDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.materialsRequiredList.SetColumnWidth(0, self.questDetailPanel.GetSize()[0] * 0.66)
+			self.materialsRequiredList.SetColumnWidth(1, self.questDetailPanel.GetSize()[0] * 0.34 - 40)
+		except:
+			pass
+
+
+	def onScroll(self, event):
+		pass
