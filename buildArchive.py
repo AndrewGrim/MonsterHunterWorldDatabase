@@ -22,6 +22,11 @@ def getDirPaths(dirName: str) -> None:
 			
 	return filePaths
 
+
+try:
+	shutil.rmtree("Monster Hunter World Database")
+except Exception as e:
+	print(e)
 try:
 	shutil.copytree("images", "Monster Hunter World Database/images")
 except Exception as e:
