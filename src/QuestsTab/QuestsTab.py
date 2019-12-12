@@ -27,7 +27,7 @@ class QuestsTab:
 		self.mainNotebook = mainNotebook
 		self.init = True
 
-		self.currentlySelectedQuestID = 0
+		self.currentlySelectedQuestID = 101
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
 
 		self.initQuestsTab()
@@ -155,7 +155,6 @@ class QuestsTab:
 																			| wx.LC_VRULES
 																			| wx.LC_HRULES
 																			)
-		self.questMonstersList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.questMonstersList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
 		self.il = wx.ImageList(24, 24)
 		self.questMonstersList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
@@ -165,7 +164,6 @@ class QuestsTab:
 																			| wx.LC_VRULES
 																			| wx.LC_HRULES
 																			)
-		self.materialsRequiredList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.materialsRequiredList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
 		self.materialsRequiredList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 		self.questDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND|wx.TOP, 5)
@@ -204,17 +202,65 @@ class QuestsTab:
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
 		info.Image = -1
 		info.Align = wx.LIST_FORMAT_LEFT
-		info.Text = ""
+		info.Text = "Name"
 		self.questMonstersList.InsertColumn(0, info)
-		self.questMonstersList.SetColumnWidth(0, 480)
+		self.questMonstersList.SetColumnWidth(0, 380)
 
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Quantity"
 		self.questMonstersList.InsertColumn(1, info)
-		self.questMonstersList.SetColumnWidth(1, 200)
+		self.questMonstersList.SetColumnWidth(1, 100)
 
-		self.questMonstersList.InsertItem(0, "test")
-		# img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
-		# index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(), mat.name, self.test)
-		# self.materialsRequiredList.SetItem(index, 1, f"{mat.quantity}")
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Objective"
+		self.questMonstersList.InsertColumn(2, info)
+		self.questMonstersList.SetColumnWidth(2, 200)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = ""
+		self.questMonstersList.InsertColumn(3, info)
+		self.questMonstersList.SetColumnWidth(3, 0)
+
+		sql = """
+			SELECT qm.monster_id, mt.name, qm.quantity, qm.is_objective 
+			FROM quest q
+			JOIN quest_monsters qm
+				ON qm.id = q.id
+			JOIN monster m
+				ON qm.monster_id = m.id
+			JOIN monster_text mt
+				ON mt.id = m.id
+				AND mt.lang_id = 'en'
+			WHERE q.id = :questID
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedQuestID,))
+		data = data.fetchall()
+
+		monsters = []
+		for row in data:
+			monsters.append(q.QuestMonster(row))
+
+		for mon in monsters:
+			img = self.il.Add(wx.Bitmap(f"images/monsters/24/{mon.name}.png"))
+			index = self.questMonstersList.InsertItem(self.questMonstersList.GetItemCount(), mon.name, img)
+			self.questMonstersList.SetItem(index, 1, f"{mon.quantity}")
+			if bool(mon.isObjective):
+				if self.root.pref.unicodeSymbols:
+					self.questMonstersList.SetItem(index, 2, "✓")
+				else:
+					self.questMonstersList.SetItem(index, 2, "Yes")
+			self.questMonstersList.SetItem(index, 3, f"monster,{mon.id},{mon.name}")
 
 
 	def loadQuestMaterials(self):
@@ -224,7 +270,7 @@ class QuestsTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = "Req. Materials"
 		self.materialsRequiredList.InsertColumn(0, info)
-		self.materialsRequiredList.SetColumnWidth(0, 480)
+		self.materialsRequiredList.SetColumnWidth(0, 380)
 
 		info = wx.ListItem()
 		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
@@ -232,12 +278,51 @@ class QuestsTab:
 		info.Align = wx.LIST_FORMAT_CENTER
 		info.Text = ""
 		self.materialsRequiredList.InsertColumn(1, info)
-		self.materialsRequiredList.SetColumnWidth(1, 200)
+		self.materialsRequiredList.SetColumnWidth(1, 100)
 
-		self.materialsRequiredList.InsertItem(0, "test")
-		# img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
-		# index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(), mat.name, self.test)
-		# self.materialsRequiredList.SetItem(index, 1, f"{mat.quantity}")
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = "Reward Group"
+		self.materialsRequiredList.InsertColumn(2, info)
+		self.materialsRequiredList.SetColumnWidth(2, 200)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.materialsRequiredList.InsertColumn(3, info)
+		self.materialsRequiredList.SetColumnWidth(3, 0)
+
+		sql = """
+			SELECT qr.item_id, it.name, i.category, qr.stack, qr.percentage, qr.reward_group, i.icon_name, i.icon_color
+			FROM quest q
+			JOIN quest_rewards qr
+				ON qr.id = q.id
+			JOIN item i
+				ON qr.item_id = i.id
+			JOIN item_text it
+				ON it.id = i.id
+				AND it.lang_id = 'en'
+			WHERE q.id = :questID
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedQuestID,))
+		data = data.fetchall()
+
+		items = []
+		for row in data:
+			items.append(q.QuestReward(row))
+
+		for item in items:
+			img = self.il.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
+			index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(), item.name, img)
+			self.materialsRequiredList.SetItem(index, 1, f"{item.stack} x {item.percentage}%")
+			self.materialsRequiredList.SetItem(index, 2, f"{item.rewardGroup}")
+			self.materialsRequiredList.SetItem(index, 3, f"item,{item.id},{item.category}")
 
 
 	def onQuestSelection(self, event):
@@ -256,13 +341,24 @@ class QuestsTab:
 		try:
 			self.questDetailList.SetColSize(0, self.questDetailPanel.GetSize()[0] * 0.66)
 			self.questDetailList.SetColSize(1, self.questDetailPanel.GetSize()[0] * 0.34 - 20)
-			self.questMonstersList.SetColumnWidth(0, self.questDetailPanel.GetSize()[0] * 0.66)
-			self.questMonstersList.SetColumnWidth(1, self.questDetailPanel.GetSize()[0] * 0.34 - 40)
-			self.materialsRequiredList.SetColumnWidth(0, self.questDetailPanel.GetSize()[0] * 0.66)
-			self.materialsRequiredList.SetColumnWidth(1, self.questDetailPanel.GetSize()[0] * 0.34 - 40)
+			self.questMonstersList.SetColumnWidth(0, self.questDetailPanel.GetSize()[0] * 0.56)
+			self.questMonstersList.SetColumnWidth(1, self.questDetailPanel.GetSize()[0] * 0.17)
+			self.questMonstersList.SetColumnWidth(2, self.questDetailPanel.GetSize()[0] * 0.27 - 40)
+			self.materialsRequiredList.SetColumnWidth(0, self.questDetailPanel.GetSize()[0] * 0.56)
+			self.materialsRequiredList.SetColumnWidth(1, self.questDetailPanel.GetSize()[0] * 0.17)
+			self.materialsRequiredList.SetColumnWidth(2, self.questDetailPanel.GetSize()[0] * 0.27 - 40)
 		except:
 			pass
 
 
 	def onScroll(self, event):
-		pass
+		if event.GetWheelRotation() > 0:
+			if self.questDetailPanel.GetViewStart()[1] < 3:
+				self.questDetailPanel.Scroll(0, self.questDetailPanel.GetViewStart()[1] + 1 * -1)
+			else:
+				self.questDetailPanel.Scroll(0, self.questDetailPanel.GetViewStart()[1] + 3 * -1)
+		else:
+			if self.questDetailPanel.GetViewStart()[1] < 3:
+				self.questDetailPanel.Scroll(0, self.questDetailPanel.GetViewStart()[1] + 1)
+			else:
+				self.questDetailPanel.Scroll(0, self.questDetailPanel.GetViewStart()[1] + 3)
