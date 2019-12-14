@@ -29,3 +29,7 @@ The first publicly available version has been released.
 * Added a tab containing all palico equipment and gadgets.
 
 * Added a tab containing all kinsect information.
+
+## v1.5.0 2019-12-14
+
+* Added a tab containing all quests.
