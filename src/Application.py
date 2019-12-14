@@ -108,7 +108,7 @@ class Application(wx.Frame):
 			if self.pref.rememberSize:
 				self.SetSize(self.pref.windowSize[0] - 1, self.pref.windowSize[1])
 			else:
-				self.SetSize(1419, 850)
+				self.SetSize(1429, 850)
 
 		if self.pref.rememberPosition:
 			self.SetPosition(self.pref.windowPosition)

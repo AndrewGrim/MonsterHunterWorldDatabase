@@ -209,7 +209,7 @@ class KinsectsTab:
 		padding = "        " * indent
 		img = wx.Bitmap(f"images/kinsects/{kin.attackType.lower()}-rarity-24/{kin.rarity}.png")
 		self.kinsectTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						img, f"{padding}{kin.name}", hAlign=wx.ALIGN_LEFT, imageOffset=self.offset[indent]))		
+						img, f"{padding}{kin.name}", hAlign=wx.ALIGN_LEFT, imageOffset=self.offset[indent]))
 		self.kinsectTree.SetCellValue(row, 0, str(kin.name))
 		self.kinsectTree.SetCellValue(row, 1, str(kin.attackType.capitalize()))
 		self.kinsectTree.SetCellValue(row, 2, str(kin.dustEffect.capitalize()))

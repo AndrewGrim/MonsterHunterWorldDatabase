@@ -133,23 +133,65 @@ class QuestsTab:
 			self.questTree.DeleteRows(0, self.questTree.GetNumberRows())
 		except:
 			pass
+
+		searchText = self.search.GetValue().replace("'", "''")
+
+		if len(searchText) == 0 or searchText == " ":
+			sql = """
+				SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
+				FROM quest q
+			"""
+		else:
+			sql = f"""
+				SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
+				FROM quest q
+				WHERE q.name LIKE '%{searchText}%'
+			"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql)
+		data = data.fetchall()
+
+		quests = []
+		for row in data:
+			quests.append(q.Quest(row))
+
+		for quest in quests:
+			self.populateQuestTree(quest)
+
 		self.init = False
 
 
+	def populateQuestTree(self, quest):
+		self.questTree.AppendRows() 
+		row = self.questTree.GetNumberRows() - 1
+
+		self.questTree.SetCellValue(row, 0, str(quest.name))
+		self.questTree.SetCellValue(row, 1, str(quest.location))
+		self.questTree.SetCellValue(row, 2, str(quest.zenny))
+
+
 	def initQuestDetail(self):
+		self.questObjectiveLabel = wx.StaticText(self.questDetailPanel, label="Objective:\n")
+		self.questNameLabel = wx.StaticText(self.questDetailPanel, label="Name:\n")
+		self.questDescriptionLabel = wx.StaticText(self.questDetailPanel, label="Description")
+		self.questDetailSizer.Add(self.questObjectiveLabel, 0.1, wx.EXPAND)
+		self.questDetailSizer.Add(self.questNameLabel, 0.1, wx.EXPAND)
+		self.questDetailSizer.Add(self.questDescriptionLabel, 0.1, wx.EXPAND)
+
 		self.questDetailList = cgr.HeaderBitmapGrid(self.questDetailPanel)
 		self.questDetailList.Bind(wx.EVT_MOUSEWHEEL, self.onScroll)
 		self.questDetailList.EnableEditing(False)
 		self.questDetailList.EnableDragRowSize(False)
-		self.questDetailSizer.Add(self.questDetailList, 1, wx.EXPAND)
+		self.questDetailSizer.Add(self.questDetailList, 0.1, wx.EXPAND)
 
 		self.questDetailList.CreateGrid(6, 2)
 		self.questDetailList.SetDefaultRowSize(24, resizeExistingRows=True)
 		self.questDetailList.SetColSize(0, 302)
 		self.questDetailList.SetColSize(1, 155 - 20)
 		self.questDetailList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
-		self.questDetailList.SetColLabelSize(0)
-		self.questDetailList.SetRowLabelSize(0)
+		self.questDetailList.SetColLabelSize(2)
+		self.questDetailList.SetRowLabelSize(1)
 
 		self.questMonstersList = wx.ListCtrl(self.questDetailPanel, style=wx.LC_REPORT
 																			| wx.LC_VRULES
@@ -158,7 +200,7 @@ class QuestsTab:
 		self.questMonstersList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
 		self.il = wx.ImageList(24, 24)
 		self.questMonstersList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.questDetailSizer.Add(self.questMonstersList, 1, wx.EXPAND|wx.TOP, 5)
+		self.questDetailSizer.Add(self.questMonstersList, 0.1, wx.EXPAND|wx.TOP, 5)
 
 		self.materialsRequiredList = wx.ListCtrl(self.questDetailPanel, style=wx.LC_REPORT
 																			| wx.LC_VRULES
@@ -166,7 +208,7 @@ class QuestsTab:
 																			)
 		self.materialsRequiredList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
 		self.materialsRequiredList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
-		self.questDetailSizer.Add(self.materialsRequiredList, 1, wx.EXPAND|wx.TOP, 5)
+		self.questDetailSizer.Add(self.materialsRequiredList, 2, wx.EXPAND|wx.TOP, 5)
 
 		self.loadQuestDetail()
 
@@ -178,16 +220,62 @@ class QuestsTab:
 		self.materialsRequiredList.ClearAll()
 		self.il.RemoveAll()
 
-		questDetail = {
-			"Name": "Tyrannt Has Fallen",
+		sql = """
+			SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
+			FROM quest q
+			WHERE q.id = :questID
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedQuestID,))
+		data = data.fetchone()
+
+		quest = q.Quest(data)
+
+		starRanks = {
+			1: "lr",
+			2: "lr",
+			3: "lr",
+			4: "lr",
+			5: "lr",
+			6: "hr",
+			7: "hr",
+			8: "hr",
+			9: "hr"
 		}
+
+		questDetail = {
+			"Stars": [f"images/rank-stars-24/{starRanks[quest.stars]}.png", str(quest.stars)],
+			"Quest Type": [None, str(quest.questType.capitalize())],
+			"Category": [None, str(quest.category.capitalize())],
+			"Location": [f"images/locations-24/{quest.location}.png", str(quest.location)],
+			"Zenny": ["images/zenny.png", str(quest.zenny)],
+		}
+
+		self.questObjectiveLabel.SetFont(self.questObjectiveLabel.GetFont().Bold())
+		self.questNameLabel.SetFont(self.questNameLabel.GetFont().Bold())
+
+		self.questObjectiveLabel.SetLabel(f"{quest.objective}\n")
+		self.questNameLabel.SetLabel(f"{quest.name}:")
+		self.questDescriptionLabel.SetLabel(f"{quest.description}\n")
+		self.questDescriptionLabel.Wrap(600)
+
+		self.questDetailList.DeleteRows(0, self.questDetailList.GetNumberRows())
+		self.questDetailList.AppendRows(len(questDetail))
 
 		for i, (k, v) in enumerate(questDetail.items()):
 			self.questDetailList.SetCellValue(i, 0, k)
-			self.questDetailList.SetCellValue(i, 1, v)
+			if v[0] != None:
+				padding = " " * 8
+				if os.path.exists(v[0]):
+					img = wx.Bitmap(v[0])
+				else:
+					img = wx.Bitmap("images/unknown.png")
+				self.questDetailList.SetCellRenderer(i, 1, cgr.ImageTextCellRenderer(
+						img, f"{v[1]}", imageOffset=55))
+			else:
+				self.questDetailList.SetCellValue(i, 1, v[1])
 
-		self.questDetailList.DeleteRows(0, self.questDetailList.GetNumberRows())
-		self.questDetailList.AppendRows(4) # TODO change to length
 
 		self.loadQuestMonsters()
 		self.loadQuestMaterials()
