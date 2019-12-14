@@ -217,6 +217,14 @@ class Application(wx.Frame):
 				self.kinsects.loadKinsectDetails()
 				self.selectTab("Kinsects")
 
+			elif self.link.eventType == "quest":
+				self.quests.currentlySelectedQuestID = self.link.info.id
+				if self.quests.currentQuestTree != self.link.info.category:
+					self.quests.currentQuestTree = self.link.info.category
+					self.quests.loadQuestTree()
+				self.quests.loadQuestDetail()
+				self.selectTab("Quests")
+
 			else:
 				debug(self.link, "self.link", "Link type not supported!")
 
@@ -233,11 +241,13 @@ class Application(wx.Frame):
 
 	def reloadUnicode(self):
 		self.monsters.loadMonsterSummary()
+		self.quests.loadQuestDetail()
 		self.weapons.loadWeaponTree()
 		self.weapons.loadWeaponDetailAll()
 		self.armor.loadArmorTree()
 		self.armor.loadArmorDetailAll()
 		self.charms.loadCharmDetail()
+		self.palico.loadEquipmentTree()
 		self.decos.loadDecorationDetail()
 		self.skills.loadSkillDetail()
 

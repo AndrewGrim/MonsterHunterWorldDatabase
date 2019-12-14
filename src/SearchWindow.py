@@ -1,5 +1,6 @@
 import wx
 import sqlite3
+import os
 
 import CustomGridRenderer as cgr
 from Debug.debug import debug
@@ -101,6 +102,7 @@ class SearchWindow:
 		self.loadSkills()
 		self.loadItems()
 		self.loadLocations()
+		self.loadQuests()
 
 
 	def searchBySkill(self, event):
@@ -450,7 +452,10 @@ class SearchWindow:
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/items-24/{row[3]}{row[4]}.png")
+			if os.path.exists(f"images/items-24/{row[3]}{row[4]}.png"):
+				img = wx.Bitmap(f"images/items-24/{row[3]}{row[4]}.png")
+			else:
+				img = wx.Bitmap(f"images/unknown.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"item,{row[0]},{row[2]},{row[1]}")
 
@@ -472,6 +477,27 @@ class SearchWindow:
 			img = wx.Bitmap(f"images/locations-24/{row[1]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"location,{row[0]},{row[1]}")
+
+		
+	def loadQuests(self):
+		sql = f"""
+			SELECT DISTINCT q.id, q.name, q.quest_type, q.category
+			FROM quest q
+			JOIN quest_monsters qm
+				ON qm.id = q.id
+			WHERE q.name LIKE '%{self.searchText}%'
+				OR qm.monster_name LIKE '%{self.searchText}%'
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/quests-24/{row[2]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"quest,{row[0]},{row[3]}")
 
 
 	def makeMenuBar(self):
