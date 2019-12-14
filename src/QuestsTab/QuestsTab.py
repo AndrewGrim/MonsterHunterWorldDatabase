@@ -119,8 +119,8 @@ class QuestsTab:
 		self.questTreeSizer.Add(self.questTree, 1, wx.EXPAND)
 
 		questTreeColumns = {
-			"Name": [470, None],
-			"Location": [110, None],
+			"Name": [405, None],
+			"Location": [175, None],
 			"Zenny": [60, wx.Bitmap("images/zenny.png")],
 			"id": [0,  None],
 		}
@@ -212,13 +212,21 @@ class QuestsTab:
 		if lastStar != quest.stars:
 			img = wx.Bitmap(f"images/rank-stars-24/{starIcon}.png")
 			self.questTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-				img, f"{quest.stars}", imageOffset=20, colour=util.hexToRGB(self.rankColors[starIcon])))
+				img, f"{quest.stars}", imageOffset=20, colour=util.hexToRGB(self.rankColors[starIcon]), font=wx.Font(wx.FontInfo(9).Bold())))
 			self.questTree.SetCellBackgroundColour(row, 1, util.hexToRGB(self.rankColors[starIcon]))
 			self.questTree.SetCellBackgroundColour(row, 2, util.hexToRGB(self.rankColors[starIcon]))
 			self.questTree.AppendRows() 
 			row = self.questTree.GetNumberRows() - 1
-		self.questTree.SetCellValue(row, 0, str(quest.name)) # TODO quest type icon
-		self.questTree.SetCellValue(row, 1, str(quest.location))
+
+		img = wx.Bitmap(f"images/quests-24/{quest.questType}.png")
+		self.questTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+			img, f"{quest.name}", imageOffset=115))
+		if os.path.exists(f"images/locations-24/{quest.location}.png"):
+			img = wx.Bitmap(f"images/locations-24/{quest.location}.png")
+		else:
+			img = wx.Bitmap(f"images/unknown.png")
+		self.questTree.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(
+			img, f"{quest.location}", imageOffset=70))
 		self.questTree.SetCellValue(row, 2, str(quest.zenny))
 		self.questTree.SetCellValue(row, 3, str(quest.id))
 
@@ -298,7 +306,7 @@ class QuestsTab:
 
 		questDetail = {
 			"Stars": [f"images/rank-stars-24/{starRanks[quest.stars]}.png", str(quest.stars)],
-			"Quest Type": [None, str(quest.questType.capitalize())],
+			"Quest Type": [f"images/quests-24/{quest.questType}.png", str(quest.questType.capitalize())],
 			"Category": [None, str(quest.category.capitalize())],
 			"Location": [f"images/locations-24/{quest.location}.png", str(quest.location)],
 			"Zenny": ["images/zenny.png", str(quest.zenny)],
