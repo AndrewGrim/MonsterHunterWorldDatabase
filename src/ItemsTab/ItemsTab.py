@@ -196,7 +196,10 @@ class ItemsTab:
 			self.il.RemoveAll()
 
 		for item in items:
-			img = self.il.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
+			if os.path.exists(f"images/items-24/{item.iconName}{item.iconColor}.png"):
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 			index = self.itemList.InsertItem(self.itemList.GetItemCount(), f"{item.name}", img)
 			self.itemList.SetItem(index, 1, f"{item.id}")
 

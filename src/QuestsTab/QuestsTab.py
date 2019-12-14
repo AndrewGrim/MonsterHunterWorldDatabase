@@ -17,6 +17,7 @@ from typing import NewType
 import Utilities as util
 from Debug import debug
 import QuestsTab as q
+import Links as link
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 
@@ -25,6 +26,7 @@ class QuestsTab:
 	def __init__(self, root, mainNotebook, link):
 		self.root = root
 		self.mainNotebook = mainNotebook
+		self.link = link
 		self.init = True
 
 		self.currentlySelectedQuestID = 101
@@ -481,7 +483,18 @@ class QuestsTab:
 
 
 	def onListDoubleClick(self, event):
-		pass
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 3).split(",")
+		self.link.event = True
+		self.link.eventType = materialInfo[0]
+		materialInfo.remove(materialInfo[0])
+		if len(materialInfo) == 1:
+			self.link.info = link.GenericSingleLink(materialInfo[0])
+		elif len(materialInfo) == 2:
+			self.link.info = link.GenericDoubleLink(materialInfo)
+		else:
+			debug(materialInfo, "materialInfo", "materialInfo length is other than accounted for!")
+		self.root.followLink()
+		self.link.reset()
 
 
 	def onSize(self, event):
