@@ -28,7 +28,14 @@ class QuestsTab:
 		self.init = True
 
 		self.currentlySelectedQuestID = 101
+		self.currentQuestTree = "optional"
 		self.testIcon = wx.Bitmap("images/unknown.png", wx.BITMAP_TYPE_ANY)
+
+		self.rankColors = {
+			"lr": "#7cd3de",
+			"hr": "#ffae47",
+			"mr": "#ffef66",
+		}
 
 		self.initQuestsTab()
 
@@ -41,9 +48,8 @@ class QuestsTab:
 		self.questTreeSizer = wx.BoxSizer(wx.VERTICAL) 
 		
 		self.questDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		questImage = wx.Bitmap("images/kinsects/Culldrone I.jpg", wx.BITMAP_TYPE_ANY)
+		questImage = wx.Bitmap("images/hunter-rank-160.png", wx.BITMAP_TYPE_ANY)
 		self.questImageLabel = wx.StaticBitmap(self.questPanel, bitmap=questImage, size=(160, 160))
-		#self.questImageLabel.SetBackgroundColour((0, 0, 0))
 
 		self.questDetailsNotebook = wx.Notebook(self.questPanel)
 		self.questDetailPanel = wx.ScrolledWindow(self.questDetailsNotebook)
@@ -79,7 +85,6 @@ class QuestsTab:
 		self.questButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
 		for i, item in enumerate(quests):
 			button = wx.Button(self.questPanel, label=item.capitalize(), name=item)
-			button.SetBitmap(wx.Bitmap(f"images/unknown.png"))
 			self.questButtonsSizer.Add(button)
 			button.Bind(wx.EVT_BUTTON, self.onQuestTypeSelection)
 
@@ -87,14 +92,22 @@ class QuestsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.questPanel)
-		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
-		self.questButtonsSizer.Add(120, 0, 0)
-		self.questButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.searchName = wx.TextCtrl(self.questPanel, name="byName")
+		self.searchName.SetHint("  search by name")
+		self.searchName.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.searchMonster = wx.TextCtrl(self.questPanel, name="byMonster")
+		self.searchMonster.SetHint("  search by monster")
+		self.searchMonster.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+
+		self.currentSearch = self.searchName
+
+		self.questButtonsSizer.Add(self.searchName, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.questButtonsSizer.Add(self.searchMonster, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):
+		self.currentSearch = event.GetEventObject()
 		self.loadQuestTree()
 
 
@@ -106,15 +119,15 @@ class QuestsTab:
 		self.questTreeSizer.Add(self.questTree, 1, wx.EXPAND)
 
 		questTreeColumns = {
-			"Name": [500, None], # joined by quest type icon
-			"Location": [100, None],
+			"Name": [470, None],
+			"Location": [110, None],
 			"Zenny": [60, wx.Bitmap("images/zenny.png")],
 			"id": [0,  None],
 		}
 
 		self.questTree.CreateGrid(1, len(questTreeColumns))
 		self.questTree.SetDefaultRowSize(27, resizeExistingRows=True)
-		self.questTree.HideRowLabels()
+		self.questTree.SetRowLabelSize(1)
 		self.questTree.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
 
 		for col, (k, v) in enumerate(questTreeColumns.items()):
@@ -134,41 +147,80 @@ class QuestsTab:
 		except:
 			pass
 
-		searchText = self.search.GetValue().replace("'", "''")
+		searchText = self.currentSearch.GetValue().replace("'", "''")
 
 		if len(searchText) == 0 or searchText == " ":
 			sql = """
 				SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
 				FROM quest q
+				WHERE q.category = :questCat
+				ORDER BY q.stars
 			"""
 		else:
-			sql = f"""
-				SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
-				FROM quest q
-				WHERE q.name LIKE '%{searchText}%'
-			"""
+			if self.currentSearch.GetName() == "byMonster":
+				sql = f"""
+					SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
+					FROM quest q
+					JOIN quest_monsters qm
+						ON qm.id = q.id
+					WHERE q.category = :questCat
+						AND qm.monster_name LIKE '%{searchText}%'
+						AND qm.is_objective = 1
+					ORDER BY q.stars
+				"""
+			else:
+				sql = f"""
+					SELECT q.id, q.name, q.description, q.objective, q.quest_type, q.category, q.location, q.stars, q.zenny
+					FROM quest q
+					WHERE q.category = :questCat
+						AND q.name LIKE '%{searchText}%'
+					ORDER BY q.stars
+				"""
 
 		conn = sqlite3.connect("mhw.db")
-		data = conn.execute(sql)
+		data = conn.execute(sql, (self.currentQuestTree,))
 		data = data.fetchall()
 
 		quests = []
 		for row in data:
 			quests.append(q.Quest(row))
 
+		starRanks = {
+			1: "lr",
+			2: "lr",
+			3: "lr",
+			4: "lr",
+			5: "lr",
+			6: "hr",
+			7: "hr",
+			8: "hr",
+			9: "hr"
+		}
+
+		lastStar = 0
 		for quest in quests:
-			self.populateQuestTree(quest)
+			self.populateQuestTree(quest, lastStar, starRanks[quest.stars])
+			lastStar = quest.stars
 
 		self.init = False
 
 
-	def populateQuestTree(self, quest):
+	def populateQuestTree(self, quest, lastStar, starIcon):
 		self.questTree.AppendRows() 
 		row = self.questTree.GetNumberRows() - 1
 
-		self.questTree.SetCellValue(row, 0, str(quest.name))
+		if lastStar != quest.stars:
+			img = wx.Bitmap(f"images/rank-stars-24/{starIcon}.png")
+			self.questTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
+				img, f"{quest.stars}", imageOffset=20, colour=util.hexToRGB(self.rankColors[starIcon])))
+			self.questTree.SetCellBackgroundColour(row, 1, util.hexToRGB(self.rankColors[starIcon]))
+			self.questTree.SetCellBackgroundColour(row, 2, util.hexToRGB(self.rankColors[starIcon]))
+			self.questTree.AppendRows() 
+			row = self.questTree.GetNumberRows() - 1
+		self.questTree.SetCellValue(row, 0, str(quest.name)) # TODO quest type icon
 		self.questTree.SetCellValue(row, 1, str(quest.location))
 		self.questTree.SetCellValue(row, 2, str(quest.zenny))
+		self.questTree.SetCellValue(row, 3, str(quest.id))
 
 
 	def initQuestDetail(self):
@@ -272,7 +324,7 @@ class QuestsTab:
 				else:
 					img = wx.Bitmap("images/unknown.png")
 				self.questDetailList.SetCellRenderer(i, 1, cgr.ImageTextCellRenderer(
-						img, f"{v[1]}", imageOffset=55))
+						img, f"{v[1]}", imageOffset=65))
 			else:
 				self.questDetailList.SetCellValue(i, 1, v[1])
 
@@ -319,15 +371,10 @@ class QuestsTab:
 		self.questMonstersList.SetColumnWidth(3, 0)
 
 		sql = """
-			SELECT qm.monster_id, mt.name, qm.quantity, qm.is_objective 
+			SELECT qm.monster_id, qm.monster_name, qm.quantity, qm.is_objective 
 			FROM quest q
 			JOIN quest_monsters qm
 				ON qm.id = q.id
-			JOIN monster m
-				ON qm.monster_id = m.id
-			JOIN monster_text mt
-				ON mt.id = m.id
-				AND mt.lang_id = 'en'
 			WHERE q.id = :questID
 		"""
 
@@ -414,11 +461,15 @@ class QuestsTab:
 
 
 	def onQuestSelection(self, event):
-		pass
+		if not self.init:
+			self.currentlySelectedQuestID = self.questTree.GetCellValue(event.GetRow(), 3)
+			if self.currentlySelectedQuestID != "":
+				self.loadQuestDetail()
 
 
 	def onQuestTypeSelection(self, event):
-		pass
+		self.currentQuestTree = event.GetEventObject().GetName()
+		self.loadQuestTree()
 
 
 	def onListDoubleClick(self, event):
