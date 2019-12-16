@@ -185,7 +185,7 @@ class PalicoTab:
 		self.gadgetSizer.Add(self.gadgetList, 1, wx.EXPAND)
 
 		self.gadgetSizer.Add(self.gadgetDetailSizer, 1, wx.EXPAND)
-		gadget = wx.Bitmap("images/palico/gadgets/230/Vigorwasp Spray.jpg", wx.BITMAP_TYPE_ANY)
+		gadget = wx.Bitmap("images/palico/gadgets/180/Vigorwasp Spray.jpg", wx.BITMAP_TYPE_ANY)
 		self.palicoGadgetImageLabel = wx.StaticBitmap(self.gadgetPanel, bitmap=gadget, size=(230, 230))
 		self.palicoGadgetImageLabel.SetBackgroundColour((0, 0, 0))
 		self.gadgetDetailSizer.Add(self.palicoGadgetImageLabel, 1, wx.EXPAND)
@@ -215,7 +215,7 @@ class PalicoTab:
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute("SELECT * FROM palico_gadget WHERE id = :gadgetID", (self.currentGadgetID,))
 		data = data.fetchone()
-		self.palicoGadgetImageLabel.SetBitmap(wx.Bitmap(f"images/palico/gadgets/230/{data[1]}.jpg"))
+		self.palicoGadgetImageLabel.SetBitmap(wx.Bitmap(f"images/palico/gadgets/180/{data[1]}.jpg"))
 		self.gadgetNameLabel.SetLabel(data[1] + ":" + "\n")
 		self.gadgetDescriptionLabel.SetLabel(data[2])
 		self.gadgetDescriptionLabel.Wrap(600)
