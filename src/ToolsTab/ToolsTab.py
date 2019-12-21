@@ -127,12 +127,14 @@ class ToolsTab:
 			sql = """
 				SELECT *
 				FROM tool t
+				ORDER BY order_id
 			"""
 		else:
 			sql = f"""
 				SELECT *
 				FROM tool t
 				WHERE t.name LIKE '%{searchText}%'
+				ORDER BY order_id
 			"""
 
 		conn = sqlite3.connect("mhw.db")
@@ -146,7 +148,7 @@ class ToolsTab:
 		padding = " " * 8
 		for row, tool in enumerate(tools):
 			self.toolTree.AppendRows() 
-			img = wx.Bitmap(f"images/hunter-tools-24/0.png")
+			img = wx.Bitmap(f"images/hunter-tools-24/{tool.name}.png")
 			self.toolTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 			img, f"{padding}{tool.name}", imageOffset=310, hAlign=wx.ALIGN_LEFT))
 			self.toolTree.SetCellValue(row, 1, str(tool.id))
