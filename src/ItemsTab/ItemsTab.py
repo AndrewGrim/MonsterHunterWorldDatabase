@@ -358,7 +358,10 @@ class ItemsTab:
 
 		item = i.Item(data)
 
-		self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/items-160/{item.iconName}{item.iconColor}.png"))
+		if os.path.exists(f"images/items-160/{item.iconName}{item.iconColor}.png"):
+			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/items-160/{item.iconName}{item.iconColor}.png"))
+		else:
+			self.itemImageLabel.SetBitmap(wx.Bitmap(f"images/items-160/QuestionWhite.png"))
 		
 		self.itemNameLabel.SetLabelText(f"\n{item.name}:")
 		self.itemDescriptionLabel.SetLabelText(f"{item.description}\n")
