@@ -26,6 +26,7 @@ class Preferences:
 			"palico": "Palico",
 			"kinsect": "Kinsects",
 			"quest": "Quests",
+			"tool": "Tools",
 		}
 
 

@@ -103,6 +103,7 @@ class SearchWindow:
 		self.loadItems()
 		self.loadLocations()
 		self.loadQuests()
+		self.loadTools()
 
 
 	def searchBySkill(self, event):
@@ -498,6 +499,25 @@ class SearchWindow:
 			img = wx.Bitmap(f"images/quests-24/{row[2]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"quest,{row[0]},{row[3]}")
+
+		
+	def loadTools(self):
+		sql = f"""
+			SELECT DISTINCT t.id, t.name
+			FROM tool t
+			WHERE t.name LIKE '%{self.searchText}%'
+			ORDER BY t.order_id
+		"""
+
+		data = self.conn.execute(sql,)
+		data = data.fetchall()
+
+		for row in data:
+			self.results.AppendRows()
+			r = self.results.GetNumberRows() - 1
+			img = wx.Bitmap(f"images/hunter-tools-24/{row[1]}.png")
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellValue(r, 1, f"tool,{row[0]}")
 
 
 	def makeMenuBar(self):

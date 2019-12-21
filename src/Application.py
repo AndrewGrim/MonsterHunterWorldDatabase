@@ -54,6 +54,7 @@ class Application(wx.Frame):
 		que = il.Add(wx.Bitmap("images/rank-stars-24/hr.png")) # TODO change to proper icon
 		wep = il.Add(wx.Bitmap("images/weapons/great-sword/rarity-24/5.png"))
 		arm = il.Add(wx.Bitmap("images/armor/armorset/rarity-24/8.png"))
+		tool = il.Add(wx.Bitmap("images/hunter-tools-24/Challenger Mantle.png"))
 		pal = il.Add(wx.Bitmap("images/palico/head-rarity-24/9.png"))
 		kin = il.Add(wx.Bitmap("images/kinsects/blunt-rarity-24/10.png"))
 		charm = il.Add(wx.Bitmap("images/charms-24/7.png"))
@@ -70,6 +71,7 @@ class Application(wx.Frame):
 		self.weapons = w.WeaponsTab(root, self.mainNotebook, self.link)
 		lo.loading.SetValue(80)
 		self.armor = a.ArmorTab(root, self.mainNotebook, self.link)
+		self.hunterTools = t.ToolsTab(root, self.mainNotebook, self.link)
 		lo.loading.SetValue(90)
 		self.palico = pp.PalicoTab(root, self.mainNotebook, self.link)
 		self.kinsects = k.KinsectsTab(root, self.mainNotebook)
@@ -79,19 +81,19 @@ class Application(wx.Frame):
 		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		self.locations = l.LocationsTab(root, self.mainNotebook, self.link)
-		self.hunterTools = t.ToolsTab(root, self.mainNotebook, self.link)
 
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, que)
 		self.mainNotebook.SetPageImage(2, wep)
 		self.mainNotebook.SetPageImage(3, arm)
-		self.mainNotebook.SetPageImage(4, pal)
-		self.mainNotebook.SetPageImage(5, kin)
-		self.mainNotebook.SetPageImage(6, charm)
-		self.mainNotebook.SetPageImage(7, deco)
-		self.mainNotebook.SetPageImage(8, skill)
-		self.mainNotebook.SetPageImage(9, item)
-		self.mainNotebook.SetPageImage(10, local)	
+		self.mainNotebook.SetPageImage(4, tool)
+		self.mainNotebook.SetPageImage(5, pal)
+		self.mainNotebook.SetPageImage(6, kin)
+		self.mainNotebook.SetPageImage(7, charm)
+		self.mainNotebook.SetPageImage(8, deco)
+		self.mainNotebook.SetPageImage(9, skill)
+		self.mainNotebook.SetPageImage(10, item)
+		self.mainNotebook.SetPageImage(11, local)	
 
 		self.makeMenuBar()
 		self.CreateStatusBar()
@@ -226,6 +228,11 @@ class Application(wx.Frame):
 					self.quests.loadQuestTree()
 				self.quests.loadQuestDetail()
 				self.selectTab("Quests")
+
+			elif self.link.eventType == "tool":
+				self.hunterTools.currentlySelectedToolID = self.link.info.id
+				self.hunterTools.loadToolDetail()
+				self.selectTab("Tools")
 
 			else:
 				debug(self.link, "self.link", "Link type not supported!")
