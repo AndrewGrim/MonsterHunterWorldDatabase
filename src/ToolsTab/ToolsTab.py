@@ -18,6 +18,7 @@ import Utilities as util
 from Debug import debug
 import ToolsTab as t
 import Links as link
+import ItemsTab as i
 
 wxTreeListItem = NewType('wxTreeListItem', None)
 
@@ -181,7 +182,15 @@ class ToolsTab:
 
 
 	def initRequiredToolMaterials(self):
-		pass
+		self.toolMaterialList = wx.ListCtrl(self.toolDetailPanel, style=wx.LC_REPORT
+																		| wx.LC_VRULES
+																		| wx.LC_HRULES
+																		)
+		self.toolMaterialList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListDoubleClick)
+		self.il = wx.ImageList(24, 24)
+		self.il.Add(self.testIcon)
+		self.toolMaterialList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.toolDetailSizer.Add(self.toolMaterialList, 1, wx.EXPAND|wx.TOP, 5)
 
 
 	def loadToolDetail(self):
@@ -219,7 +228,6 @@ class ToolsTab:
 		self.toolUnlockConditionDetailLabel.SetLabel(f"{tool.unlockCondition}\n")
 		self.toolUnlockConditionDetailLabel.Wrap(600)
 
-
 		for i, (k, v) in enumerate(toolDetail.items()):
 			self.toolDetailList.SetCellValue(i, 0, k)
 			self.toolDetailList.SetCellValue(i, 1, v)
@@ -232,8 +240,56 @@ class ToolsTab:
 
 
 	def loadRequiredToolMaterials(self):
-		pass
+		self.il.RemoveAll()
+		self.toolMaterialList.ClearAll()
 
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_LEFT
+		info.Text = "Req. Materials"
+		self.toolMaterialList.InsertColumn(0, info)
+		self.toolMaterialList.SetColumnWidth(0, 480)
+
+		info = wx.ListItem()
+		info.Mask = wx.LIST_MASK_TEXT | wx.LIST_MASK_IMAGE | wx.LIST_MASK_FORMAT
+		info.Image = -1
+		info.Align = wx.LIST_FORMAT_CENTER
+		info.Text = ""
+		self.toolMaterialList.InsertColumn(1, info)
+		self.toolMaterialList.SetColumnWidth(1, 240 - 20)
+
+		self.toolMaterialList.InsertColumn(2, info)
+		self.toolMaterialList.SetColumnWidth(2, 0)
+
+		sql = """
+			SELECT i.id, it.name, i.category, tr.quantity, i.icon_name, i.icon_color
+			FROM tool_recipe tr
+				JOIN item i
+					ON tr.item_id = i.id
+				JOIN item_text it
+					ON tr.item_id = it.id
+			WHERE it.lang_id = 'en'
+				AND tr.id = :kinId
+			ORDER BY i.id
+		"""
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute(sql, (self.currentlySelectedToolID,))
+		data = data.fetchall()
+
+		materials = []
+		for row in data:
+			materials.append(t.ToolMaterial(row))
+
+		for mat in materials:
+			if os.path.exists(f"images/items-24/{mat.iconName}{mat.iconColor}.png"):
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
+			index = self.toolMaterialList.InsertItem(self.toolMaterialList.GetItemCount(), mat.name, img)
+			self.toolMaterialList.SetItem(index, 1, f"{mat.quantity}")
+			self.toolMaterialList.SetItem(index, 2, f"item,{mat.id},{mat.category}")
 
 	def onToolSelection(self, event):
 		if not self.init:
@@ -248,7 +304,7 @@ class ToolsTab:
 
 
 	def onListDoubleClick(self, event):
-		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 3).split(",")
+		materialInfo = event.GetEventObject().GetItemText(event.GetEventObject().GetFirstSelected(), 2).split(",")
 		self.link.event = True
 		self.link.eventType = materialInfo[0]
 		materialInfo.remove(materialInfo[0])
@@ -266,6 +322,8 @@ class ToolsTab:
 		try:
 			self.toolDetailList.SetColSize(0, self.toolDetailPanel.GetSize()[0] * 0.66)
 			self.toolDetailList.SetColSize(1, self.toolDetailPanel.GetSize()[0] * 0.34 - 20)
+			self.toolMaterialList.SetColumnWidth(0, self.toolDetailPanel.GetSize()[0] * 0.66)
+			self.toolMaterialList.SetColumnWidth(1, self.toolDetailPanel.GetSize()[0] * 0.34 - 20)
 		except:
 			pass
 
