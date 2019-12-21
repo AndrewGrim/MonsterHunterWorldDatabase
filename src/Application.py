@@ -16,6 +16,7 @@ import CharmsTab as c
 import LocationsTab as l
 import KinsectsTab as k
 import QuestsTab as q
+import ToolsTab as t
 import Utilities as util
 import Links as link
 import Preferences as p
@@ -78,6 +79,7 @@ class Application(wx.Frame):
 		self.skills = s.SkillsTab(root, self.mainNotebook, self.link)
 		self.items = i.ItemsTab(root, self.mainNotebook, self.link)
 		self.locations = l.LocationsTab(root, self.mainNotebook, self.link)
+		self.hunterTools = t.ToolsTab(root, self.mainNotebook, self.link)
 
 		self.mainNotebook.SetPageImage(0, mon)
 		self.mainNotebook.SetPageImage(1, que)
