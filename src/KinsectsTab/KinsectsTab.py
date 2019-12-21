@@ -329,7 +329,6 @@ class KinsectsTab:
 		self.kinsectMaterialList.InsertColumn(1, info)
 		self.kinsectMaterialList.SetColumnWidth(1, 200)
 
-
 		sql = """
 			SELECT k.id, kr.item_id, kr.quantity, kt.name,
 				i.category, i.icon_name, i.icon_color, it.name
@@ -357,7 +356,7 @@ class KinsectsTab:
 
 		for mat in materials:
 			img = self.il.Add(wx.Bitmap(f"images/items-24/{mat.iconName}{mat.iconColor}.png"))
-			index = self.kinsectMaterialList.InsertItem(self.kinsectMaterialList.GetItemCount(), mat.name, self.test)
+			index = self.kinsectMaterialList.InsertItem(self.kinsectMaterialList.GetItemCount(), mat.name, img)
 			self.kinsectMaterialList.SetItem(index, 1, f"{mat.quantity}")
 
 		width, height = self.kinsectPanel.GetSize()
