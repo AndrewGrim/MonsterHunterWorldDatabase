@@ -178,30 +178,62 @@ class PalicoTab:
 		data = conn.execute("SELECT * FROM palico_gadget")
 		data = data.fetchall()
 
+		gadgets = []
 		for row in data:
-			img = self.ilGadgets.Add(wx.Bitmap(f"images/palico/gadgets/24/{row[1]}.png"))
-			index = self.gadgetList.InsertItem(self.gadgetList.GetItemCount(), row[1], img)
-			self.gadgetList.SetItem(index, 1, str(row[0]))
+			gadgets.append(p.PalicoGadget(row))
+
+		for g in gadgets:
+			img = self.ilGadgets.Add(wx.Bitmap(f"images/palico/gadgets/24/{g.name}.png"))
+			index = self.gadgetList.InsertItem(self.gadgetList.GetItemCount(), g.name, img)
+			self.gadgetList.SetItem(index, 1, str(g.id))
 		self.gadgetSizer.Add(self.gadgetList, 1, wx.EXPAND)
 
 		self.gadgetSizer.Add(self.gadgetDetailSizer, 1, wx.EXPAND)
 		gadget = wx.Bitmap("images/palico/gadgets/180/Vigorwasp Spray.jpg", wx.BITMAP_TYPE_ANY)
-		self.palicoGadgetImageLabel = wx.StaticBitmap(self.gadgetPanel, bitmap=gadget, size=(230, 230))
+		self.palicoGadgetImageLabel = wx.StaticBitmap(self.gadgetPanel, bitmap=gadget, size=(180, 180))
 		self.palicoGadgetImageLabel.SetBackgroundColour((0, 0, 0))
 		self.gadgetDetailSizer.Add(self.palicoGadgetImageLabel, 1, wx.EXPAND)
 
 		self.gadgetDetailesNotebook = wx.Notebook(self.gadgetPanel)
 		self.gadgetDetailPanel = wx.Panel(self.gadgetDetailesNotebook)
 		self.gadgetDetailesNotebook.AddPage(self.gadgetDetailPanel, "Detail")
-		self.gadgetDetailSizer.Add(self.gadgetDetailesNotebook, 2, wx.EXPAND)
+		self.gadgetDetailSizer.Add(self.gadgetDetailesNotebook, 3, wx.EXPAND)
 
 		self.gadgetDetailNotebookSizer = wx.BoxSizer(wx.VERTICAL)
-		self.gadgetNameLabel = wx.StaticText(self.gadgetDetailPanel, label="test")
-		self.gadgetNameLabel.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False).Bold())
-		self.gadgetDetailNotebookSizer.Add(self.gadgetNameLabel, 0.5, wx.EXPAND)
-		self.gadgetDescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="test")
-		self.gadgetDescriptionLabel.SetFont(wx.Font(32, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
-		self.gadgetDetailNotebookSizer.Add(self.gadgetDescriptionLabel, 2, wx.EXPAND)
+		self.gadgetNameLabel = wx.StaticText(self.gadgetDetailPanel, label="Name:")
+		self.gadgetNameLabel.SetFont(self.gadgetNameLabel.GetFont().Bold())
+		self.gadgetDetailNotebookSizer.Add(self.gadgetNameLabel, 0.1, wx.EXPAND)
+		self.gadgetDescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="Description")
+		self.gadgetDetailNotebookSizer.Add(self.gadgetDescriptionLabel, 0.5, wx.EXPAND)
+
+		self.gadgetUnlockConditionLabel = wx.StaticText(self.gadgetDetailPanel, label="Unlock Condition:")
+		self.gadgetUnlockConditionLabel.SetFont(self.gadgetUnlockConditionLabel.GetFont().Bold())
+		self.gadgetDetailNotebookSizer.Add(self.gadgetUnlockConditionLabel, 0.1, wx.EXPAND)
+
+		self.gadgetUnlockConditionDescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="Description")
+		self.gadgetUnlockConditionDescriptionLabel.SetFont(self.gadgetUnlockConditionDescriptionLabel.GetFont())
+		self.gadgetDetailNotebookSizer.Add(self.gadgetUnlockConditionDescriptionLabel, 0.5, wx.EXPAND)
+
+		self.level1Label = wx.StaticText(self.gadgetDetailPanel, label="Level 1:")
+		self.level1Label.SetFont(self.level1Label.GetFont().Bold())
+		self.gadgetDetailNotebookSizer.Add(self.level1Label, 0.1, wx.EXPAND)
+
+		self.level1DescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="Description")
+		self.gadgetDetailNotebookSizer.Add(self.level1DescriptionLabel, 0.5, wx.EXPAND)
+
+		self.level2Label = wx.StaticText(self.gadgetDetailPanel, label="Level 2:")
+		self.level2Label.SetFont(self.level2Label.GetFont().Bold())
+		self.gadgetDetailNotebookSizer.Add(self.level2Label, 0.1, wx.EXPAND)
+
+		self.level2DescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="Description")
+		self.gadgetDetailNotebookSizer.Add(self.level2DescriptionLabel, 0.5, wx.EXPAND)
+
+		self.level3Label = wx.StaticText(self.gadgetDetailPanel, label="Level 3:")
+		self.level3Label.SetFont(self.level3Label.GetFont().Bold())
+		self.gadgetDetailNotebookSizer.Add(self.level3Label, 0.1, wx.EXPAND)
+
+		self.level3DescriptionLabel = wx.StaticText(self.gadgetDetailPanel, label="Description")
+		self.gadgetDetailNotebookSizer.Add(self.level3DescriptionLabel, 0.5, wx.EXPAND)
 
 		self.gadgetDetailPanel.SetSizer(self.gadgetDetailNotebookSizer)
 		self.gadgetPanel.SetSizer(self.gadgetSizer)
@@ -215,10 +247,35 @@ class PalicoTab:
 		conn = sqlite3.connect("mhw.db")
 		data = conn.execute("SELECT * FROM palico_gadget WHERE id = :gadgetID", (self.currentGadgetID,))
 		data = data.fetchone()
-		self.palicoGadgetImageLabel.SetBitmap(wx.Bitmap(f"images/palico/gadgets/180/{data[1]}.jpg"))
-		self.gadgetNameLabel.SetLabel(data[1] + ":" + "\n")
-		self.gadgetDescriptionLabel.SetLabel(data[2])
+
+		g = p.PalicoGadget(data)
+
+		self.palicoGadgetImageLabel.SetBitmap(wx.Bitmap(f"images/palico/gadgets/180/{g.name}.jpg"))
+
+		self.gadgetNameLabel.SetLabel(f"{g.name}:")
+		self.gadgetDescriptionLabel.SetLabel(f"{g.description}\n")
 		self.gadgetDescriptionLabel.Wrap(600)
+
+		self.gadgetUnlockConditionLabel.SetLabel("Unlock Condition:")
+		self.gadgetUnlockConditionDescriptionLabel.SetLabel(f"{g.unlockCondition}\n")
+		self.gadgetUnlockConditionDescriptionLabel.Wrap(600)
+
+		conn = sqlite3.connect("mhw.db")
+		data = conn.execute("SELECT * FROM palico_gadget_level WHERE id = :gadgetID", (self.currentGadgetID,))
+		data = data.fetchall()
+
+		self.level1Label.SetLabel("Level 1:")
+		self.level1DescriptionLabel.SetLabel(f"{data[0][2]} - {data[0][3]}\n\n")
+		self.level1DescriptionLabel.Wrap(600)
+
+		self.level2Label.SetLabel("Level 5:")
+		self.level2DescriptionLabel.SetLabel(f"{data[1][2]} - {data[1][3]}\n\n{data[2][2]} - {data[2][3]}\n\n")
+		self.level2DescriptionLabel.Wrap(600)
+
+		self.level3Label.SetLabel("Level 10:")
+		self.level3DescriptionLabel.SetLabel(f"{data[3][2]} - {data[3][3]}\n\n")
+		self.level3DescriptionLabel.Wrap(600)
+
 		width, height = self.gadgetPanel.GetSize()
 		self.gadgetPanel.SetSize(width + 1, height + 1)
 		self.gadgetPanel.SetSize(width, height)
