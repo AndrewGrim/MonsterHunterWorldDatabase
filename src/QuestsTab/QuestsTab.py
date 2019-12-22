@@ -397,7 +397,10 @@ class QuestsTab:
 			monsters.append(q.QuestMonster(row))
 
 		for mon in monsters:
-			img = self.il.Add(wx.Bitmap(f"images/monsters/24/{mon.name}.png"))
+			if mon.name == "Kestodon":
+				img = self.il.Add(wx.Bitmap(f"images/monsters/24/Kestodon Male.png"))
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/monsters/24/{mon.name}.png"))
 			index = self.questMonstersList.InsertItem(self.questMonstersList.GetItemCount(), mon.name, img)
 			self.questMonstersList.SetItem(index, 1, f"{mon.quantity}")
 			if bool(mon.isObjective):
@@ -463,7 +466,10 @@ class QuestsTab:
 			items.append(q.QuestReward(row))
 
 		for item in items:
-			img = self.il.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
+			if os.path.exists(f"images/items-24/{item.iconName}{item.iconColor}.png"):
+				img = self.il.Add(wx.Bitmap(f"images/items-24/{item.iconName}{item.iconColor}.png"))
+			else:
+				img = self.il.Add(wx.Bitmap(f"images/unknown.png"))
 			index = self.materialsRequiredList.InsertItem(self.materialsRequiredList.GetItemCount(), item.name, img)
 			self.materialsRequiredList.SetItem(index, 1, f"{item.stack} x {item.percentage}%")
 			self.materialsRequiredList.SetItem(index, 2, f"{item.rewardGroup}")
