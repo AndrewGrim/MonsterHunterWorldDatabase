@@ -58,7 +58,7 @@ class ItemsTab:
 		self.itemDetailPanel.SetSizer(self.itemDetailSizer)
 		
 		self.itemDetailedSizer.Add(self.itemImageLabel, 1, wx.ALIGN_CENTER)
-		self.itemDetailedSizer.Add(self.itemDetailsNotebook, 3, wx.EXPAND)
+		self.itemDetailedSizer.Add(self.itemDetailsNotebook, 5, wx.EXPAND)
 
 		self.itemsSizer.Add(self.itemListSizer, 0, wx.EXPAND)
 		self.itemsSizer.Add(self.itemDetailedSizer, 1, wx.EXPAND)

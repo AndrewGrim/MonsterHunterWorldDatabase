@@ -64,7 +64,7 @@ class QuestsTab:
 		self.questDetailedImagesSizer.Add(self.questImageLabel, 1, wx.ALIGN_CENTER)
 		
 		self.questDetailedSizer.Add(self.questDetailedImagesSizer, 1, wx.EXPAND)
-		self.questDetailedSizer.Add(self.questDetailsNotebook, 3, wx.EXPAND)
+		self.questDetailedSizer.Add(self.questDetailsNotebook, 5, wx.EXPAND)
 
 		self.questSizer.Add(self.questTreeSizer, 0, wx.EXPAND)
 		self.questSizer.Add(self.questDetailedSizer, 1, wx.EXPAND)
