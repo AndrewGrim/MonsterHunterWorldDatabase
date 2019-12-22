@@ -58,8 +58,8 @@ class ArmorTab:
 			7: ["images/weapon-detail-24/slots.png", "Slot III"],
 			8: ["images/damage-types-24/fire.png", "Fire"],
 			9: ["images/damage-types-24/water.png", "Water"],
-			10: ["images/damage-types-24/ice.png", "Ice"],
-			11: [ "images/damage-types-24/thunder.png", "Thunder"],
+			10: [ "images/damage-types-24/thunder.png", "Thunder"],
+			11: ["images/damage-types-24/ice.png", "Ice"],
 			12: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
@@ -73,8 +73,8 @@ class ArmorTab:
 			7: ["images/decoration-slots-24/3.png", "Slots"],
 			8: ["images/damage-types-24/fire.png", "Fire"],
 			9: ["images/damage-types-24/water.png", "Water"],
-			10: ["images/damage-types-24/ice.png", "Ice"],
-			11: [ "images/damage-types-24/thunder.png", "Thunder"],
+			10: [ "images/damage-types-24/thunder.png", "Thunder"],
+			11: ["images/damage-types-24/ice.png", "Ice"],
 			12: [ "images/damage-types-24/dragon.png", "Dragon"],
 		}
 
@@ -191,8 +191,8 @@ class ArmorTab:
 			"Defense Augmented Max": [32, wx.Bitmap("images/weapon-detail-24/defense.png")],
 			"Fire": [32, wx.Bitmap("images/damage-types-24/fire.png")],
 			"Water": [32, wx.Bitmap("images/damage-types-24/water.png")],
-			"Ice": [32, wx.Bitmap("images/damage-types-24/ice.png")],
 			"Thunder": [32, wx.Bitmap("images/damage-types-24/thunder.png")],
+			"Ice": [32, wx.Bitmap("images/damage-types-24/ice.png")],
 			"Dragon": [32, wx.Bitmap("images/damage-types-24/dragon.png")],
 			"id": [0,  wx.Bitmap("images/noImage24.png")],
 			"armorSetID": [0, wx.Bitmap("images/noImage24.png")],
@@ -290,14 +290,20 @@ class ArmorTab:
 			else:
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 					img, f"{piecePadding}{a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
+			colorLevel = 0
 			self.armorTree.SetCellValue(row, 4, str(a.defenseBase))
 			self.armorTree.SetCellValue(row, 5, str(a.defenseMax))
 			self.armorTree.SetCellValue(row, 6, str(a.defenseAugmentedMax))
 			self.armorTree.SetCellValue(row, 7, str(a.fire))
+			self.armorTree.SetCellBackgroundColour(row, 7, util.hexToRGB(util.damageColors["fire"][colorLevel]))
 			self.armorTree.SetCellValue(row, 8, str(a.water))
-			self.armorTree.SetCellValue(row, 9, str(a.ice))
-			self.armorTree.SetCellValue(row, 10, str(a.thunder))
+			self.armorTree.SetCellBackgroundColour(row, 8, util.hexToRGB(util.damageColors["water"][colorLevel]))
+			self.armorTree.SetCellValue(row, 9, str(a.thunder))
+			self.armorTree.SetCellBackgroundColour(row, 9, util.hexToRGB(util.damageColors["thunder"][colorLevel]))
+			self.armorTree.SetCellValue(row, 10, str(a.ice))
+			self.armorTree.SetCellBackgroundColour(row, 10, util.hexToRGB(util.damageColors["ice"][colorLevel]))
 			self.armorTree.SetCellValue(row, 11, str(a.dragon))
+			self.armorTree.SetCellBackgroundColour(row, 11, util.hexToRGB(util.damageColors["dragon"][colorLevel]))
 			self.armorTree.SetCellValue(row, 12, str(a.id))
 			self.armorTree.SetCellValue(row, 13, str(a.armorSetID))
 
@@ -400,9 +406,17 @@ class ArmorTab:
 			7:  str(armor.slot3),
 			8:  str(armor.fire),
 			9:  str(armor.water),
-			10:  str(armor.ice),
-			11: str(armor.thunder),
+			10: str(armor.thunder),
+			11: str(armor.ice),
 			12: str(armor.dragon),
+		}
+
+		eleBG = {
+			8: "fire",
+			9: "water",
+			10: "thunder",
+			11: "ice",
+			12: "dragon",
 		}
 
 		imageOffset = 85
@@ -427,6 +441,8 @@ class ArmorTab:
 										))
 			if num not in [5, 6, 7]:
 				self.armorDetailList.SetCellValue(num, 1, armorDetail[num])
+				if num in [8, 9, 10, 11, 12]:
+					self.armorDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors[eleBG[num]][0]))
 			else:
 				if armorDetail[num] != "0":
 					self.armorDetailList.SetCellRenderer(num, 1,
