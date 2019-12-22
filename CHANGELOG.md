@@ -33,3 +33,13 @@ The first publicly available version has been released.
 ## v1.5.0 2019-12-14
 
 * Added a tab containing all quests.
+
+## v1.6.5 2019-12-22
+
+* Added a tab for hunter tools (mantles, boosters).
+
+* Updated palico gadgets to include more information and changed to a smaller font.
+
+* Added background colour to elemental resistances in ArmorTab.
+
+* Swapped the position of Thunder and Ice elements in ArmorTab to keep consistency with the game.

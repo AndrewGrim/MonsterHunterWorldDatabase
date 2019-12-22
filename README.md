@@ -12,8 +12,10 @@ Most of the information is linked. Meaning you can double click on a list item t
 It contains the tabs with the following information:
 
 * Monsters
+* Quests
 * Weapons
 * Armor
+* Tools
 * Palico
 * Kinsects
 * Charms

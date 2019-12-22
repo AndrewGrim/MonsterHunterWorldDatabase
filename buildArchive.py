@@ -1,7 +1,8 @@
 import zipfile
 import os
-import typing
 import shutil
+import typing
+from typing import List
 
 def getDirPaths(dirName: str) -> List[str]:
 	"""
