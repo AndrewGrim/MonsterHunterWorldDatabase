@@ -41,7 +41,7 @@ class MonstersTab:
 		self.loadMonsterList()
 		self.initMonsterSummary()
 		self.initMonsterDamage()
-		self.initWeaponButtons()
+		self.initRankButtons()
 		self.initMonsterMaterials()
 		self.loadMonsterDetail()
 
@@ -75,7 +75,6 @@ class MonstersTab:
 		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage, size=(160, 160))
 		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
-		self.monsterDetailsNotebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChanged)
 		self.summaryPanel = wx.Panel(self.monsterDetailsNotebook)
 		self.damagePanel = wx.ScrolledWindow(self.monsterDetailsNotebook)
 		self.materialsPanel = wx.Panel(self.monsterDetailsNotebook)
@@ -128,7 +127,7 @@ class MonstersTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER, size=(123, -1))
+		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.monsterSizeButtonsSizer.Add((420, 0))
@@ -136,7 +135,6 @@ class MonstersTab:
 
 
 	def onSearchTextEnter(self, event):
-		print("ON TEXT ENTER: ", self.search.GetValue())
 		self.loadMonsterList()
 
 
@@ -604,7 +602,7 @@ class MonstersTab:
 			self.breakDamageTable.SetCellValue(index, 4, f"{b.extract.capitalize()}")
 
 
-	def initWeaponButtons(self):
+	def initRankButtons(self):
 		ranks = {
 			"LR": "Low Rank",
 			"HR": "High Rank",
@@ -748,10 +746,6 @@ class MonstersTab:
 	def onMonsterSizeSelect(self, event):
 		self.currentMonsterSize = event.GetEventObject().GetName()
 		self.loadMonsterList()
-
-
-	def onTabChanged(self, event):
-		pass#self.loadMonsterDetail()
 
 
 	def onSize(self, event):
