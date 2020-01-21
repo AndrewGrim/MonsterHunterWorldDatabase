@@ -55,22 +55,20 @@ class CharmsTab:
 		self.charmSizer.Add(self.charmListSizer, 0, wx.EXPAND)
 		self.charmSizer.Add(self.charmDetailedSizer, 1, wx.EXPAND)
 
-		self.charmPanel.SetSizer(self.charmSizer)
-
 		self.initSearch()
 		self.initCharmList()
 		self.initCharmDetail()
 		self.loadCharmList()
 
-		self.charmList.Bind(wx.EVT_SIZE, self.onSize)
-
+		self.charmPanel.SetSizer(self.charmSizer)
+		
 
 	def initSearch(self):
-		self.searchName = wx.TextCtrl(self.charmPanel, name="byName")
+		self.searchName = wx.TextCtrl(self.charmPanel, name="byName", size=(124, -1), style=wx.TE_PROCESS_ENTER)
 		self.searchName.SetHint("  search by name")
 		self.searchName.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
-		self.searchSkill = wx.TextCtrl(self.charmPanel, name="bySkill")
+		self.searchSkill = wx.TextCtrl(self.charmPanel, name="bySkill", size=(124, -1), style=wx.TE_PROCESS_ENTER)
 		self.searchSkill.SetHint("  search by skill")
 		self.searchSkill.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
@@ -94,13 +92,14 @@ class CharmsTab:
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
-		self.charmListSizer.Add(self.charmList, 1, wx.EXPAND)
 		self.charmList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onCharmSelected)
 
 		self.il = wx.ImageList(24, 24)
 		self.test = self.il.Add(self.testIcon)
 		self.charmList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
+		self.charmListSizer.Add(self.charmList, 1, wx.EXPAND)
+		
 
 	def loadCharmList(self):
 		try:
@@ -186,6 +185,7 @@ class CharmsTab:
 																| wx.LC_HRULES
 																)
 		self.charmSkillList.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onSkillDoubleClick)
+		self.charmSkillList.Bind(wx.EVT_SIZE, self.onSize)
 		self.charmDetailSizer.Add(self.charmSkillList, 1, wx.EXPAND)
 		self.charmSkillList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
 
@@ -339,3 +339,4 @@ class CharmsTab:
 		self.charmSkillList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.materialList.SetColumnWidth(0, self.charmDetailPanel.GetSize()[0] * 0.66)
 		self.materialList.SetColumnWidth(1, self.charmDetailPanel.GetSize()[0] * 0.34 - 20)
+		event.Skip()
