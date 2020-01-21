@@ -173,10 +173,10 @@ class WeaponsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.weaponPanel, style=wx.TE_PROCESS_ENTER)
+		self.search = wx.TextCtrl(self.weaponPanel, style=wx.TE_PROCESS_ENTER, size=(123, -1))
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		self.weaponButtonsSizer.Add(372, 0, 0)
+		self.weaponButtonsSizer.Add(200, 0, 0)
 		self.weaponButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
@@ -440,7 +440,7 @@ class WeaponsTab:
 		self.weaponMelodiesList.SetColSize(2, 26)
 		self.weaponMelodiesList.SetColSize(3, 26)
 		self.weaponMelodiesList.SetColSize(4, 55)
-		self.weaponMelodiesList.SetColSize(5, 60)
+		self.weaponMelodiesList.SetColSize(5, 75)
 
 		self.weaponMelodiesList.SetDefaultRowSize(32, resizeExistingRows=True)
 		self.weaponMelodiesList.SetDefaultCellAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
@@ -979,7 +979,10 @@ class WeaponsTab:
 
 
 	def loadHuntingHornMelodies(self, notes: List[str]):
-		size = self.weaponMelodiesPanel.GetSize()[0] - 4 * 29 - 60 - 65 - 6 - 20 + 27
+		if self.weaponMelodiesPanel.GetSize()[0] < 275:
+			size = 275
+		else:
+			size = self.weaponMelodiesPanel.GetSize()[0] - 4 * 29 - 60 - 65 - 6 - 20 + 27
 		self.weaponMelodiesList.SetColSize(6, size)
 		noteNumbers = {
 			notes[0]: "Note1",
