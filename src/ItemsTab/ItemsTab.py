@@ -115,7 +115,7 @@ class ItemsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.itemPanel, style=wx.TE_PROCESS_ENTER, size=(123, -1))
+		self.search = wx.TextCtrl(self.itemPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.itemButtonsSizer.Add(130, 0, 0)

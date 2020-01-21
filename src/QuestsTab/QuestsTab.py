@@ -94,11 +94,11 @@ class QuestsTab:
 
 
 	def initSearch(self):
-		self.searchName = wx.TextCtrl(self.questPanel, name="byName", style=wx.TE_PROCESS_ENTER, size=(123, -1))
+		self.searchName = wx.TextCtrl(self.questPanel, name="byName", style=wx.TE_PROCESS_ENTER, size=(124, -1))
 		self.searchName.SetHint("  search by name")
 		self.searchName.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
-		self.searchMonster = wx.TextCtrl(self.questPanel, name="byMonster", style=wx.TE_PROCESS_ENTER, size=(123, -1))
+		self.searchMonster = wx.TextCtrl(self.questPanel, name="byMonster", style=wx.TE_PROCESS_ENTER, size=(124, -1))
 		self.searchMonster.SetHint("  search by monster")
 		self.searchMonster.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 

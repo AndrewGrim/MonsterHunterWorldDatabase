@@ -173,10 +173,10 @@ class WeaponsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.weaponPanel, style=wx.TE_PROCESS_ENTER, size=(123, -1))
+		self.search = wx.TextCtrl(self.weaponPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		self.weaponButtonsSizer.Add(200, 0, 0)
+		self.weaponButtonsSizer.Add(255, 0, 0)
 		self.weaponButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
