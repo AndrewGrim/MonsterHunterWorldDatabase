@@ -283,6 +283,11 @@ class PalicoTab:
 
 	
 	def onGadgetSelected(self, event):
+		self.root.Freeze()
+		width, height = self.gadgetPanel.GetSize()
+		self.gadgetDetailPanel.SetSize(width + 1, height + 1)
+		self.gadgetDetailPanel.SetSize(width, height)
+		self.root.Thaw()
 		self.currentGadgetID = str(self.gadgetList.GetItemText(event.GetEventObject().GetFirstSelected(), 1))
 		self.loadGadgetDetail()
 
