@@ -470,6 +470,8 @@ class WeaponsTab:
 		self.root.Freeze()
 		self.loadWeaponDetail()
 		width, height = self.weaponPanel.GetSize()
+		self.weaponDetailPanel.SetSize(width + 5, height + 20)
+		self.weaponDetailPanel.SetSize(width, height)
 		self.weaponPanel.SetSize(width + 5, height + 20)
 		self.weaponPanel.SetSize(width, height)
 		self.root.Thaw()
@@ -818,6 +820,7 @@ class WeaponsTab:
 				self.weaponDetailSizer.SetDimension(self.weaponDetailPanel.GetPosition(), self.weaponDetailPanel.GetSize())
 
 		self.loadWeaponMaterials()
+
 
 	def loadBowgunAmmo(self):
 		self.ilAmmo.RemoveAll()
