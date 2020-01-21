@@ -838,6 +838,7 @@ class ItemsTab:
 		self.itemUsageList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 40)
 		self.itemObtainingList.SetColumnWidth(0, self.itemDetailPanel.GetSize()[0] * 0.66)
 		self.itemObtainingList.SetColumnWidth(1, self.itemDetailPanel.GetSize()[0] * 0.34 - 40)
+		event.Skip()
 
 
 	def onScroll(self, event):

@@ -436,3 +436,4 @@ class SkillsTab:
 		self.skillDetailList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.80 - 20)
 		self.foundList.SetColumnWidth(0, self.skillDetailPanel.GetSize()[0] * 0.66)
 		self.foundList.SetColumnWidth(1, self.skillDetailPanel.GetSize()[0] * 0.34 - 20)
+		event.Skip()

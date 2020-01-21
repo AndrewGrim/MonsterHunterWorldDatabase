@@ -67,7 +67,6 @@ class LocationsTab:
 														| wx.LC_VRULES
 														| wx.LC_HRULES
 														)
-		self.locationList.Bind(wx.EVT_SIZE, self.onSize)
 		self.locationListSizer.Add(self.locationList, 1, wx.EXPAND)
 		self.locationList.Bind(wx.EVT_LIST_ITEM_SELECTED, self.onLocationSelected)
 
@@ -119,6 +118,7 @@ class LocationsTab:
 																| wx.LC_HRULES
 																)
 		self.baseCampList.SetImageList(self.il, wx.IMAGE_LIST_SMALL)
+		self.baseCampList.Bind(wx.EVT_SIZE, self.onSize)
 		self.locationDetailSizer.Add(self.baseCampList, 1, wx.EXPAND)
 
 		self.materialList = wx.ListCtrl(self.locationDetailPanel, style=wx.LC_REPORT
@@ -254,3 +254,4 @@ class LocationsTab:
 		self.materialList.SetColumnWidth(0, self.locationDetailPanel.GetSize()[0] * 0.66)
 		self.materialList.SetColumnWidth(1, self.locationDetailPanel.GetSize()[0] * 0.22)
 		self.materialList.SetColumnWidth(2, self.locationDetailPanel.GetSize()[0] * 0.12 - 20)
+		event.Skip()

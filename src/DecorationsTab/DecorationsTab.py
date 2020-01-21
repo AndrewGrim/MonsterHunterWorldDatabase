@@ -320,3 +320,4 @@ class DecorationsTab:
 		self.skillList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
 		self.dropList.SetColumnWidth(0, self.decorationDetailPanel.GetSize()[0] * 0.66)
 		self.dropList.SetColumnWidth(1, self.decorationDetailPanel.GetSize()[0] * 0.34 - 20)
+		event.Skip()
