@@ -128,7 +128,7 @@ class MonstersTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER)
+		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER, size=(123, -1))
 		self.search.SetHint("  search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.monsterSizeButtonsSizer.Add((420, 0))
