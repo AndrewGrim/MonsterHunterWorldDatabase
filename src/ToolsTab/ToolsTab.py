@@ -77,9 +77,9 @@ class ToolsTab:
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.toolPanel)
+		self.search = wx.TextCtrl(self.toolPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.toolTreeSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 

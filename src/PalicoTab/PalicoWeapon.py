@@ -8,7 +8,7 @@ class PalicoWeapon:
 		self.setName = dbRow[4]
 		self.attackMelee = dbRow[5]
 		self.attackRanged = dbRow[6]
-		self.attackType = dbRow[7]
+		self.attackType = dbRow[7].lower()
 		self.element = dbRow[8]
 		self.elementAttack = dbRow[9]
 		self.elderseal = dbRow[10]

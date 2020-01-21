@@ -320,7 +320,7 @@ class SearchWindow:
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/palico/{row[4]}-rarity-24/{row[3]}.png")
+			img = wx.Bitmap(f"images/palico/{row[4].lower()}-rarity-24/{row[3]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"palico,{row[0]},{row[2]},weapon")
 

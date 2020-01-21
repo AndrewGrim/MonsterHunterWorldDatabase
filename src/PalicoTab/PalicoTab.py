@@ -183,7 +183,7 @@ class PalicoTab:
 			gadgets.append(p.PalicoGadget(row))
 
 		for g in gadgets:
-			img = self.ilGadgets.Add(wx.Bitmap(f"images/palico/gadgets/24/{g.name}.png"))
+			img = self.ilGadgets.Add(wx.Bitmap(f"images/palico/gadgets/24/{g.name.lower()}.png"))
 			index = self.gadgetList.InsertItem(self.gadgetList.GetItemCount(), g.name, img)
 			self.gadgetList.SetItem(index, 1, str(g.id))
 		self.gadgetSizer.Add(self.gadgetList, 1, wx.EXPAND)
@@ -309,9 +309,9 @@ class PalicoTab:
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.equipmentPanel)
+		self.search = wx.TextCtrl(self.palicoPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.equipmentButtonsSizer.Add(380, 0, 0)
 		self.equipmentButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 

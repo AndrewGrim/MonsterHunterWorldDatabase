@@ -128,14 +128,15 @@ class MonstersTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.monstersPanel)
+		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.monsterSizeButtonsSizer.Add((420, 0))
 		self.monsterSizeButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
 
 	def onSearchTextEnter(self, event):
+		print("ON TEXT ENTER: ", self.search.GetValue())
 		self.loadMonsterList()
 
 
@@ -750,7 +751,7 @@ class MonstersTab:
 
 
 	def onTabChanged(self, event):
-		self.loadMonsterDetail()
+		pass#self.loadMonsterDetail()
 
 
 	def onSize(self, event):

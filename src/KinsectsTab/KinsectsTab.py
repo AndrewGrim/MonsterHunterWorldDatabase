@@ -93,9 +93,9 @@ class KinsectsTab:
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.kinsectPanel)
+		self.search = wx.TextCtrl(self.kinsectPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.kinsectTreeSizer.Add(697, 0, 0)
 		self.kinsectTreeSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 

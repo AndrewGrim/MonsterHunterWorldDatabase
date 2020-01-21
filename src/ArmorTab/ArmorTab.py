@@ -163,9 +163,9 @@ class ArmorTab:
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.armorPanel)
+		self.search = wx.TextCtrl(self.armorPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.armorButtonsSizer.Add(380, 0, 0)
 		self.armorButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 

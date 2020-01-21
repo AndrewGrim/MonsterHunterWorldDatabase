@@ -64,13 +64,13 @@ class DecorationsTab:
 
 	
 	def initSearch(self):
-		self.searchName = wx.TextCtrl(self.decorationPanel, name="byName")
+		self.searchName = wx.TextCtrl(self.decorationPanel, name="byName", style=wx.TE_PROCESS_ENTER)
 		self.searchName.SetHint("  search by name")
-		self.searchName.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.searchName.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
-		self.searchSkill = wx.TextCtrl(self.decorationPanel, name="bySkill")
+		self.searchSkill = wx.TextCtrl(self.decorationPanel, name="bySkill", style=wx.TE_PROCESS_ENTER)
 		self.searchSkill.SetHint("  search by skill")
-		self.searchSkill.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.searchSkill.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
 		self.currentSearch = self.searchName
 

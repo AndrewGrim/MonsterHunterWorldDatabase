@@ -173,9 +173,9 @@ class WeaponsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.weaponPanel)
+		self.search = wx.TextCtrl(self.weaponPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.weaponButtonsSizer.Add(372, 0, 0)
 		self.weaponButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
@@ -1145,15 +1145,16 @@ class WeaponsTab:
 		"""
 		When a specific weapon is selected in the tree, the detail view gets populated with the information from the database.
 		"""
-
-		if not self.init:
-			self.currentlySelectedWeaponID = self.weaponTree.GetCellValue(event.GetRow(), 9)
-			if self.currentlySelectedWeaponID != "":
-				try:
-					self.weaponSharpnessTable.ClearGrid()
-				except:
-					pass
-				self.loadWeaponDetailAll()
+		
+		# TODO linux crash
+		# if not self.init:
+		# 	self.currentlySelectedWeaponID = self.weaponTree.GetCellValue(event.GetRow(), 9)
+		# 	if self.currentlySelectedWeaponID != "":
+		# 		try:
+		# 			self.weaponSharpnessTable.ClearGrid()
+		# 		except:
+		# 			pass
+		# 		self.loadWeaponDetailAll()
 
 		
 	def onWeaponTypeSelection(self, event):

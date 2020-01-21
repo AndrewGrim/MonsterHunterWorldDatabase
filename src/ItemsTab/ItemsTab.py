@@ -115,9 +115,9 @@ class ItemsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.itemPanel)
+		self.search = wx.TextCtrl(self.itemPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 		self.itemButtonsSizer.Add(130, 0, 0)
 		self.itemButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
 
@@ -585,7 +585,7 @@ class ItemsTab:
 		data = data.fetchall()
 
 		for wep in data:
-			img = self.il.Add(wx.Bitmap(f"images/palico/{wep[2]}-rarity-24/{wep[3]}.png"))
+			img = self.il.Add(wx.Bitmap(f"images/palico/{wep[2].lower()}-rarity-24/{wep[3]}.png"))
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), wep[1], img)
 			self.itemUsageList.SetItem(index, 1, f"{wep[4]}")
 			self.itemUsageList.SetItem(index, 2, f"palico,{wep[0]},{wep[5]},weapon")
@@ -627,7 +627,7 @@ class ItemsTab:
 		data = data.fetchall()
 
 		for kin in data:
-			img = self.il.Add(wx.Bitmap(f"images/kinsects/{kin[2]}-rarity-24/{kin[3]}.png"))
+			img = self.il.Add(wx.Bitmap(f"images/kinsects/{kin[2].lower()}-rarity-24/{kin[3]}.png"))
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), kin[1], img)
 			self.itemUsageList.SetItem(index, 1, f"{kin[4]}")
 			self.itemUsageList.SetItem(index, 2, f"kinsect,{kin[0]}")

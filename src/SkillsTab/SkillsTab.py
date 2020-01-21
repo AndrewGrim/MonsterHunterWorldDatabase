@@ -65,9 +65,9 @@ class SkillsTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.skillPanel)
+		self.search = wx.TextCtrl(self.skillPanel, style=wx.TE_PROCESS_ENTER)
 		self.search.SetHint("  search by name")
-		self.search.Bind(wx.EVT_TEXT, self.onSearchTextEnter)
+		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
 		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.searchSizer.Add(self.search)
