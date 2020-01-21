@@ -685,7 +685,7 @@ class WeaponsTab:
 							cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/element.png"),
 								key,util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
 						self.weaponDetailList.SetCellRenderer(row, 1,
-							cgr.ImageTextCellRenderer(wx.Bitmap(f"images/damage-types-24/{str(value[0].split(' ')[0])}.png"),
+							cgr.ImageTextCellRenderer(wx.Bitmap(f"images/damage-types-24/{str(value[0].split(' ')[0].lower())}.png"),
 								value[0], util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
 				except:
 					self.weaponDetailList.SetCellValue(row, 1, "-")
@@ -706,11 +706,11 @@ class WeaponsTab:
 			except:
 				pass
 
-		try:
-			self.weaponDetailsNotebook.RemovePage(1)
-			self.weaponDetailsNotebook.RemovePage(1)
-		except:
-			pass
+		pageCount = self.weaponDetailsNotebook.GetPageCount()
+		if pageCount != 1:
+			for i in range(pageCount - 1):
+				self.weaponDetailsNotebook.RemovePage(1)
+
 
 		row = len(weaponDetail.items())
 		if self.currentWeaponTree in ["charge-blade", "switch-axe", "gunlance", "insect-glaive"]:
@@ -1038,6 +1038,7 @@ class WeaponsTab:
 				wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False))
 			self.weaponMelodiesList.SetCellValue(row, 6, f"{melody.effect1}\n{melody.effect2}")
 			
+
 	def splitNotes(self, notes: str) -> List[str]:
 		return [note for note in notes]
 
@@ -1146,15 +1147,14 @@ class WeaponsTab:
 		When a specific weapon is selected in the tree, the detail view gets populated with the information from the database.
 		"""
 		
-		# TODO linux crash
-		# if not self.init:
-		# 	self.currentlySelectedWeaponID = self.weaponTree.GetCellValue(event.GetRow(), 9)
-		# 	if self.currentlySelectedWeaponID != "":
-		# 		try:
-		# 			self.weaponSharpnessTable.ClearGrid()
-		# 		except:
-		# 			pass
-		# 		self.loadWeaponDetailAll()
+		if not self.init:
+			self.currentlySelectedWeaponID = self.weaponTree.GetCellValue(event.GetRow(), 9)
+			if self.currentlySelectedWeaponID != "":
+				try:
+					self.weaponSharpnessTable.ClearGrid()
+				except:
+					pass
+				self.loadWeaponDetailAll()
 
 		
 	def onWeaponTypeSelection(self, event):
