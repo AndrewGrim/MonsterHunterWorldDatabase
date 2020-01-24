@@ -64,22 +64,21 @@ class CharmsTab:
 		
 
 	def initSearch(self):
-		self.searchName = wx.TextCtrl(self.charmPanel, name="byName", size=(124, -1), style=wx.TE_PROCESS_ENTER)
-		self.searchName.SetHint("  search by name")
+		self.searchName = wx.TextCtrl(self.charmPanel, name="byName", style=wx.TE_PROCESS_ENTER)
+		self.searchName.SetHint("search by name")
 		self.searchName.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
-		self.searchSkill = wx.TextCtrl(self.charmPanel, name="bySkill", size=(124, -1), style=wx.TE_PROCESS_ENTER)
-		self.searchSkill.SetHint("  search by skill")
+		self.searchSkill = wx.TextCtrl(self.charmPanel, name="bySkill", style=wx.TE_PROCESS_ENTER)
+		self.searchSkill.SetHint("search by skill")
 		self.searchSkill.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
 		self.currentSearch = self.searchName
 
 		self.searchSizer = wx.BoxSizer(wx.HORIZONTAL)
-		self.searchSizer.Add(self.searchName)
-		self.searchSizer.Add(self.searchSkill)
-		self.searchSizer.Add(482, 0, 0)
+		self.searchSizer.Add(self.searchName, 1, wx.EXPAND)
+		self.searchSizer.Add(self.searchSkill, 1, wx.EXPAND)
 
-		self.charmListSizer.Add(self.searchSizer)
+		self.charmListSizer.Add(self.searchSizer, 0, wx.EXPAND)
 
 
 	def onSearchTextEnter(self, event):

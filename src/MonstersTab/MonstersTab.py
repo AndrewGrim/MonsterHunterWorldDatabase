@@ -49,51 +49,37 @@ class MonstersTab:
 
 
 	def initMonstersTab(self):
-		# the outermost panel for the monsters tab
 		self.monstersPanel = wx.Panel(self.mainNotebook)
-		# add page to notebook
 		self.mainNotebook.AddPage(self.monstersPanel, "Monsters")
-		# main sizer for the monsters tab
 		self.monstersSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-		# left side
-		# sizer containing the monsters table
 		self.monsterSelectionSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterListSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterSizeButtonsSizer = wx.BoxSizer(wx.HORIZONTAL)
 		self.monsterSelectionSizer.Add(self.monsterListSizer)
-		self.monsterSelectionSizer.Add(self.monsterSizeButtonsSizer)
-		# create monsters table and add bindings on selection and on size change of the main window
-		# add left side sizer to the main sizer of the monsters tab
-		self.monstersSizer.Add(self.monsterSelectionSizer, 0, wx.EXPAND)
+		self.monsterSelectionSizer.Add(self.monsterSizeButtonsSizer, 0, wx.EXPAND)
+		self.monstersSizer.Add(self.monsterSelectionSizer, 1, wx.EXPAND)
 
-		# right side
-		# sizer containing the monsters details
 		self.monstersDetailedSizer = wx.BoxSizer(wx.VERTICAL)
-		# create bitmap from image and load bitmap into a label
 		self.monsterImage = wx.Bitmap("images/monsters/160/Great Jagras.png", wx.BITMAP_TYPE_ANY)
 		self.monsterImageLabel = wx.StaticBitmap(self.monstersPanel, bitmap=self.monsterImage, size=(160, 160))
-		# detailed view notebook
 		self.monsterDetailsNotebook = wx.Notebook(self.monstersPanel)
 		self.summaryPanel = wx.Panel(self.monsterDetailsNotebook)
 		self.damagePanel = wx.ScrolledWindow(self.monsterDetailsNotebook)
 		self.materialsPanel = wx.Panel(self.monsterDetailsNotebook)
-		#
+		
 		self.monsterSummarySizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.summaryPanel, "Summary")
-		# 
+		
 		self.monsterDamageSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.damagePanel, "Damage")
-		#
+		
 		self.monsterMaterialsSizer = wx.BoxSizer(wx.VERTICAL)
 		self.monsterDetailsNotebook.AddPage(self.materialsPanel, "Materials")
-		# add the right side detailed view to the main size of the monsters notebook tab
 		self.monstersSizer.Add(self.monstersDetailedSizer, 1, wx.EXPAND)
-		# add widgets within to their parent sizer
 		self.monstersDetailedSizer.Add(self.monsterImageLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
 		self.monstersDetailedSizer.Add(self.monsterDetailsNotebook, 5, wx.EXPAND)
 
-		# set sizer for the monsters notebook tab
 		self.monstersPanel.SetSizer(self.monstersSizer)
 		self.damagePanel.SetScrollRate(20, 20)
 
@@ -127,11 +113,10 @@ class MonstersTab:
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
-		self.search.SetHint("  search by name")
+		self.search = wx.TextCtrl(self.monstersPanel, style=wx.TE_PROCESS_ENTER)
+		self.search.SetHint("search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		self.monsterSizeButtonsSizer.Add((420, 0))
-		self.monsterSizeButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.monsterSizeButtonsSizer.Add(self.search, 1, wx.EXPAND)
 
 
 	def onSearchTextEnter(self, event):
@@ -168,7 +153,7 @@ class MonstersTab:
 		info.Align = wx.LIST_FORMAT_LEFT
 		info.Text = ""
 		self.monsterList.InsertColumn(0, info)
-		self.monsterList.SetColumnWidth(0, 685)
+		self.monsterList.SetColumnWidth(0, 715)
 		self.monsterList.InsertColumn(1, info)
 		self.monsterList.SetColumnWidth(1, 0)
 

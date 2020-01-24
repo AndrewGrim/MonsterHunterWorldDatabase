@@ -111,15 +111,14 @@ class ItemsTab:
 		self.itemButtonsSizer.Add(self.miscButton)
 		self.itemButtonsSizer.Add(self.craftingButton)
 
-		self.itemListSizer.Add(self.itemButtonsSizer)
+		self.itemListSizer.Add(self.itemButtonsSizer, 0, wx.EXPAND)
 
 
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.itemPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
-		self.search.SetHint("  search by name")
+		self.search = wx.TextCtrl(self.itemPanel, style=wx.TE_PROCESS_ENTER)
+		self.search.SetHint("search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		self.itemButtonsSizer.Add(130, 0, 0)
-		self.itemButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.itemButtonsSizer.Add(self.search, 1, wx.EXPAND)
 
 
 	def onSearchTextEnter(self, event):
