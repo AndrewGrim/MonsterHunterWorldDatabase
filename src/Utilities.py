@@ -18,6 +18,10 @@ def hexToRGB(color: str) -> Tuple[int, int, int]:
 	blue = int(color[4:6], 16)
 
 	return (red, green, blue)
+
+
+def replaceUnicode(text: str) -> str:
+	return text.replace("α", "Alpha").replace("β", "Beta").replace("γ", "Gamma")
 	
 
 damageColors = {
