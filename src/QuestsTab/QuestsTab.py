@@ -90,22 +90,22 @@ class QuestsTab:
 			self.questButtonsSizer.Add(button)
 			button.Bind(wx.EVT_BUTTON, self.onQuestTypeSelection)
 
-		self.questTreeSizer.Add(self.questButtonsSizer)
+		self.questTreeSizer.Add(self.questButtonsSizer, 0, wx.EXPAND)
 
 
 	def initSearch(self):
-		self.searchName = wx.TextCtrl(self.questPanel, name="byName", style=wx.TE_PROCESS_ENTER, size=(124, -1))
-		self.searchName.SetHint("  search by name")
+		self.searchName = wx.TextCtrl(self.questPanel, name="byName", style=wx.TE_PROCESS_ENTER)
+		self.searchName.SetHint("search by name")
 		self.searchName.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
-		self.searchMonster = wx.TextCtrl(self.questPanel, name="byMonster", style=wx.TE_PROCESS_ENTER, size=(124, -1))
-		self.searchMonster.SetHint("  search by monster")
+		self.searchMonster = wx.TextCtrl(self.questPanel, name="byMonster", style=wx.TE_PROCESS_ENTER)
+		self.searchMonster.SetHint("search by monster")
 		self.searchMonster.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
 
 		self.currentSearch = self.searchName
 
-		self.questButtonsSizer.Add(self.searchName, 0, wx.ALIGN_CENTER_VERTICAL)
-		self.questButtonsSizer.Add(self.searchMonster, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.questButtonsSizer.Add(self.searchName, 1, wx.EXPAND)
+		self.questButtonsSizer.Add(self.searchMonster, 1, wx.EXPAND)
 
 
 	def onSearchTextEnter(self, event):
@@ -121,9 +121,9 @@ class QuestsTab:
 		self.questTreeSizer.Add(self.questTree, 1, wx.EXPAND)
 
 		questTreeColumns = {
-			"Name": [405, None],
-			"Location": [175, None],
-			"Zenny": [60, wx.Bitmap("images/zenny.png")],
+			"Name": [425, None],
+			"Location": [185, None],
+			"Zenny": [70, wx.Bitmap("images/zenny.png")],
 			"id": [0,  None],
 		}
 
@@ -222,13 +222,13 @@ class QuestsTab:
 
 		img = wx.Bitmap(f"images/quests-24/{quest.questType}.png")
 		self.questTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-			img, f"{quest.name}", imageOffset=115))
+			img, f"{quest.name}", imageOffset=130))
 		if os.path.exists(f"images/locations-24/{quest.location}.png"):
 			img = wx.Bitmap(f"images/locations-24/{quest.location}.png")
 		else:
 			img = wx.Bitmap(f"images/unknown.png")
 		self.questTree.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(
-			img, f"{quest.location}", imageOffset=70))
+			img, f"{quest.location}", imageOffset=75))
 		self.questTree.SetCellValue(row, 2, str(quest.zenny))
 		self.questTree.SetCellValue(row, 3, str(quest.id))
 
@@ -334,7 +334,7 @@ class QuestsTab:
 				else:
 					img = wx.Bitmap("images/unknown.png")
 				self.questDetailList.SetCellRenderer(i, 1, cgr.ImageTextCellRenderer(
-						img, f"{v[1]}", imageOffset=65))
+						img, f"{v[1]}", imageOffset=75))
 			else:
 				self.questDetailList.SetCellValue(i, 1, v[1])
 
