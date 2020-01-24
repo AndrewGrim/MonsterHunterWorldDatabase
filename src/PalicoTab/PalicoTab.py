@@ -310,15 +310,14 @@ class PalicoTab:
 		self.equipmentButtonsSizer.Add(self.highRankButton)
 		#self.equipmentButtonsSizer.Add(self.masterRankButton)
 
-		self.equipmentTreeSizer.Add(self.equipmentButtonsSizer)
+		self.equipmentTreeSizer.Add(self.equipmentButtonsSizer, 0, wx.EXPAND)
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.equipmentPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
-		self.search.SetHint("  search by name")
+		self.search = wx.TextCtrl(self.equipmentPanel, style=wx.TE_PROCESS_ENTER)
+		self.search.SetHint("search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		self.equipmentButtonsSizer.Add(380, 0, 0)
-		self.equipmentButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.equipmentButtonsSizer.Add(self.search, 1, wx.EXPAND)
 
 
 	def onSearchTextEnter(self, event):
@@ -406,11 +405,15 @@ class PalicoTab:
 		equipmentSet = "" 
 		row = 0
 		if self.root.pref.unicodeSymbols:
-			piecePadding = "┗━━━" + (12 * " ")
+			piecePadding = "┗━━━       "
 		else:
 			piecePadding = " " * 20
 		setPadding = " " * 8
 		for eq in equipmentList:
+			if not self.root.pref.unicodeSymbols:
+				eq.setName = eq.setName.replace("α", "Alpha")
+				eq.name = eq.name.replace("α", "Alpha")
+
 			self.armorTree.AppendRows()
 			if eq.setName != equipmentSet:
 				img = wx.Bitmap(f"images/palico/armorset-rarity-24/{eq.rarity}.png")
@@ -425,6 +428,7 @@ class PalicoTab:
 				img = wx.Bitmap(f"images/palico/chest-rarity-24/{eq.rarity}.png")
 			else:
 				img = wx.Bitmap(f"images/palico/head-rarity-24/{eq.rarity}.png")
+
 			self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 				img, f"{piecePadding}{eq.name}", hAlign=wx.ALIGN_LEFT, imageOffset=295))
 			self.armorTree.SetCellValue(row, 1, str(eq.id))
@@ -488,6 +492,9 @@ class PalicoTab:
 				self.palicoEquipmentImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 			del noLog
 			
+			if not self.root.pref.unicodeSymbols:
+				weapon.name = weapon.name.replace("α", "Alpha")
+
 			weaponDetail = {
 				0: str(weapon.name),
 				1: str(weapon.rarity),
@@ -575,6 +582,9 @@ class PalicoTab:
 			except:
 				self.palicoEquipmentImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 			del noLog
+			
+			if not self.root.pref.unicodeSymbols:
+				armor.name = armor.name.replace("α", "Alpha")
 			
 			armorDetail = {
 				0: str(armor.name),
