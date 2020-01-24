@@ -131,16 +131,11 @@ class Application(wx.Frame):
 
 
 	def initMainNotebook(self):
-		# the outermost panel holding in all the widgets
 		self.mainPanel = wx.Panel(self)
-		# main geometry manager
 		self.mainSizer = wx.BoxSizer(wx.HORIZONTAL)
-		# main notebook holding the top tabs ie: monsters, weapons etc.
 		self.mainNotebook = wx.Notebook(self.mainPanel)
-		# add notebook to sizer
 		self.mainSizer.Add(self.mainNotebook, 1, wx.EXPAND)
 
-		# set the sizer for mainWindow
 		self.mainPanel.SetSizer(self.mainSizer)
 
 
