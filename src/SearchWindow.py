@@ -5,6 +5,7 @@ import os
 import CustomGridRenderer as cgr
 from Debug.debug import debug
 import Links as link
+import Utilities as util
 
 class SearchWindow:
 
@@ -285,7 +286,7 @@ class SearchWindow:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/armorset/rarity-24/{row[3]}.png")
-			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{util.replaceUnicode(row[1])}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"armorset,{row[0]},{row[2]},{row[4]}")
 
 		sql = f"""
@@ -303,7 +304,7 @@ class SearchWindow:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/armor/{row[2]}/rarity-24/{row[3]}.png")
-			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{util.replaceUnicode(row[1])}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"armor,{row[0]},{row[4]}")
 
 
@@ -321,7 +322,7 @@ class SearchWindow:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
 			img = wx.Bitmap(f"images/palico/{row[4].lower()}-rarity-24/{row[3]}.png")
-			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{util.replaceUnicode(row[1])}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"palico,{row[0]},{row[2]},weapon")
 
 		sql = f"""
@@ -340,7 +341,7 @@ class SearchWindow:
 				img = wx.Bitmap(f"images/palico/chest-rarity-24/{row[3]}.png")
 			else:
 				img = wx.Bitmap(f"images/palico/head-rarity-24/{row[3]}.png")
-			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
+			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{util.replaceUnicode(row[1])}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"palico,{row[0]},{row[2]},armor")
 
 		data = self.conn.execute(f"SELECT * FROM palico_gadget WHERE name LIKE '%{self.searchText}%'")
@@ -349,7 +350,7 @@ class SearchWindow:
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/palico/gadgets/24/{row[3]}.png")
+			img = wx.Bitmap(f"images/palico/gadgets/24/{row[3].lower()}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[3]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"gadget,{row[0]}")
 
@@ -370,7 +371,7 @@ class SearchWindow:
 		for row in data:
 			self.results.AppendRows()
 			r = self.results.GetNumberRows() - 1
-			img = wx.Bitmap(f"images/kinsects/{row[2]}-rarity-24/{row[3]}.png")
+			img = wx.Bitmap(f"images/kinsects/{row[2].lower()}-rarity-24/{row[3]}.png")
 			self.results.SetCellRenderer(r, 0, cgr.ImageTextCellRenderer(img, f"{self.padding}{row[1]}", hAlign=wx.ALIGN_LEFT, imageOffset=320))
 			self.results.SetCellValue(r, 1, f"kinsect,{row[0]}")
 
