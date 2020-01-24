@@ -105,7 +105,6 @@ class ArmorTab:
 		self.armorDetailPanel.SetSizer(self.armorDetailSizer)
 
 		self.armorSetSizer = wx.BoxSizer(wx.VERTICAL)
-		# TODO prob add armorset icon 0.png to the tab
 		self.armorDetailsNotebook.AddPage(self.armorSetPanel, "Armor Set Detail")
 		il = wx.ImageList(24, 24)
 		head = il.Add(wx.Bitmap("images/armor/head/rarity-24/0.png"))
@@ -139,6 +138,7 @@ class ArmorTab:
 
 		self.armorDetailPanel.SetScrollRate(20, 20)
 		self.armorSetPanel.SetScrollRate(20, 20)
+		self.armorDetailsNotebook.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.onTabChanged)
 
 
 	def initArmorButtons(self):
@@ -159,19 +159,23 @@ class ArmorTab:
 		self.armorButtonsSizer.Add(self.highRankButton)
 		#self.armorButtonsSizer.Add(self.masterRankButton)
 
-		self.armorTreeSizer.Add(self.armorButtonsSizer)
+		self.armorTreeSizer.Add(self.armorButtonsSizer, 0, wx.EXPAND)
 
 	
 	def initSearch(self):
-		self.search = wx.TextCtrl(self.armorPanel, style=wx.TE_PROCESS_ENTER, size=(124, -1))
-		self.search.SetHint("  search by name")
+		self.search = wx.TextCtrl(self.armorPanel, style=wx.TE_PROCESS_ENTER)
+		self.search.SetHint("search by name")
 		self.search.Bind(wx.EVT_TEXT_ENTER, self.onSearchTextEnter)
-		self.armorButtonsSizer.Add(380, 0, 0)
-		self.armorButtonsSizer.Add(self.search, 0, wx.ALIGN_CENTER_VERTICAL)
+		self.armorButtonsSizer.Add(self.search, 1, wx.EXPAND)
 
 
 	def onSearchTextEnter(self, event):
 		self.loadArmorTree()
+
+
+	def onTabChanged(self, event):
+		w, h = self.armorDetailPanel.GetSize()
+		self.armorDetailPanel.SetSize(wx.Size(w, h))
 
 
 	def initArmorTree(self):
@@ -264,11 +268,15 @@ class ArmorTab:
 		armorSet = "" 
 		row = 0
 		if self.root.pref.unicodeSymbols:
-			piecePadding = "┗━━━            "
+			piecePadding = "┗━━━       "
 		else:
 			piecePadding = "                    "
 		setPadding = "        "
 		for a in armorList:
+			if not self.root.pref.unicodeSymbols:
+				a.armorSetName = util.replaceUnicode(a.armorSetName)
+				a.name = util.replaceUnicode(a.name)
+
 			self.armorTree.AppendRows()
 			if a.armorSetName != armorSet:
 				img = wx.Bitmap(f"images/armor/armorset/rarity-24/{a.rarity}.png")
@@ -395,6 +403,14 @@ class ArmorTab:
 			self.armorFemaleImageLabel.SetBitmap(wx.Bitmap(f"images/noImage.png"))
 		del noLog
 		
+		if not self.root.pref.unicodeSymbols:
+			armor.armorSetName = armor.armorSetName.replace("α", "Alpha")
+			armor.name = armor.name.replace("α", "Alpha")
+			armor.armorSetName = armor.armorSetName.replace("β", "Beta")
+			armor.name = armor.name.replace("β", "Beta")
+			armor.armorSetName = armor.armorSetName.replace("γ", "Gamma")
+			armor.name = armor.name.replace("γ", "Gamma")
+			
 		armorDetail = {
 			0:  str(armor.name),
 			1:  str(armor.rarity),
@@ -419,7 +435,7 @@ class ArmorTab:
 			12: "dragon",
 		}
 
-		imageOffset = 85
+		imageOffset = 95
 		rarityIcon = self.il.il.GetBitmap(self.il.armorIcons[armor.armorType][armor.rarity])
 
 		self.armorDetailList.SetCellValue(0, 0, "Name")
@@ -784,9 +800,13 @@ class ArmorTab:
 			12: str(dragon),
 		}
 
-		imageOffset = 85
+		imageOffset = 95
 		rarityIcon = self.il.il.GetBitmap(self.il.armorIcons["armorset"][armor.rarity])
 
+		if not self.root.pref.unicodeSymbols:
+			armor.armorSetName = armor.armorSetName.replace("α", "Alpha")
+			armor.armorSetName = armor.armorSetName.replace("β", "Beta")
+			armor.armorSetName = armor.armorSetName.replace("γ", "Gamma")
 		self.armorSetDetailList.SetCellValue(0, 0, "Name")
 		self.armorSetDetailList.SetCellValue(0, 1, armor.armorSetName)
 		for num in range(1, 13):
