@@ -15,3 +15,5 @@ tests/sqlTest.py
 /Monster Hunter World Database
 *.zip
 *.7z
+MHWDB-x64
+preferences.config

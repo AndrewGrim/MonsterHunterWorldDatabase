@@ -405,9 +405,9 @@ class PalicoTab:
 		equipmentSet = "" 
 		row = 0
 		if self.root.pref.unicodeSymbols:
-			piecePadding = "┗━━━       "
+			piecePadding = "┗━━━      "
 		else:
-			piecePadding = " " * 20
+			piecePadding = " " * 21
 		setPadding = " " * 8
 		for eq in equipmentList:
 			if not self.root.pref.unicodeSymbols:
@@ -430,7 +430,7 @@ class PalicoTab:
 				img = wx.Bitmap(f"images/palico/head-rarity-24/{eq.rarity}.png")
 
 			self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-				img, f"{piecePadding}{eq.name}", hAlign=wx.ALIGN_LEFT, imageOffset=295))
+				img, f"{piecePadding}{eq.name}", hAlign=wx.ALIGN_LEFT, imageOffset=290))
 			self.armorTree.SetCellValue(row, 1, str(eq.id))
 
 			row += 1
@@ -508,7 +508,7 @@ class PalicoTab:
 				9: str(weapon.price)
 			}
 
-			imageOffset = 55
+			imageOffset = 70
 			rarityIcon = wx.Bitmap(f"images/palico/{weapon.attackType.lower()}-rarity-24/{weapon.rarity}.png")
 			if weapon.element != "None":
 				element = wx.Bitmap(f"images/damage-types-24/{weapon.element.lower()}.png")
@@ -566,7 +566,7 @@ class PalicoTab:
 						else:
 							self.equipmentDetailList.SetCellValue(num, 1, "-")
 					else:
-						self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num])
+						self.equipmentDetailList.SetCellValue(num, 1, weaponDetail[num].capitalize())
 		else:
 			sql = "SELECT * FROM palico_armor WHERE id = :id"
 
@@ -599,7 +599,7 @@ class PalicoTab:
 			}
 
 			colorLevel = 0
-			imageOffset = 55
+			imageOffset = 70
 			if armor.fullArmorSet == 1:
 				rarityIcon = wx.Bitmap(f"images/palico/armorset-rarity-24/{armor.rarity}.png")
 			elif armor.id % 3 == 2:

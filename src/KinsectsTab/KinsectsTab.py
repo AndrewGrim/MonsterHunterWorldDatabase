@@ -113,10 +113,10 @@ class KinsectsTab:
 		kinsectTreeColumns = {
 			"Name": [472, None],
 			"Attack Type": [45, wx.Bitmap("images/weapon-detail-24/attacktype.png")],
-			"Dust Effect": [57, wx.Bitmap("images/weapon-detail-24/dusteffect.png")],
-			"Power": [35, wx.Bitmap("images/weapon-detail-24/power.png")],
-			"Speed": [35, wx.Bitmap("images/weapon-detail-24/speed.png")],
-			"Heal": [35, wx.Bitmap("images/weapon-detail-24/heal.png")],
+			"Dust Effect": [65, wx.Bitmap("images/weapon-detail-24/dusteffect.png")],
+			"Power": [38, wx.Bitmap("images/weapon-detail-24/power.png")],
+			"Speed": [38, wx.Bitmap("images/weapon-detail-24/speed.png")],
+			"Heal": [38, wx.Bitmap("images/weapon-detail-24/heal.png")],
 			"id": [0,  None],
 		}
 
@@ -281,7 +281,7 @@ class KinsectsTab:
 			6: f"Lv {kin.heal}",
 		}
 
-		imageOffset = 55
+		imageOffset = 70
 		self.kinsectImageLabel.SetBitmap(wx.Bitmap(f"images/kinsects/{kin.name}.jpg"))
 		rarityIcon = wx.Bitmap(f"images/kinsects/{kin.attackType.lower()}-rarity-24/{kin.rarity}.png")
 		self.kinsectDetailList.SetCellValue(0, 0, "Name")

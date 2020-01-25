@@ -193,8 +193,8 @@ class WeaponsTab:
 		weaponTreeColumns = {
 			"Name": [472, None],
 			"Attack": [35, wx.Bitmap("images/weapon-detail-24/attack.png")],
-			"Element": [75, wx.Bitmap("images/weapon-detail-24/element.png")],
-			"Affinity": [35, wx.Bitmap("images/weapon-detail-24/affinity.png")],
+			"Element": [70, wx.Bitmap("images/weapon-detail-24/element.png")],
+			"Affinity": [40, wx.Bitmap("images/weapon-detail-24/affinity.png")],
 			"Defense": [35, wx.Bitmap("images/weapon-detail-24/defense.png")],
 			"Slot I": [29, wx.Bitmap("images/weapon-detail-24/slots.png")],
 			"Slot II": [29, wx.Bitmap("images/weapon-detail-24/slots.png")],
@@ -673,10 +673,10 @@ class WeaponsTab:
 
 			if key in ["Slot I", "Slot II", "Slot III"]:
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					wx.Bitmap("images/weapon-detail-24/slots.png"), key))	
+					wx.Bitmap("images/weapon-detail-24/slots.png"), key, imageOffset=70))	
 				if value[0] != 0:
 					self.weaponDetailList.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(
-						wx.Bitmap(f"images/decoration-slots-24/{value[0]}.png"), str(value[0])))
+						wx.Bitmap(f"images/decoration-slots-24/{value[0]}.png"), str(value[0]), imageOffset=70))
 				else:
 					self.weaponDetailList.SetCellValue(row, 1, str(value[0]))
 			if key in ["Element I", "Element II"]:
@@ -684,10 +684,10 @@ class WeaponsTab:
 					if str(value[0].split(" ")[0]) != "-":
 						self.weaponDetailList.SetCellRenderer(row, 0,
 							cgr.ImageTextCellRenderer(wx.Bitmap("images/weapon-detail-24/element.png"),
-								key,util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
+								key, util.hexToRGB(self.elementColors[value[0].split(" ")[0]]), imageOffset=70))
 						self.weaponDetailList.SetCellRenderer(row, 1,
 							cgr.ImageTextCellRenderer(wx.Bitmap(f"images/damage-types-24/{str(value[0].split(' ')[0].lower())}.png"),
-								value[0], util.hexToRGB(self.elementColors[value[0].split(" ")[0]])))
+								value[0], util.hexToRGB(self.elementColors[value[0].split(" ")[0]]), imageOffset=70))
 				except:
 					self.weaponDetailList.SetCellValue(row, 1, "-")
 			else:
@@ -700,10 +700,10 @@ class WeaponsTab:
 					self.weaponDetailList.SetCellValue(row, 0, key)
 				elif key == "Rarity":
 					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/rarity-24/{value[0]}.png"), key))
+						wx.Bitmap(f"images/weapons/{self.currentWeaponTree}/rarity-24/{value[0]}.png"), key, imageOffset=70))
 				else:
 					self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-						wx.Bitmap(self.weaponDetailIcons[key]), key))
+						wx.Bitmap(self.weaponDetailIcons[key]), key, imageOffset=70))
 			except:
 				pass
 
@@ -718,25 +718,30 @@ class WeaponsTab:
 			if self.currentWeaponTree in ["charge-blade", "switch-axe"] :
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							"images/weapon-detail-24/phials.png") 
-							, additionalDetails[self.currentWeaponTree][0]))
+							, additionalDetails[self.currentWeaponTree][0]
+							, imageOffset=70))
 			elif self.currentWeaponTree == "gunlance":
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							"images/weapon-detail-24/shelling.png") 
-							, additionalDetails[self.currentWeaponTree][0]))
+							, additionalDetails[self.currentWeaponTree][0]
+							, imageOffset=70))
 			elif self.currentWeaponTree == "insect-glaive":
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							"images/damage-types-24/kinsect.png") 
-							, additionalDetails[self.currentWeaponTree][0]))
+							, additionalDetails[self.currentWeaponTree][0]
+							, imageOffset=70))
 			self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][1]))
 		elif self.currentWeaponTree in ["light-bowgun", "heavy-bowgun"]:
 			self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							"images/weapon-detail-24/specialammo.png") 
-							, additionalDetails[self.currentWeaponTree][0]))
+							, additionalDetails[self.currentWeaponTree][0]
+							, imageOffset=70))
 			self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][1]))
 
 			self.weaponDetailList.SetCellRenderer(row + 1, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							"images/weapon-detail-24/deviation.png") 
-							, additionalDetails[self.currentWeaponTree][3]))
+							, additionalDetails[self.currentWeaponTree][3]
+							, imageOffset=70))
 			self.weaponDetailList.SetCellValue(row + 1, 1, str(additionalDetails[self.currentWeaponTree][4]))
 
 			self.weaponDetailsNotebook.AddPage(self.weaponAmmoPanel, "Ammo")
@@ -747,7 +752,8 @@ class WeaponsTab:
 			for num in range(0, 17, 3):
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							f"images/items-24/Bottle{coatingIconColors[num]}.png") 
-							, additionalDetails[self.currentWeaponTree][num]))
+							, additionalDetails[self.currentWeaponTree][num]
+							, imageOffset=70))
 				self.weaponDetailList.SetCellValue(row, 0, additionalDetails[self.currentWeaponTree][num])
 				self.weaponDetailList.SetCellValue(row, 1, str(additionalDetails[self.currentWeaponTree][num + 1]))
 				row += 1
@@ -756,12 +762,13 @@ class WeaponsTab:
 			for num in range(0, 9, 3):
 				self.weaponDetailList.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(wx.Bitmap(
 							"images/weapon-detail-24/notes.png")
-							, additionalDetails[self.currentWeaponTree][num + 2]))
+							, additionalDetails[self.currentWeaponTree][num + 2]
+							, imageOffset=70))
 				noteColor = self.noteColors[additionalDetails[self.currentWeaponTree][num + 3]]
 				self.weaponDetailList.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(wx.Bitmap( 
 							f"images/notes-24/Note{noteNum}{noteColor}.png")
 							, f"{noteColor}",
-							imageOffset=40))
+							imageOffset=70))
 				noteNum += 1
 				row += 1
 

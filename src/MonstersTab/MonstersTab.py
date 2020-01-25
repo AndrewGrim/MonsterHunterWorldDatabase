@@ -311,7 +311,7 @@ class MonstersTab:
 						self.summaryTree.SetCellValue(row, 1, f"{data[col[0]]}/3 ({data[col[1]]}/3)")
 					self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 										wx.Bitmap(f"images/damage-types-24/{weakness.lower()}.png"),
-										f"{self.padding}{weakness}", imageOffset=30))
+										f"{self.padding}{weakness}", imageOffset=40))
 				else:
 					if self.root.pref.unicodeSymbols:
 						self.summaryTree.SetCellValue(row, 1, f"{weaknessRating[data[col[0]]]}")
@@ -319,7 +319,7 @@ class MonstersTab:
 						self.summaryTree.SetCellValue(row, 1, f"{data[col[0]]}/3")
 					self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 										wx.Bitmap(f"images/damage-types-24/{weakness.lower()}.png"),
-										f"{self.padding}{weakness}", imageOffset=30))
+										f"{self.padding}{weakness}", imageOffset=40))
 
 			for weakness, col in weaknessStatus.items():
 				self.summaryTree.AppendRows()
@@ -330,7 +330,7 @@ class MonstersTab:
 					self.summaryTree.SetCellValue(row, 1, f"{data[col]}/3")
 				self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 									wx.Bitmap(f"images/damage-types-24/{weakness.lower()}.png"),
-									f"{self.padding}{weakness}", imageOffset=30))
+									f"{self.padding}{weakness}", imageOffset=40))
 
 			ailments = {
 				"Roar": [21, self.testIcon],
@@ -372,7 +372,7 @@ class MonstersTab:
 					else:
 						self.summaryTree.SetCellValue(row, 1, str(data[ailments[ailment][0]]).capitalize())
 					self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-									col[1], f"{self.padding}{ailment}", imageOffset=40))
+									col[1], f"{self.padding}{ailment}", imageOffset=50))
 			if self.summaryTree.GetNumberRows() == 12:
 				self.summaryTree.AppendRows()
 				row = self.summaryTree.GetNumberRows() - 1
@@ -414,7 +414,7 @@ class MonstersTab:
 			row = self.summaryTree.GetNumberRows() - 1
 			self.summaryTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
 								wx.Bitmap(f"images/locations-24/{item[4]}.png"),
-								f"{self.padding}{item[4]}", imageOffset=50))
+								f"{self.padding}{item[4]}", imageOffset=60))
 			self.summaryTree.SetCellValue(row, 1, f"{item[0]} > {item[1]} > {item[2]}")
 		if self.summaryTree.GetCellValue(row, 0) == "Habitat":
 			self.summaryTree.AppendRows()

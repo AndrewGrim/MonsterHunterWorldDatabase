@@ -268,9 +268,9 @@ class ArmorTab:
 		armorSet = "" 
 		row = 0
 		if self.root.pref.unicodeSymbols:
-			piecePadding = "┗━━━       "
+			piecePadding = "┗━━━      "
 		else:
-			piecePadding = "                    "
+			piecePadding = "                     "
 		setPadding = "        "
 		for a in armorList:
 			if not self.root.pref.unicodeSymbols:
@@ -294,10 +294,10 @@ class ArmorTab:
 			if a.name[0:11] == "King Beetle":
 				name = a.name.replace("King", "King / Queen")
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"{piecePadding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
+					img, f"{piecePadding}{name}", hAlign=wx.ALIGN_LEFT, imageOffset=110))
 			else:
 				self.armorTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-					img, f"{piecePadding}{a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=115))
+					img, f"{piecePadding}{a.name}", hAlign=wx.ALIGN_LEFT, imageOffset=110))
 			colorLevel = 0
 			self.armorTree.SetCellValue(row, 4, str(a.defenseBase))
 			self.armorTree.SetCellValue(row, 5, str(a.defenseMax))
@@ -435,7 +435,7 @@ class ArmorTab:
 			12: "dragon",
 		}
 
-		imageOffset = 95
+		imageOffset = 105
 		rarityIcon = self.il.il.GetBitmap(self.il.armorIcons[armor.armorType][armor.rarity])
 
 		self.armorDetailList.SetCellValue(0, 0, "Name")
@@ -800,7 +800,15 @@ class ArmorTab:
 			12: str(dragon),
 		}
 
-		imageOffset = 95
+		eleBG = {
+			8: "fire",
+			9: "water",
+			10: "thunder",
+			11: "ice",
+			12: "dragon",
+		}
+
+		imageOffset = 105
 		rarityIcon = self.il.il.GetBitmap(self.il.armorIcons["armorset"][armor.rarity])
 
 		if not self.root.pref.unicodeSymbols:
@@ -826,6 +834,8 @@ class ArmorTab:
 										))
 			if num not in [5, 6, 7]:
 				self.armorSetDetailList.SetCellValue(num, 1, armorDetail[num])
+				if num in [8, 9, 10, 11, 12]:
+					self.armorSetDetailList.SetCellBackgroundColour(num, 1, util.hexToRGB(util.damageColors[eleBG[num]][0]))
 			else:
 				if armorDetail[num] != "0":
 					self.armorSetDetailList.SetCellRenderer(num, 1, wx.grid.GridCellStringRenderer())

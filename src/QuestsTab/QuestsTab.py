@@ -222,13 +222,13 @@ class QuestsTab:
 
 		img = wx.Bitmap(f"images/quests-24/{quest.questType}.png")
 		self.questTree.SetCellRenderer(row, 0, cgr.ImageTextCellRenderer(
-			img, f"{quest.name}", imageOffset=130))
+			img, f"{quest.name}", imageOffset=140))
 		if os.path.exists(f"images/locations-24/{quest.location}.png"):
 			img = wx.Bitmap(f"images/locations-24/{quest.location}.png")
 		else:
 			img = wx.Bitmap(f"images/unknown.png")
 		self.questTree.SetCellRenderer(row, 1, cgr.ImageTextCellRenderer(
-			img, f"{quest.location}", imageOffset=75))
+			img, f"{quest.location}", imageOffset=80))
 		self.questTree.SetCellValue(row, 2, str(quest.zenny))
 		self.questTree.SetCellValue(row, 3, str(quest.id))
 
@@ -334,7 +334,7 @@ class QuestsTab:
 				else:
 					img = wx.Bitmap("images/unknown.png")
 				self.questDetailList.SetCellRenderer(i, 1, cgr.ImageTextCellRenderer(
-						img, f"{v[1]}", imageOffset=75))
+						img, f"{v[1]}", imageOffset=80))
 			else:
 				self.questDetailList.SetCellValue(i, 1, v[1])
 
