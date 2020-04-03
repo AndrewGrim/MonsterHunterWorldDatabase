@@ -521,7 +521,7 @@ class ItemsTab:
 
 	def loadUsageArmor(self):
 		sql = """
-			SELECT armor_id id, name, armor_type, rarity, ar.quantity
+			SELECT armor_id id, name, armor_type, rarity, ar.quantity, rank
 			FROM armor_recipe ar
 				JOIN armor a
 					ON ar.armor_id = a.id
@@ -543,7 +543,7 @@ class ItemsTab:
 			img = self.il.Add(wx.Bitmap(f"images/armor/{arm.armorType}/rarity-24/{arm.rarity}.png"))
 			index = self.itemUsageList.InsertItem(self.itemUsageList.GetItemCount(), arm.name, img)
 			self.itemUsageList.SetItem(index, 1, f"{arm.quantity}")
-			self.itemUsageList.SetItem(index, 2, f"armor,{arm.id}")
+			self.itemUsageList.SetItem(index, 2, f"armor,{arm.id},{arm.rank}")
 
 
 	def loadUsageWeapons(self):

@@ -6,6 +6,7 @@ class ArmorUsage:
         self.armorType = dbRow[2]
         self.rarity = dbRow[3]
         self.quantity = dbRow[4]
+        self.rank = dbRow[5]
 
 
     def __repr__(self):
